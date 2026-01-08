@@ -1,6 +1,12 @@
 # Crop Yield Prediction System 🌾
 
-Hey! This is our machine learning project (example) that helps farmers decide what to grow and how much they can expect to harvest.
+Hey Guys! This is our machine learning project (example) that helps farmers decide what to grow and how much they can expect to harvest.
+
+## Team Members 👥
+- **Arunmozhi Adithya**
+- **Jenivaa**
+- **Pradeepraja**
+- **Dilshan**
 
 ## What does it do?
 It uses AI to look at things like soil quality, rain, and temperature to tell you two main things:
@@ -13,7 +19,7 @@ It uses AI to look at things like soil quality, rain, and temperature to tell yo
 - **Dashboard:** See cool charts and stats about the data you uploaded (like which state performs best).
 
 ## How to run it?
-It's super easy. I made a script for it.
+It's super easy. We made a script for it.
 1. Just double-click the file named **`run.bat`**.
 2. It will install everything and start the website for you.
 3. Open `http://127.0.0.1:5000` in your browser.
