@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriVision - AI Crop Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand">AgriVision AI</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/predict_yield">Yield Prediction</a>
+            <a href="/recommend_crop">Crop Recommendation</a>
+            <a href="/dashboard">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Smart Farming with AI</h1>
+            <p>Empowering farmers with data-driven yield predictions and intelligent crop recommendations.</p>
+            <a href="/recommend_crop" class="btn">Get Started</a>
+        </div>
+
+        <div class="features">
+            <div class="glass-card">
+                <h3>🌾 Yield Prediction</h3>
+                <p>Estimate harvest quantity based on historical soil, climate, and crop data using advanced Regression models.</p>
+                <a href="/predict_yield" class="btn" style="margin-top: 15px;">Predict Now</a>
+            </div>
+            <div class="glass-card">
+                <h3>🌱 Crop Recommendation</h3>
+                <p>Discover the most suitable crops for your soil chemistry and local weather conditions using Classification AI.</p>
+                <a href="/recommend_crop" class="btn" style="margin-top: 15px;">Find Crop</a>
+            </div>
+            <div class="glass-card">
+                <h3>📊 Analytics Dashboard</h3>
+                <p>Visualize trends, compare crops, and view real-time weather insights.</p>
+                <a href="/dashboard" class="btn" style="margin-top: 15px;">View Data</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
