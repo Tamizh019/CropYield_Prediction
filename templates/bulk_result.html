@@ -12,7 +12,10 @@
 <body>
     <div class="app-container">
         <div class="sidebar">
-            <div class="brand">🌱 AgriVision</div>
+            <div class="brand">
+                <span class="brand-icon">🌱</span>
+                <span class="brand-text">AgriVision</span>
+            </div>
             <div class="nav-links">
                 <a href="/" class="nav-item">
                     <span class="nav-icon">🏠</span> Dashboard
@@ -27,62 +30,117 @@
         </div>
 
         <div class="main-content">
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <!-- Header with Download -->
+            <div class="analytics-header">
                 <div>
-                    <h1 class="page-title">Analytics Report</h1>
-                    <p class="page-subtitle">Deep dive into your uploaded dataset.</p>
+                    <h1 class="page-title">📊 Analytics Dashboard</h1>
+                    <p class="page-subtitle">Comprehensive analysis of your agricultural data</p>
                 </div>
-                <a href="{{ url_for('download_file', filename='predicted_yield.csv') }}" class="btn">Download Full CSV
-                    ⬇️</a>
+                <a href="{{ url_for('download_file', filename='predicted_yield.csv') }}" class="btn btn-download">
+                    <span>⬇️ Download CSV</span>
+                </a>
             </div>
 
-            <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 30px;">
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div style="font-size: 0.9rem; opacity: 0.7;">Records Processed</div>
-                    <div class="stat-number">{{ total_rows }}</div>
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Records Processed</div>
+                        <div class="stat-value">{{ total_rows }}</div>
+                    </div>
                 </div>
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div style="font-size: 0.9rem; opacity: 0.7;">Total Forecast</div>
-                    <div class="stat-number">{{ total_yield }} T</div>
+
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">🌾</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Forecast</div>
+                        <div class="stat-value">{{ total_yield }} <span class="stat-unit">T</span></div>
+                    </div>
                 </div>
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div style="font-size: 0.9rem; opacity: 0.7;">Avg Yield</div>
-                    <div class="stat-number">{{ avg_yield }}</div>
+
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Average Yield</div>
+                        <div class="stat-value">{{ avg_yield }} <span class="stat-unit">T/Ha</span></div>
+                    </div>
                 </div>
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div style="font-size: 0.9rem; opacity: 0.7;">Top State</div>
-                    <div class="stat-number" style="font-size: 1.2rem; margin-top: 15px;">{{ top_state }}</div>
+
+                <div class="stat-card stat-info">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Top Performer</div>
+                        <div class="stat-value stat-text">{{ top_state }}</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="glass-card">
-                <h3>Visual Insights</h3>
-                <div class="charts-container" style="margin-top: 20px;">
-                    <div style="height: 300px;">
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>🗺️ Regional Performance</h3>
+                        <span class="badge">Top 5 States</span>
+                    </div>
+                    <div class="chart-container">
                         <canvas id="stateChart"></canvas>
                     </div>
-                    <div style="height: 300px; display: flex; justify-content: center;">
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>🌾 Crop Distribution</h3>
+                        <span class="badge badge-purple">Top 5 Crops</span>
+                    </div>
+                    <div class="chart-container">
                         <canvas id="cropChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card">
-                <h3>📋 Data Preview (Top 50 Rows)</h3>
-                <div style="overflow-x: auto; margin-top: 15px;">
-                    <table style="width: 100%; border-collapse: collapse; color: #ddd; font-size: 0.9rem;">
+            <!-- AI Insights -->
+            {% if ai_insight %}
+            <div class="ai-insights-container bulk-ai">
+                <div class="ai-header">
+                    <svg class="ai-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <h3>🤖 AI Data Analyst Report</h3>
+                </div>
+                
+                <div class="ai-content">
+                    <pre class="ai-formatted">{{ ai_insight }}</pre>
+                </div>
+                
+                <div class="ai-footer">
+                    <small>Powered by Gemini 2.0 Flash • Advanced Analytics</small>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Data Table -->
+            <div class="glass-card table-card">
+                <div class="card-header">
+                    <h3>📋 Data Preview</h3>
+                    <span class="badge">First 25 Rows</span>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
                         <thead>
-                            <tr style="background: rgba(0,0,0,0.3); border-bottom: 2px solid var(--primary-color);">
+                            <tr>
                                 {% for col in columns %}
-                                <th style="padding: 12px; text-align: left;">{{ col }}</th>
+                                <th>{{ col }}</th>
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in preview_data %}
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <tr>
                                 {% for item in row %}
-                                <td style="padding: 10px;">{{ item }}</td>
+                                <td>{{ item }}</td>
                                 {% endfor %}
                             </tr>
                             {% endfor %}
@@ -94,84 +152,81 @@
     </div>
 
     <script>
-        // Data from Flask - Properly parsed as JSON
         const stateLabels = JSON.parse('{{ state_labels | tojson | safe }}');
         const stateData = JSON.parse('{{ state_yields | tojson | safe }}');
         const cropLabels = JSON.parse('{{ crop_labels | tojson | safe }}');
         const cropData = JSON.parse('{{ crop_counts | tojson | safe }}');
 
-        // State Chart
-        const stateChart = new Chart(document.getElementById('stateChart'), {
+        // State Performance Chart
+        new Chart(document.getElementById('stateChart'), {
             type: 'bar',
             data: {
                 labels: stateLabels,
                 datasets: [{
                     label: 'Average Yield (Tonnes)',
                     data: stateData,
-                    backgroundColor: 'rgba(46, 204, 113, 0.6)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.8)',
                     borderColor: '#2ecc71',
-                    borderWidth: 2
+                    borderWidth: 2,
+                    borderRadius: 8,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Top 5 Yielding States',
-                        color: '#fff',
-                        font: { size: 16, weight: 'bold' }
-                    },
-                    legend: {
-                        labels: { color: '#fff' }
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 }
                     }
                 },
                 scales: {
                     y: {
-                        ticks: { color: '#ddd' },
-                        grid: { color: 'rgba(255,255,255,0.1)' },
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: { color: '#ddd', font: { size: 12 } },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
                     },
                     x: {
-                        ticks: { color: '#ddd' },
+                        ticks: { color: '#ddd', font: { size: 12 } },
                         grid: { display: false }
                     }
                 }
             }
         });
 
-        // Crop Chart
-        const cropChart = new Chart(document.getElementById('cropChart'), {
+        // Crop Distribution Chart
+        new Chart(document.getElementById('cropChart'), {
             type: 'doughnut',
             data: {
                 labels: cropLabels,
                 datasets: [{
-                    label: 'Records',
                     data: cropData,
                     backgroundColor: [
-                        '#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71'
+                        '#f1c40f', '#e67e22', '#e74c3c', 
+                        '#9b59b6', '#3498db', '#2ecc71'
                     ],
-                    borderColor: '#1a1a1a',
-                    borderWidth: 2
+                    borderColor: '#1e1e1e',
+                    borderWidth: 3
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Crop Distribution (Top 5)',
-                        color: '#fff',
-                        font: { size: 16, weight: 'bold' }
-                    },
                     legend: {
                         position: 'right',
                         labels: {
                             color: '#fff',
-                            padding: 15
+                            padding: 15,
+                            font: { size: 13 }
                         }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12
                     }
                 }
             }

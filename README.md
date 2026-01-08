@@ -1,6 +1,5 @@
 # Crop Yield Prediction System 🌾
-
-Hey Guys! This is our machine learning project (example) that helps farmers decide what to grow and how much they can expect to harvest.
+Hey Guys! This is our machine learning project that helps farmers decide what to grow and how much they can expect to harvest.
 
 ## Work in Progress 🚧
 We are still working on this project! We will add more features soon.
@@ -11,17 +10,22 @@ We are still working on this project! We will add more features soon.
 - **Pradeepraja**
 - **Dilshan**
 
-## What does it do?
-It uses AI to look at things like soil quality, rain, and temperature to tell you two main things:
-1. **Yield Prediction:** If you plant a crop, how much of it will you get? (in tonnes).
-2. **Crop Recommendation:** Based on your soil, what is the best crop to grow?
-
-## Features
-- **Smart Forms:** Just enter the details (like State, District, nitrogen levels, etc.) and get an instant answer.
-- **Bulk Upload:** Got a big excel/csv file? Upload it and get predictions for hundreds of rows at once.
-- **Dashboard:** See cool charts and stats about the data you uploaded (like which state performs best).
+## What's New? (v2.0 Updates) 🚀
+We have upgraded the system with the latest tech:
+- **Agri-Intelligence AI:** Now powered by **Gemini 2.0 Flash** to give smart advice and risk analysis.
+- **Advanced Models:** We now use **Ensemble Learning** (Random Forest + XGBoost + Gradient Boosting) to get the best possible accuracy.
+- **Bulk Analytics:** Upload improved CSVs and get detailed reports instantly.
 
 ## How to run it?
+### 🔑 IMPORTANT: API Key Setup
+Before running, you **must** setup the AI:
+1. Create a file named `.env` in this folder.
+2. Add your Google Gemini API key inside it like this:
+   ```
+   GOOGLE_API_KEY=your_actual_api_key_here
+   ```
+
+### Running the App
 It's super easy. We made a script for it.
 1. Just double-click the file named **`run.bat`**.
 2. It will install everything and start the website for you.
@@ -35,11 +39,12 @@ If you want to run manually, open CMD in this folder and run:
 
 ## Technologies Used
 - **Python & Flask:** For the backend server.
-- **HTML/CSS:** For the website design (it looks pretty modern!).
-- **Machine Learning:** Random Forest algorithm (it's accurate!).
+- **Google Gemini AI:** For smart agronomy insights.
+- **Machine Learning:** XGBoost & Ensemble Classifiers (High Accuracy).
+- **Glassmorphism UI:** Modern and beautiful design.
 
 ## Note 📢
-Guys, if you can't train the model for any reason, you can download the already trained models from my drive:
+Guys , If you can't train the model for any reason, you can download the trained models from my drive:
 👉 [Download Models Here](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5?usp=sharing)
 
 I already trained it for you! Just put the files in the `models/` folder.
