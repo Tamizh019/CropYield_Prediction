@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# Model Files (Generated)
+models/*.pkl
+
+# Generated Outputs
+static/predicted_yield.csv
+model_log.txt
+model_log_retry.txt
+cols.txt
+
+# Datasets/
