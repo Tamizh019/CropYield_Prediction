@@ -1,5 +1,5 @@
 # Crop Yield Prediction System 🌾
-Hey Guys! This is our machine learning project that helps farmers decide what to grow and how much they can expect to harvest.
+Hey Guys! This is our machine learning project (Example) that helps farmers decide what to grow and how much they can expect to harvest.
 
 ## Work in Progress 🚧
 We are still working on this project! We will add more features soon.
