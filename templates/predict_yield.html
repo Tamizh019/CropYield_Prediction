@@ -11,7 +11,10 @@
 <body>
     <div class="app-container">
         <div class="sidebar">
-            <div class="brand">🌱 AgriVision</div>
+            <div class="brand">
+                <span class="brand-icon">🌱</span>
+                <span class="brand-text">AgriVision</span>
+            </div>
             <div class="nav-links">
                 <a href="/" class="nav-item">
                     <span class="nav-icon">🏠</span> Dashboard
@@ -27,109 +30,172 @@
 
         <div class="main-content">
             <div class="page-header">
-                <h1 class="page-title">Yield Prediction Tool</h1>
-                <p class="page-subtitle">Estimate agricultural output for specific conditions.</p>
+                <h1 class="page-title">🌾 Yield Prediction Tool</h1>
+                <p class="page-subtitle">Advanced AI-powered agricultural output estimation</p>
             </div>
 
             <div class="dashboard-grid">
                 <!-- Single Prediction Form -->
-                <div class="glass-card">
-                    <h3>Single Entry Prediction</h3>
-                    <form action="/predict_yield" method="POST" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label>State</label>
-                            <select name="State_Name" required>
-                                <option value="">Select State</option>
-                                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                <option value="Karnataka">Karnataka</option>
-                                <option value="Kerala">Kerala</option>
-                                <option value="Tamil Nadu">Tamil Nadu</option>
-                            </select>
-                        </div>
-                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="glass-card form-card">
+                    <div class="card-header">
+                        <h3>📝 Single Entry Prediction</h3>
+                        <span class="badge">AI-Powered</span>
+                    </div>
+
+                    <form action="/predict_yield" method="POST">
+                        <div class="form-section">
+                            <div class="section-label">📍 Location Details</div>
+                            
                             <div class="form-group">
-                                <label>District</label>
-                                <input type="text" name="District_Name" placeholder="District" required>
+                                <label>State</label>
+                                <select name="State_Name" required>
+                                    <option value="">Select State</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Kerala">Kerala</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                </select>
                             </div>
-                            <div class="form-group">
-                                <label>Year</label>
-                                <input type="number" name="Crop_Year" placeholder="2024" required>
-                            </div>
-                        </div>
-                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>Crop</label>
-                                <input type="text" name="Crop" placeholder="Rice" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Area (Ha)</label>
-                                <input type="number" step="0.01" name="Area" placeholder="Area" required>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>District</label>
+                                    <input type="text" name="District_Name" placeholder="e.g., Chennai" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Year</label>
+                                    <input type="number" name="Crop_Year" placeholder="2024" required>
+                                </div>
                             </div>
                         </div>
 
-                        <label
-                            style="margin-top: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 15px;">Environmental
-                            Factors</label>
-
-                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>Temp (°C)</label>
-                                <input type="number" step="0.1" name="Temperature" placeholder="25.0" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Humidity (%)</label>
-                                <input type="number" step="0.1" name="Humidity" placeholder="80.0" required>
-                            </div>
-                        </div>
-                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>pH</label>
-                                <input type="number" step="0.1" name="pH" placeholder="6.5" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Rainfall (mm)</label>
-                                <input type="number" step="0.1" name="Rainfall" placeholder="200.0" required>
+                        <div class="form-section">
+                            <div class="section-label">🌾 Crop Information</div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Crop Type</label>
+                                    <input type="text" name="Crop" placeholder="e.g., Rice, Wheat" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Area (Hectares)</label>
+                                    <input type="number" step="0.01" name="Area" placeholder="0.00" required>
+                                </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Predict Yield</button>
+                        <div class="form-section">
+                            <div class="section-label">🌡️ Environmental Conditions</div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Temperature (°C)</label>
+                                    <input type="number" step="0.1" name="Temperature" placeholder="25.0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Humidity (%)</label>
+                                    <input type="number" step="0.1" name="Humidity" placeholder="80.0" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Soil pH</label>
+                                    <input type="number" step="0.1" name="pH" placeholder="6.5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Rainfall (mm)</label>
+                                    <input type="number" step="0.1" name="Rainfall" placeholder="200.0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <span>🚀 Predict Yield</span>
+                        </button>
                     </form>
 
                     {% if prediction %}
-                    <div
-                        style="margin-top: 20px; background: rgba(46, 204, 113, 0.1); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--primary-color);">
-                        <label>Estimated Prediction</label>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-color);">
-                            {{ prediction }} <span style="font-size: 0.8rem; color: #fff;">Tonnes</span>
+                    <div class="prediction-result">
+                        <div class="result-header">
+                            <span class="result-icon">✅</span>
+                            <span>Prediction Complete</span>
+                        </div>
+                        <div class="result-value">
+                            <span class="value-number">{{ prediction }}</span>
+                            <span class="value-unit">Tonnes</span>
+                        </div>
+                        <div class="result-label">Estimated Yield</div>
+                    </div>
+
+                    {% if ai_insight %}
+                    <div class="ai-insights-container">
+                        <div class="ai-header">
+                            <svg class="ai-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <h3>🤖 AI Agronomist Insights</h3>
+                        </div>
+                        
+                        <div class="ai-content">
+                            <pre class="ai-formatted">{{ ai_insight }}</pre>
+                        </div>
+                        
+                        <div class="ai-footer">
+                            <small>Powered by Gemini 2.0 Flash • Pro Analysis</small>
                         </div>
                     </div>
+                    {% endif %}
                     {% endif %}
                 </div>
 
                 <!-- Bulk Prediction -->
-                <div class="glass-card" style="height: fit-content;">
-                    <h3>📂 Bulk Processing</h3>
-                    <p style="opacity: 0.7; font-size: 0.9rem; margin: 15px 0;">
-                        Upload a CSV file containing multiple rows of crop data. The system will process all of them and
-                        generate an analytics report.
-                    </p>
+                <div class="glass-card bulk-card">
+                    <div class="card-header">
+                        <h3>📂 Bulk Processing</h3>
+                        <span class="badge badge-purple">Advanced</span>
+                    </div>
 
-                    <div
-                        style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; border: 1px dashed var(--glass-border); text-align: center;">
+                    <div class="bulk-description">
+                        <p>Upload CSV files with multiple crop records for comprehensive analysis and AI-powered insights.</p>
+                    </div>
+
+                    <div class="upload-zone">
                         <form action="/predict_yield_bulk" method="POST" enctype="multipart/form-data">
-                            <input type="file" name="file" accept=".csv" required style="margin-bottom: 15px;">
-                            <button type="submit" class="btn" style="width: 100%;">Upload & Analyze</button>
+                            <div class="file-input-wrapper">
+                                <input type="file" name="file" accept=".csv" id="csvFile" required>
+                                <label for="csvFile" class="file-label">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-text">Choose CSV File</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-secondary">
+                                <span>📊 Upload & Analyze</span>
+                            </button>
                         </form>
                     </div>
 
-                    <div style="margin-top: 20px;">
-                        <h4>Required CSV Columns:</h4>
-                        <ul style="opacity: 0.7; font-size: 0.85rem; padding-left: 20px;">
-                            <li>State Name, Dist Name</li>
-                            <li>Year, Crop, Area_ha</li>
-                            <li>Temperature_C, Humidity_%</li>
-                            <li>pH, Rainfall_mm</li>
-                        </ul>
+                    <div class="csv-requirements">
+                        <h4>📋 Required CSV Columns</h4>
+                        <div class="requirements-grid">
+                            <div class="req-item">
+                                <span class="req-icon">📍</span>
+                                <span>State Name, Dist Name</span>
+                            </div>
+                            <div class="req-item">
+                                <span class="req-icon">🌾</span>
+                                <span>Year, Crop, Area_ha</span>
+                            </div>
+                            <div class="req-item">
+                                <span class="req-icon">🌡️</span>
+                                <span>Temperature_C, Humidity_%</span>
+                            </div>
+                            <div class="req-item">
+                                <span class="req-icon">💧</span>
+                                <span>pH, Rainfall_mm</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

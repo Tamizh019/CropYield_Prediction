@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-01-09T00:56:33.434330",
+    "type": "crop",
+    "input": {
+      "N": 54.0,
+      "P": 54.0,
+      "K": 54.0,
+      "Temperature": 34.0,
+      "Humidity": 24.0,
+      "pH": 5.0,
+      "Rainfall": 134.0
+    },
+    "prediction": "Chickpea"
+  }
+]

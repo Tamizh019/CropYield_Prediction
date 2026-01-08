@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - AgriVision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .doc-section {
+            margin-bottom: 40px;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            margin: 0 0 8px 0;
+            color: var(--primary-color);
+        }
+
+        .step-content p {
+            margin: 0;
+            color: var(--muted-text);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #111;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #e67e22;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar (Same as other pages) -->
+        <div class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">🌱</span>
+                <span class="brand-text">AgriVision</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a href="/predict_yield" class="nav-item">
+                    <span class="nav-icon">🌾</span> Yield Prediction
+                </a>
+                <a href="/recommend_crop" class="nav-item">
+                    <span class="nav-icon">🧪</span> Crop Recommend
+                </a>
+                <a href="/sample_data" class="nav-item">
+                    <span class="nav-icon">📊</span> Sample Data
+                </a>
+                <a href="/documentation" class="nav-item active">
+                    <span class="nav-icon">📚</span> Documentation
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>System Online</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">📚 User Documentation</h1>
+                <p class="page-subtitle">Learn how to use AgriVision tools effectively.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Yield Prediction Guide -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>🌾 Yield Prediction Tool</h3>
+                        <span class="badge">Predict Output</span>
+                    </div>
+                    <div class="doc-section">
+                        <p style="color: var(--muted-text);">Estimate agricultural output based on environmental factors
+                            and historical data.</p>
+
+                        <div class="step-list">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Enter Details</h4>
+                                    <p>Fill in the Location (State, District), Crop Type, Year, Area, and Environmental
+                                        factors (Temp, Humidity, Rainfall, pH).</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Get Prediction</h4>
+                                    <p>The AI model (Random Forest/XGBoost) calculates the expected yield in Tonnes.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>AI Analysis</h4>
+                                    <p>Gemini AI analyzes the result and suggests improvement tips and risk factors.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Upload Guide -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>📂 Bulk Analysis</h3>
+                        <span class="badge badge-purple">Advanced</span>
+                    </div>
+                    <div class="doc-section">
+                        <p style="color: var(--muted-text);">Process hundreds of records at once using CSV upload.</p>
+
+                        <div class="step-list">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Prepare CSV</h4>
+                                    <p>Ensure your CSV file has the required columns. Column names are flexible (e.g.,
+                                        'State Name' or 'state').</p>
+                                    <div class="code-block">State, District, Year, Crop, Area, Temp, Humidity, Rainfall,
+                                        pH</div>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Upload & Analyze</h4>
+                                    <p>Upload the file. The system processes it and generates a comprehensive report.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Visual Reports</h4>
+                                    <p>View interactive charts for State Performance and Crop Distribution, plus AI
+                                        summaries.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crop Recommendation Guide -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>🧪 Crop Recommendation</h3>
+                        <span class="badge" style="background: rgba(52, 152, 219, 0.15); color: #3498db;">Decision
+                            Support</span>
+                    </div>
+                    <div class="doc-section">
+                        <p style="color: var(--muted-text);">Find the most suitable crop for your specific soil
+                            conditions.</p>
+
+                        <div class="step-list">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Soil Test</h4>
+                                    <p>Enter the N (Nitrogen), P (Phosphorus), and K (Potassium) values from your soil
+                                        test report.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Climate Data</h4>
+                                    <p>Input the avg Temperature, Humidity, pH, and Rainfall for your region.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Result</h4>
+                                    <p>The system suggests the Best Crop to grow with the highest success probability.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Full Width Help Section -->
+            <div class="glass-card" style="margin-top: 30px; border-left: 4px solid var(--primary-color);">
+                <div class="card-header">
+                    <h3>❓ Need Help?</h3>
+                    <span class="badge">Support</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
+                    <!-- Troubleshooting -->
+                    <div>
+                        <h4
+                            style="color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                            🛠️ Troubleshooting</h4>
+                        <div style="color: var(--muted-text); display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <strong style="color: var(--accent-color);">System Offline?</strong>
+                                <div style="font-size: 0.9rem;">Check if `app.py` is running in your terminal and models
+                                    are loaded.</div>
+                            </div>
+                            <div>
+                                <strong style="color: var(--accent-color);">AI Not Working?</strong>
+                                <div style="font-size: 0.9rem;">Ensure `GOOGLE_API_KEY` is correctly set in your `.env`
+                                    file.</div>
+                            </div>
+                            <div>
+                                <strong style="color: var(--accent-color);">CSV Error?</strong>
+                                <div style="font-size: 0.9rem;">Check for empty rows or missing columns in your file.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Team -->
+                    <div>
+                        <h4
+                            style="color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                            👥 Contact Our Team</h4>
+                        <p style="color: var(--muted-text); margin-bottom: 15px;">Have other doubts? Reach out to any of
+                            us:</p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div
+                                style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                                👤 <span>Tamizharasan</span>
+                            </div>
+                            <div
+                                style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                                👤 <span>Arunmozhi Adithya</span>
+                            </div>
+                            <div
+                                style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                                👤 <span>Jenivaa</span>
+                            </div>
+                            <div
+                                style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                                👤 <span>Pradeepraja</span>
+                            </div>
+                            <div
+                                style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                                👤 <span>Dilshan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
