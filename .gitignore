@@ -5,6 +5,9 @@ __pycache__/
 venv/
 env/
 
+# Environment variables
+.env
+
 # IDEs
 .vscode/
 .idea/
@@ -18,4 +21,4 @@ model_log.txt
 model_log_retry.txt
 cols.txt
 
-# Datasets/
+# Datasets
