@@ -2,6 +2,9 @@
 
 Hey Guys! This is our machine learning project (example) that helps farmers decide what to grow and how much they can expect to harvest.
 
+## Work in Progress 🚧
+We are still working on this project! We will add more features soon.
+
 ## Team Members 👥
 - **Arunmozhi Adithya**
 - **Jenivaa**
