@@ -205,9 +205,9 @@ def predict_yield_bulk():
                 crop_labels = crop_dist.index.tolist()
                 crop_counts = crop_dist.values.tolist()
 
-            # 4. Preview Data (Top 10)
+            # 4. Preview Data (Top 50)
             preview_cols = original_df.columns.tolist()
-            preview_data = original_df.head(10).values.tolist()
+            preview_data = original_df.head(50).values.tolist()
             
             return render_template(
                 'bulk_result.html',

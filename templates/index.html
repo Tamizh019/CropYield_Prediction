@@ -1,47 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriVision - AI Crop Prediction</title>
+    <title>Dashboard - AgriVision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-    <nav>
-        <a href="/" class="nav-brand">AgriVision AI</a>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/predict_yield">Yield Prediction</a>
-            <a href="/recommend_crop">Crop Recommendation</a>
-            <a href="/dashboard">Dashboard</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="hero">
-            <h1>Smart Farming with AI</h1>
-            <p>Empowering farmers with data-driven yield predictions and intelligent crop recommendations.</p>
-            <a href="/recommend_crop" class="btn">Get Started</a>
-        </div>
-
-        <div class="features">
-            <div class="glass-card">
-                <h3>🌾 Yield Prediction</h3>
-                <p>Estimate harvest quantity based on historical soil, climate, and crop data using advanced Regression models.</p>
-                <a href="/predict_yield" class="btn" style="margin-top: 15px;">Predict Now</a>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="brand"> AgriVision</div>
+            <div class="nav-links">
+                <a href="/" class="nav-item active">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a href="/predict_yield" class="nav-item">
+                    <span class="nav-icon">🌾</span> Yield Prediction
+                </a>
+                <a href="/recommend_crop" class="nav-item">
+                    <span class="nav-icon">🧪</span> Crop Recommend
+                </a>
             </div>
-            <div class="glass-card">
-                <h3>🌱 Crop Recommendation</h3>
-                <p>Discover the most suitable crops for your soil chemistry and local weather conditions using Classification AI.</p>
-                <a href="/recommend_crop" class="btn" style="margin-top: 15px;">Find Crop</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">AgriVision Ecosystem</h1>
+                <p class="page-subtitle">Welcome to your advanced agricultural decision support system.</p>
             </div>
-            <div class="glass-card">
-                <h3>📊 Analytics Dashboard</h3>
-                <p>Visualize trends, compare crops, and view real-time weather insights.</p>
-                <a href="/dashboard" class="btn" style="margin-top: 15px;">View Data</a>
+
+            <div class="dashboard-grid">
+                <div class="glass-card">
+                    <h3>🌾 Yield Prediction</h3>
+                    <p style="opacity: 0.7; margin: 15px 0;">Estimate crop production based on environmental factors and
+                        historical data. Supports bulk processing.</p>
+                    <a href="/predict_yield" class="btn" style="width: 100%; box-sizing: border-box;">Launch Tool</a>
+                </div>
+
+                <div class="glass-card">
+                    <h3>🧪 Crop Recommendation</h3>
+                    <p style="opacity: 0.7; margin: 15px 0;">Find the perfect crop for your soil conditions (N, P, K
+                        levels) and local weather.</p>
+                    <a href="/recommend_crop" class="btn" style="width: 100%; box-sizing: border-box;">Launch Tool</a>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top: 20px;">
+                <h3>📊 System Status</h3>
+                <div style="display: flex; gap: 20px; margin-top: 15px;">
+                    <div>
+                        <div style="font-size: 0.8rem; opacity: 0.6;">MODELS LOADED</div>
+                        <div style="color: var(--primary-color); font-weight: bold;">Random Forest (v1.0)</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; opacity: 0.6;">STATUS</div>
+                        <div style="color: var(--primary-color); font-weight: bold;">Online ✅</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 </body>
+
 </html>
