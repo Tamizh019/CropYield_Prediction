@@ -22,6 +22,7 @@ We are still working on this project! We will add more features soon.
 ## Team Members 👥
 - **Arunmozhi Adithya**
 - **Jenivaa**
+- **Tamizharasan**
 - **Pradeepraja**
 - **Dilshan**
 
@@ -64,4 +65,4 @@ Guys , If you can't train the model for any reason, you can download the trained
 
 I already trained it for you! Just put the files in the `models/` folder.
 
-Enjoy! 🚀
+IF YOU SEEN UNTIL HERE , HAVE A GOOD DAY 😊! 
