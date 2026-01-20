@@ -12,7 +12,7 @@ xgboost==2.0.3
 joblib==1.3.2
 
 # Deep Learning (v3.0)
-tensorflow==2.15.0
+tensorflow==2.16.1
 Pillow==10.1.0
 
 # Visualization

@@ -38,7 +38,18 @@ pip install -r requirements.txt
 ### 3. Train Models (First Time)
 ```bash
 python train_models.py          # ML models (Yield, Recommendation)
-python train_disease_model.py   # CNN model (requires PlantVillage dataset)
+```
+
+### 3.1 Setup Plant Disease Dataset (Deep Learning)
+Required for `train_disease_model.py`.
+1. Download **PlantVillage** dataset from Kaggle:
+   - **Full Dataset (Recommended):** [PlantVillage Dataset (2.18 GB)](https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset) - Better accuracy.
+   - **Lightweight (Fast):** [PlantDisease (342 MB)](https://www.kaggle.com/datasets/emmarex/plantdisease) - Quicker training.
+2. Extract it into `Datasets/PlantVillage`.
+3. Run the organization script:
+```bash
+python organize_dataset.py      # Fixes folder structure & class names
+python train_disease_model.py   # Trains the CNN model
 ```
 
 ### 4. Run the App
@@ -75,6 +86,7 @@ CropYield_Prediction/
 ├── app.py                      # Main Flask application
 ├── train_models.py             # ML model training
 ├── train_disease_model.py      # CNN training script
+├── organize_dataset.py         # Dataset helper script
 ├── disease_detection.py        # Plant Doctor module
 ├── price_forecast.py           # LSTM price prediction
 ├── weather_service.py          # Weather API integration

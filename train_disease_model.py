@@ -165,6 +165,18 @@ def train_model():
     final_acc = max(history.history['val_accuracy'])
     print(f"🏆 Best Validation Accuracy: {final_acc:.2%}")
     
+    # Save Class Mapping
+    import json
+    class_indices = train_generator.class_indices
+    # Invert to map index -> class_name (actually we just need the ordered list of keys for the app)
+    # But usually class_indices is {'name': 0, 'other': 1}
+    # We want a list where list[0] is the name of class 0.
+    class_names = [k for k, v in sorted(class_indices.items(), key=lambda item: item[1])]
+    
+    with open('models/classes.json', 'w') as f:
+        json.dump(class_names, f)
+    print("✅ Class mapping saved to models/classes.json")
+    
     return history
 
 

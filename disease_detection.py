@@ -228,10 +228,26 @@ class PlantDoctor:
         self.model_path = model_path
         self.model = None
         self.img_size = (224, 224)  # MobileNetV2 default
-        self.class_names = CLASS_NAMES
+        self.class_names = []
+        self._load_class_names()
         
         # Load model if available
         self._load_model()
+    
+    def _load_class_names(self):
+        """Load class names from JSON or fallback to database"""
+        json_path = os.path.join(os.path.dirname(self.model_path), 'classes.json')
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, 'r') as f:
+                    self.class_names = json.load(f)
+                print(f"✅ Loaded {len(self.class_names)} classes from {json_path}")
+            except Exception as e:
+                print(f"⚠️ Failed to load classes.json: {e}")
+                self.class_names = CLASS_NAMES
+        else:
+            print("⚠️ classes.json not found. Using default database keys (may be mismatched!)")
+            self.class_names = CLASS_NAMES
     
     def _load_model(self):
         """Load the trained CNN model"""
