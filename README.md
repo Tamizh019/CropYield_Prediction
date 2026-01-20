@@ -23,6 +23,11 @@ Transform farming decisions with Machine Learning, Deep Learning, and real-time 
 
 ## 📋 Quick Start
 
+> [!IMPORTANT]
+> **New to the project?** 
+> - If manual setup feels complicated, just double-click **`run.bat`**! It will handle the environment, dependencies, and start the app for you automatically.
+> - For a deep understanding of the system, models, and API, check out our **[Docs/ Directory](./Docs/README.md)**.
+
 ### 1. Setup API Keys
 Create a `.env` file:
 ```env
