@@ -7,6 +7,7 @@ We are still working on this project! We will add more features soon.
 ## Team Members 👥
 - **Arunmozhi Adithya**
 - **Jenivaa**
+- **Tamizharasan**
 - **Pradeepraja**
 - **Dilshan**
 
