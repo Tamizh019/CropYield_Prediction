@@ -67,9 +67,12 @@ class WeatherService:
                 weather = self._parse_weather(data, city, country)
                 weather["alerts"] = self._generate_alerts(weather["current"])
                 return weather
+            else:
+                print(f"❌ Weather API Error: {response.status_code} - {response.text}")
         except Exception as e:
-            pass
+            print(f"❌ Weather Service Exception: {e}")
         
+        print(f"⚠️ Falling back to simulated weather for {city}")
         return self._get_simulated_weather(city)
     
     def _parse_weather(self, data, city, country):
@@ -127,6 +130,49 @@ class WeatherService:
         return alerts
     
     def get_forecast(self, city="Delhi", days=5):
+        """Get 5-day forecast from API or simulation"""
+        if not self.api_key:
+            return self._get_simulated_forecast(city, days)
+            
+        try:
+            response = requests.get(
+                f"{WEATHER_BASE_URL}/forecast",
+                params={"q": city, "appid": self.api_key, "units": "metric"},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                forecast_list = []
+                # API returns data every 3 hours. We pick one entry per day (e.g., noon)
+                # or aggregate. Simple approach: Pick distinct days.
+                seen_dates = set()
+                
+                for item in data['list']:
+                    date_txt = item['dt_txt'].split(' ')[0]
+                    if date_txt not in seen_dates:
+                        seen_dates.add(date_txt)
+                        forecast_list.append({
+                            "date": date_txt,
+                            "temp_high": round(item['main']['temp_max']),
+                            "temp_low": round(item['main']['temp_min']),
+                            "humidity": item['main']['humidity'],
+                            "rain": item.get('rain', {}).get('3h', 0),
+                            "description": item['weather'][0]['description']
+                        })
+                        if len(forecast_list) >= days:
+                            break
+                            
+                return {"success": True, "location": city, "forecast": forecast_list}
+            else:
+                print(f"❌ Forecast API Error: {response.status_code}")
+                
+        except Exception as e:
+            print(f"❌ Forecast Error: {e}")
+            
+        return self._get_simulated_forecast(city, days)
+
+    def _get_simulated_forecast(self, city, days):
         # Simulated forecast
         import random
         forecast_list = []

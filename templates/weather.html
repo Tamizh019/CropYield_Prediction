@@ -98,11 +98,13 @@
 
             <div class="glass-card">
                 <form method="POST" style="display:flex; gap:15px; align-items:flex-end">
-                    <div class="form-group" style="flex:1">
+                    <div class="form-group" style="flex-grow:1; min-width: 0;">
                         <label>City</label>
-                        <input type="text" name="city" value="{{ city }}" class="form-control" placeholder="Enter city">
+                        <input type="text" name="city" value="{{ city }}" class="form-control" placeholder="Enter city"
+                            style="width:100%">
                     </div>
-                    <button type="submit" class="btn btn-primary">🔍 Get Weather</button>
+                    <button type="submit" class="btn btn-primary"
+                        style="width:auto; white-space:nowrap; padding: 14px 32px;">🔍 Get Weather</button>
                 </form>
             </div>
 
@@ -117,6 +119,16 @@
                         <h3>{{ weather.location.city }}</h3>
                         <div class="temp-display">{{ weather.current.temp }}°C</div>
                         <p style="color:var(--muted-text)">{{ weather.current.description | capitalize }}</p>
+
+                        <!-- Data Source Badge -->
+                        <span
+                            style="font-size:0.8rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:12px; margin-top:5px; display:inline-block">
+                            {% if weather.source == 'OpenWeatherMap API' %}
+                            🟢 Live Data
+                            {% else %}
+                            🟠 Simulated Data
+                            {% endif %}
+                        </span>
                         <div style="margin-top:20px">
                             <div class="weather-stat">
                                 <span>💧 Humidity</span><span>{{ weather.current.humidity }}%</span>

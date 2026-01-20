@@ -140,25 +140,48 @@ Humidity: {data['Humidity']}%
 Rainfall: {data['Rainfall']}mm
 Soil pH: {data['pH']}
 
-Provide a structured analysis:
+IMPORTANT FORMATTING RULES:
+- Output ONLY raw HTML. Do NOT wrap in markdown code blocks like ```html.
+- Do NOT include any text before or after the HTML.
+- Start directly with <div> and end with </div>.
 
-1. YIELD ASSESSMENT
-[Evaluate if this yield is good/average/poor for these conditions. Compare with typical yields.]
+Use this exact structure:
 
-2. OPTIMIZATION STRATEGIES
-• [First specific, actionable recommendation]
-• [Second specific, actionable recommendation]
+<div class="ai-insight-card">
+    <div class="insight-section">
+        <h4>📊 Yield Assessment</h4>
+        <p>[Is this yield good/average/poor? Compare with typical yields.]</p>
+    </div>
 
-3. RISK FACTORS
-[Identify the main risk (weather/pH/climate) and explain its impact]
+    <div class="insight-section">
+        <h4>🚀 Optimization Strategies</h4>
+        <ul>
+            <li>[First actionable recommendation]</li>
+            <li>[Second actionable recommendation]</li>
+        </ul>
+    </div>
 
-4. SEASONAL ADVICE
-[Brief tip on best practices for current conditions]
+    <div class="insight-section">
+        <h4>⚠️ Risk Factors</h4>
+        <p>[Main risk and its impact]</p>
+    </div>
 
-Keep each section concise and farmer-friendly."""
+    <div class="insight-section">
+        <h4>🌤️ Seasonal Advice</h4>
+        <p class="highlight-text">[Best practice tip]</p>
+    </div>
+</div>
+
+Keep it concise and farmer-friendly."""
         
         response = model.generate_content(prompt)
-        return response.text
+        # Clean the response - remove any markdown code block wrappers
+        result = response.text.strip()
+        if result.startswith('```'):
+            result = result.split('\n', 1)[1] if '\n' in result else result[3:]
+        if result.endswith('```'):
+            result = result[:-3]
+        return result.strip()
     
     except Exception as e:
         print(f"AI Insight Error: {e}")
@@ -182,24 +205,53 @@ Average Yield: {stats['avg_yield']} tonnes/hectare
 Top Performing State: {stats['top_state']}
 Best Yielding Crop: {stats['top_crop']}
 
-Provide expert insights:
+IMPORTANT FORMATTING RULES:
+- Output ONLY raw HTML. Do NOT wrap in markdown code blocks like ```html.
+- Do NOT include any text before or after the HTML.
+- Start directly with <div> and end with </div>.
 
-1. OVERALL ASSESSMENT
-[Brief evaluation of the dataset's agricultural potential]
+Use this exact structure:
 
-2. REGIONAL ANALYSIS
-[Key insights about {stats['top_state']}'s performance]
+<div class="ai-analysis-container">
+    <div class="analysis-card overall">
+        <h4>🌍 Overall Assessment</h4>
+        <p>[2-3 sentences about agricultural potential and data quality]</p>
+    </div>
 
-3. CROP RECOMMENDATIONS
-[Strategic advice based on {stats['top_crop']}'s dominance]
+    <div class="analysis-grid">
+        <div class="analysis-card regional">
+            <h4>🗺️ Regional Analysis</h4>
+            <p><strong>{stats['top_state']}</strong> [Why this region performs well]</p>
+        </div>
 
-4. ACTIONABLE INSIGHTS
-[2-3 specific recommendations for farmers or policymakers]
+        <div class="analysis-card crop">
+            <h4>🌾 Crop Strategy</h4>
+            <p><strong>{stats['top_crop']}</strong> [Market and cultivation advice]</p>
+        </div>
+    </div>
+
+    <div class="analysis-card actions">
+        <h4>💡 Actionable Insights</h4>
+        <ul>
+            <li>[Specific recommendation 1]</li>
+            <li>[Specific recommendation 2]</li>
+            <li>[Specific recommendation 3]</li>
+        </ul>
+    </div>
+</div>
 
 Keep insights data-driven and practical."""
         
         response = model.generate_content(prompt)
-        return response.text
+        # Clean the response - remove any markdown code block wrappers
+        result = response.text.strip()
+        if result.startswith('```'):
+            # Remove opening code block
+            result = result.split('\n', 1)[1] if '\n' in result else result[3:]
+        if result.endswith('```'):
+            # Remove closing code block
+            result = result[:-3]
+        return result.strip()
     
     except Exception as e:
         print(f"Bulk AI Error: {e}")
@@ -227,22 +279,43 @@ Humidity: {input_data['Humidity']}%
 pH: {input_data['pH']}
 Rainfall: {input_data['Rainfall']}mm
 
-Provide a structured, friendly, and professional analysis. Use emojis to make it engaging.
+IMPORTANT FORMATTING RULES:
+- Output ONLY raw HTML. Do NOT wrap in markdown code blocks like ```html.
+- Do NOT include any text before or after the HTML.
+- Start directly with <div> and end with </div>.
 
-1. 🌟 WHY THIS CROP?
-[Explain simply why {recommended_crop} matches the soil/conditions. Keep it under 2 sentences.]
+Use this exact structure:
 
-2. 🚜 CULTIVATION TIPS
-• [Tip 1]
-• [Tip 2]
+<div class="crop-insight-card">
+    <div class="insight-header">
+        <h4>🌟 Why {recommended_crop}?</h4>
+        <p>[Why it matches your soil/conditions - 1-2 sentences]</p>
+    </div>
 
-3. 💰 PROFITABILITY
-[Brief mention of market potential or yield expectation]
+    <div class="insight-body">
+        <h5>🚜 Cultivation Tips</h5>
+        <ul>
+            <li>[Tip 1]</li>
+            <li>[Tip 2]</li>
+        </ul>
+    </div>
 
-Tone: Helpful expert. Keep it concise (max 100 words)."""
+    <div class="insight-footer">
+        <span class="profit-badge">💰 Profitability</span>
+        <span class="insight-text">[Brief market potential note]</span>
+    </div>
+</div>
+
+Tone: Helpful expert. Keep it concise."""
         
         response = model.generate_content(prompt)
-        return response.text
+        # Clean the response - remove any markdown code block wrappers
+        result = response.text.strip()
+        if result.startswith('```'):
+            result = result.split('\n', 1)[1] if '\n' in result else result[3:]
+        if result.endswith('```'):
+            result = result[:-3]
+        return result.strip()
     
     except Exception as e:
         print(f"Recommendation AI Error: {e}")
@@ -323,11 +396,50 @@ def get_model_info():
     """
     Get information about loaded models
     """
+    # Check Price Model Status
+    price_status = "Inactive"
+    price_type = "N/A"
+    if PRICE_MODULE_AVAILABLE:
+        try:
+            forecaster = get_price_forecaster()
+            if forecaster.model:
+                price_status = "Active"
+                price_type = "LSTM Neural Net"
+            else:
+                price_status = "Simulation"
+                price_type = "Statistical Mock"
+        except:
+            pass
+
+    # Check Weather Status
+    weather_status = "Inactive"
+    weather_type = "N/A"
+    if WEATHER_MODULE_AVAILABLE:
+        try:
+            service = get_weather_service()
+            if service.api_key:
+                weather_status = "Active"
+                weather_type = "Live API"
+            else:
+                weather_status = "Simulation"
+                weather_type = "Historical Data"
+        except:
+            pass
+
     info = {
         'yield_model': yield_model is not None,
         'recommend_model': recommend_model is not None,
         'ai_model': model is not None,
-        'prediction_count': len(prediction_history)
+        'prediction_count': len(prediction_history),
+        'price_model': {
+            'status': price_status,
+            'type': price_type
+        },
+        'weather_service': {
+            'status': weather_status,
+            'type': weather_type
+        },
+        'disease_model': DISEASE_MODULE_AVAILABLE
     }
     return info
 

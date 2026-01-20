@@ -52,6 +52,12 @@ python organize_dataset.py      # Fixes folder structure & class names
 python train_disease_model.py   # Trains the CNN model
 ```
 
+### 3.2 Train Market Price Model (Optional)
+Enable the real LSTM forecasting model:
+```bash
+python train_price_model.py
+```
+
 ### 4. Run the App
 ```bash
 python app.py
@@ -116,7 +122,13 @@ CropYield_Prediction/
 
 ## 📝 Notes
 
-- Pre-trained models available: [Google Drive](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5)
+> [!TIP]
+> **Don't want to train?** If your PC is low-spec or you want to skip training, use our pre-trained models:
+> 
+> 📥 **[Download Pre-Trained Models (Google Drive)](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5)**
+> 
+> Extract files into the `models/` folder and you're ready to go!
+
 - Disease detection works in "mock mode" without trained CNN
 - Price forecasting uses simulation when LSTM model is not trained
 

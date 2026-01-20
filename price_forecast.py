@@ -66,17 +66,73 @@ SEASONAL_FACTORS = {
 # PRICE GENERATOR (For Training Data)
 # ========================================
 
-def generate_historical_prices(crop, days=365):
+def generate_historical_prices(crop, days=730):
     """
-    Generate realistic historical price data for a crop
-    
-    Args:
-        crop: Crop name
-        days: Number of days of history
-    
-    Returns:
-        DataFrame with Date and Price columns
+    Get historical prices from real CSV datasets if available, else simulate.
     """
+    # File paths
+    file_one = "Datasets/price_dataset_One.csv"
+    file_two = "Datasets/price_dataset_Two.csv"
+    
+    dfs = []
+    
+    # --- DATASET ONE (Daily Mandi Prices) ---
+    if os.path.exists(file_one):
+        try:
+            df1 = pd.read_csv(file_one)
+            # Filter for crop
+            df1 = df1[df1['Commodity'].astype(str).str.lower() == crop.lower()]
+            
+            if not df1.empty:
+                # Parse Dates (DD/MM/YYYY)
+                df1['Date'] = pd.to_datetime(df1['Price Date'], format='%d/%m/%Y', errors='coerce')
+                df1['Price'] = pd.to_numeric(df1['Modal_Price'], errors='coerce')
+                
+                # Monthly Average to smooth data
+                df1 = df1.groupby('Date')['Price'].mean().reset_index()
+                dfs.append(df1[['Date', 'Price']])
+                print(f"   📄 Loaded {len(df1)} records from Price Dataset One")
+        except Exception as e:
+            print(f"⚠️ Error reading Dataset One: {e}")
+
+    # --- DATASET TWO (Monthly Averages) ---
+    if os.path.exists(file_two):
+        try:
+            df2 = pd.read_csv(file_two)
+            # Filter for crop
+            df2 = df2[df2['commodity_name'].astype(str).str.lower() == crop.lower()]
+            
+            if not df2.empty:
+                # Parse Dates (YYYY-MM-DD)
+                df2['Date'] = pd.to_datetime(df2['month'], errors='coerce')
+                df2['Price'] = pd.to_numeric(df2['avg_modal_price'], errors='coerce')
+                
+                dfs.append(df2[['Date', 'Price']])
+                print(f"   📄 Loaded {len(df2)} records from Price Dataset Two")
+        except Exception as e:
+            print(f"⚠️ Error reading Dataset Two: {e}")
+            
+    # --- MERGE & CLEAN ---
+    if dfs:
+        full_df = pd.concat(dfs).sort_values('Date')
+        full_df = full_df.dropna().drop_duplicates(subset=['Date'])
+        
+        # Resample to Daily (Interpolate missing values)
+        full_df.set_index('Date', inplace=True)
+        full_df = full_df.resample('D').interpolate(method='linear')
+        full_df.reset_index(inplace=True)
+        
+        # Filter last 'days'
+        start_date = datetime.now() - timedelta(days=days)
+        full_df = full_df[full_df['Date'] >= start_date]
+        
+        if len(full_df) > 30:
+            full_df['Crop'] = crop
+            print(f"   ✅ Using REAL DATA for {crop} ({len(full_df)} days)")
+            return full_df
+
+    # --- FALLBACK: SIMULATION ---
+    print(f"   ⚠️ Real data insufficient for {crop}. Using simulation.")
     if crop not in CROP_BASE_PRICES:
         crop = "Rice"  # Default
     

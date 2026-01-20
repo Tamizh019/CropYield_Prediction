@@ -104,16 +104,16 @@
             <div class="ai-insights-container bulk-ai">
                 <div class="ai-header">
                     <svg class="ai-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                        <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                     </svg>
                     <h3>🤖 AI Data Analyst Report</h3>
                 </div>
-                
+
                 <div class="ai-content">
-                    <pre class="ai-formatted">{{ ai_insight }}</pre>
+                    <div class="ai-formatted">{{ ai_insight | safe }}</div>
                 </div>
-                
+
                 <div class="ai-footer">
                     <small>Powered by Gemini 2.0 Flash • Advanced Analytics</small>
                 </div>
@@ -205,7 +205,7 @@
                 datasets: [{
                     data: cropData,
                     backgroundColor: [
-                        '#f1c40f', '#e67e22', '#e74c3c', 
+                        '#f1c40f', '#e67e22', '#e74c3c',
                         '#9b59b6', '#3498db', '#2ecc71'
                     ],
                     borderColor: '#1e1e1e',
