@@ -1,16 +1,18 @@
 [
   {
-    "timestamp": "2026-01-09T00:56:33.434330",
-    "type": "crop",
+    "timestamp": "2026-01-12T12:37:18.538528",
+    "type": "yield",
     "input": {
-      "N": 54.0,
-      "P": 54.0,
-      "K": 54.0,
-      "Temperature": 34.0,
-      "Humidity": 24.0,
-      "pH": 5.0,
-      "Rainfall": 134.0
+      "State_Name": "Tamil Nadu",
+      "District_Name": "Chennai",
+      "Crop_Year": 2012.0,
+      "Crop": "Rice",
+      "Area": 39.92,
+      "Temperature": 25.0,
+      "Humidity": 100.0,
+      "pH": 6.0,
+      "Rainfall": 150.0
     },
-    "prediction": "Chickpea"
+    "prediction": "4714.07"
   }
 ]

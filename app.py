@@ -9,6 +9,35 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from functools import wraps
 
+# AgriVision v3.0 - New Module Imports
+try:
+    from disease_detection import get_plant_doctor
+    DISEASE_MODULE_AVAILABLE = True
+except ImportError:
+    DISEASE_MODULE_AVAILABLE = False
+    print("⚠️ Disease detection module not available")
+
+try:
+    from price_forecast import get_price_forecaster
+    PRICE_MODULE_AVAILABLE = True
+except ImportError:
+    PRICE_MODULE_AVAILABLE = False
+    print("⚠️ Price forecast module not available")
+
+try:
+    from weather_service import get_weather_service
+    WEATHER_MODULE_AVAILABLE = True
+except ImportError:
+    WEATHER_MODULE_AVAILABLE = False
+    print("⚠️ Weather service module not available")
+
+try:
+    from fertilizer_optimizer import calculate_fertilizer, get_supported_crops as get_fertilizer_crops
+    FERTILIZER_MODULE_AVAILABLE = True
+except ImportError:
+    FERTILIZER_MODULE_AVAILABLE = False
+    print("⚠️ Fertilizer optimizer module not available")
+
 # Load Environment Variables
 load_dotenv()
 
@@ -632,6 +661,171 @@ def download_dataset(filename):
         return send_from_directory('Datasets', filename, as_attachment=True)
     except FileNotFoundError:
         return "File not found", 404
+
+
+# ========================================
+# AGRIVISION v3.0 - NEW FEATURE ROUTES
+# ========================================
+
+@app.route('/plant_doctor', methods=['GET', 'POST'])
+def plant_doctor():
+    """AI Plant Doctor - Disease Detection"""
+    result = None
+    error = None
+    
+    if request.method == 'POST':
+        if not DISEASE_MODULE_AVAILABLE:
+            error = "Disease detection module not available"
+            return render_template('plant_doctor.html', error=error)
+        
+        if 'image' not in request.files:
+            error = "No image uploaded"
+            return render_template('plant_doctor.html', error=error)
+        
+        file = request.files['image']
+        if file.filename == '':
+            error = "No image selected"
+            return render_template('plant_doctor.html', error=error)
+        
+        try:
+            doctor = get_plant_doctor()
+            result = doctor.predict(file.read())
+            
+            # Generate AI treatment advice if available
+            if model and result.get('success'):
+                disease = result['prediction']['disease_name']
+                crop = result['prediction']['crop']
+                prompt = f"Give 2-3 concise treatment tips for {disease} in {crop}."
+                try:
+                    ai_response = model.generate_content(prompt)
+                    result['ai_advice'] = ai_response.text
+                except:
+                    pass
+                    
+        except Exception as e:
+            error = f"Analysis failed: {str(e)}"
+    
+    return render_template('plant_doctor.html', result=result, error=error)
+
+
+@app.route('/market_prices', methods=['GET', 'POST'])
+def market_prices():
+    """Market Price Forecasting"""
+    forecast = None
+    overview = None
+    error = None
+    selected_crop = request.form.get('crop', 'Rice')
+    
+    if not PRICE_MODULE_AVAILABLE:
+        error = "Price forecast module not available"
+        return render_template('market_prices.html', error=error)
+    
+    try:
+        forecaster = get_price_forecaster()
+        
+        if request.method == 'POST':
+            forecast = forecaster.forecast(selected_crop)
+        
+        overview = forecaster.get_market_overview()
+        supported_crops = forecaster.get_supported_crops()
+        
+    except Exception as e:
+        error = f"Forecast error: {str(e)}"
+    
+    return render_template('market_prices.html', 
+                         forecast=forecast, 
+                         overview=overview,
+                         crops=supported_crops if 'supported_crops' in dir() else [],
+                         selected_crop=selected_crop,
+                         error=error)
+
+
+@app.route('/weather', methods=['GET', 'POST'])
+def weather():
+    """Weather Intelligence Dashboard"""
+    weather_data = None
+    forecast = None
+    error = None
+    city = request.form.get('city', 'Delhi')
+    
+    if not WEATHER_MODULE_AVAILABLE:
+        error = "Weather service not available"
+        return render_template('weather.html', error=error)
+    
+    try:
+        service = get_weather_service()
+        weather_data = service.get_current_weather(city)
+        forecast = service.get_forecast(city, days=5)
+    except Exception as e:
+        error = f"Weather error: {str(e)}"
+    
+    return render_template('weather.html', 
+                         weather=weather_data, 
+                         forecast=forecast,
+                         city=city,
+                         error=error)
+
+
+@app.route('/fertilizer', methods=['GET', 'POST'])
+def fertilizer():
+    """Smart Fertilizer Calculator"""
+    result = None
+    error = None
+    
+    if not FERTILIZER_MODULE_AVAILABLE:
+        error = "Fertilizer module not available"
+        return render_template('fertilizer.html', error=error)
+    
+    if request.method == 'POST':
+        try:
+            crop = request.form.get('crop')
+            soil_n = float(request.form.get('soil_n', 0))
+            soil_p = float(request.form.get('soil_p', 0))
+            soil_k = float(request.form.get('soil_k', 0))
+            area = float(request.form.get('area', 1))
+            
+            result = calculate_fertilizer(crop, soil_n, soil_p, soil_k, area)
+        except Exception as e:
+            error = f"Calculation error: {str(e)}"
+    
+    crops = get_fertilizer_crops() if FERTILIZER_MODULE_AVAILABLE else []
+    return render_template('fertilizer.html', result=result, crops=crops, error=error)
+
+
+@app.route('/api/disease_detect', methods=['POST'])
+def api_disease_detect():
+    """API endpoint for disease detection"""
+    if not DISEASE_MODULE_AVAILABLE:
+        return jsonify({"error": "Module not available"}), 503
+    
+    if 'image' not in request.files:
+        return jsonify({"error": "No image provided"}), 400
+    
+    doctor = get_plant_doctor()
+    result = doctor.predict(request.files['image'].read())
+    return jsonify(result)
+
+
+@app.route('/api/price_forecast/<crop>')
+def api_price_forecast(crop):
+    """API endpoint for price forecast"""
+    if not PRICE_MODULE_AVAILABLE:
+        return jsonify({"error": "Module not available"}), 503
+    
+    forecaster = get_price_forecaster()
+    result = forecaster.forecast(crop)
+    return jsonify(result)
+
+
+@app.route('/api/weather/<city>')
+def api_weather(city):
+    """API endpoint for weather"""
+    if not WEATHER_MODULE_AVAILABLE:
+        return jsonify({"error": "Module not available"}), 503
+    
+    service = get_weather_service()
+    result = service.get_current_weather(city)
+    return jsonify(result)
 
 
 # ========================================

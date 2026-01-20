@@ -3,8 +3,8 @@ echo Installing requirements...
 pip install -r requirements.txt
 
 echo Training Models...
-python train_models.py
+py train_models.py
 
 echo Starting Application...
-python app.py
+py app.py
 pause

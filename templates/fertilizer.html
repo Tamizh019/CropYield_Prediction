@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fertilizer Calculator - AgriVision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .fertilizer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .fert-name {
+            font-weight: bold;
+        }
+
+        .fert-qty {
+            font-size: 1.3rem;
+            color: var(--success);
+        }
+
+        .deficit-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .deficit-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .deficit-n {
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+        }
+
+        .deficit-p {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+        }
+
+        .deficit-k {
+            background: linear-gradient(90deg, #2196f3, #03a9f4);
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tips-list li:before {
+            content: "💡";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="brand"><span class="brand-icon">🌱</span><span class="brand-text">AgriVision</span></div>
+            <div class="nav-links">
+                <a href="/" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+                <a href="/predict_yield" class="nav-item"><span class="nav-icon">🌾</span> Yield Prediction</a>
+                <a href="/recommend_crop" class="nav-item"><span class="nav-icon">🧪</span> Crop Recommend</a>
+                <div class="nav-divider">v3.0 Features</div>
+                <a href="/plant_doctor" class="nav-item"><span class="nav-icon">🩺</span> Plant Doctor</a>
+                <a href="/market_prices" class="nav-item"><span class="nav-icon">💰</span> Market Prices</a>
+                <a href="/weather" class="nav-item"><span class="nav-icon">🌦️</span> Weather</a>
+                <a href="/fertilizer" class="nav-item active"><span class="nav-icon">🧪</span> Fertilizer Calc</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">🧪 Smart Fertilizer Calculator</h1>
+                <p class="page-subtitle">Optimize fertilizer usage based on soil analysis</p>
+            </div>
+
+            <div class="glass-card">
+                <form method="POST">
+                    <div class="input-grid">
+                        <div class="form-group">
+                            <label>Select Crop</label>
+                            <select name="crop" class="form-control" required>
+                                {% for crop in crops %}
+                                <option value="{{ crop }}">{{ crop }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Field Area (Hectares)</label>
+                            <input type="number" name="area" class="form-control" value="1" min="0.1" step="0.1"
+                                required>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 25px 0 15px">Current Soil NPK Levels (kg/ha)</h4>
+                    <div class="input-grid">
+                        <div class="form-group">
+                            <label>🟢 Nitrogen (N)</label>
+                            <input type="number" name="soil_n" class="form-control" placeholder="e.g., 40" min="0"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>🟠 Phosphorus (P)</label>
+                            <input type="number" name="soil_p" class="form-control" placeholder="e.g., 20" min="0"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>🔵 Potassium (K)</label>
+                            <input type="number" name="soil_k" class="form-control" placeholder="e.g., 15" min="0"
+                                required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:20px">
+                        ⚗️ Calculate Fertilizer Requirements
+                    </button>
+                </form>
+
+                {% if error %}
+                <div class="alert alert-error" style="margin-top:20px">{{ error }}</div>
+                {% endif %}
+
+                {% if result and result.success %}
+                <div class="result-card">
+                    <h3>📊 Results for {{ result.crop }} ({{ result.area_hectares }} ha)</h3>
+
+                    <h4 style="margin-top:25px">Nutrient Deficits</h4>
+                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-top:15px">
+                        <div>
+                            <div style="display:flex; justify-content:space-between">
+                                <span>Nitrogen</span>
+                                <span>{{ result.deficits.N }} kg/ha</span>
+                            </div>
+                            <div class="deficit-bar">
+                                <div class="deficit-fill deficit-n"
+                                    style="width:{{ (result.deficits.N / result.soil_status.required_N * 100) | int }}%">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between">
+                                <span>Phosphorus</span>
+                                <span>{{ result.deficits.P }} kg/ha</span>
+                            </div>
+                            <div class="deficit-bar">
+                                <div class="deficit-fill deficit-p"
+                                    style="width:{{ (result.deficits.P / result.soil_status.required_P * 100) | int }}%">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between">
+                                <span>Potassium</span>
+                                <span>{{ result.deficits.K }} kg/ha</span>
+                            </div>
+                            <div class="deficit-bar">
+                                <div class="deficit-fill deficit-k"
+                                    style="width:{{ (result.deficits.K / result.soil_status.required_K * 100) | int }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top:30px">Recommended Fertilizers</h4>
+                    {% for rec in result.recommendations %}
+                    <div class="fertilizer-item">
+                        <span class="fert-name">{{ rec.fertilizer }}</span>
+                        <div style="text-align:right">
+                            <span class="fert-qty">{{ rec.quantity_kg }} kg</span>
+                            <p style="color:var(--muted-text); font-size:0.9rem">₹{{ rec.cost_inr }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1)">
+                        <span style="font-size:1.2rem">Total Estimated Cost</span>
+                        <span style="font-size:1.5rem; font-weight:bold; color:var(--success)">₹{{ result.total_cost_inr
+                            }}</span>
+                    </div>
+
+                    <h4 style="margin-top:30px">Application Tips</h4>
+                    <ul class="tips-list">
+                        {% for tip in result.application_tips %}
+                        <li>{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
