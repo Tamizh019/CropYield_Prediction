@@ -1,24 +1,108 @@
+# ================================
 # Python
+# ================================
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
 venv/
 env/
+ENV/
+.venv/
 
-# Environment variables
+# ================================
+# Environment & Secrets
+# ================================
 .env
+.env.local
+.env.*.local
+*.env
 
-# IDEs
+# ================================
+# IDEs & Editors
+# ================================
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
 
-# Model Files (Generated)
+# ================================
+# Model Files (Large - Generated)
+# ================================
 models/*.pkl
+models/*.h5
+models/*.keras
+models/*.pt
+models/*.pth
+models/*.onnx
 
-# Generated Outputs
-static/predicted_yield.csv
+# ================================
+# Deep Learning Datasets (Large)
+# ================================
+Datasets/PlantVillage/
+Datasets/*.zip
+Datasets/*.tar.gz
+
+# ================================
+# Logs & Temporary Files
+# ================================
+logs/
+*.log
 model_log.txt
 model_log_retry.txt
 cols.txt
 
-# Datasets
+# ================================
+# Generated Outputs
+# ================================
+static/predicted_yield.csv
+static/*.csv
+uploads/
+
+# ================================
+# OS Generated Files
+# ================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ================================
+# Jupyter Notebooks
+# ================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ================================
+# TensorFlow / Keras
+# ================================
+*.h5
+checkpoint/
+saved_model/
+tensorboard_logs/
