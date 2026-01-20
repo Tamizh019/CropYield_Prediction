@@ -1,4 +1,19 @@
 # Crop Yield Prediction System 🌾
+
+---
+
+> [!IMPORTANT]
+> **🚀 Deep Learning Version Available!**
+> We have implemented advanced **Convolutional Neural Networks (CNN)** for disease detection and **LSTM Neural Networks** for price forecasting on a separate branch.
+> 
+> To explore these features, switch your branch:
+> ```bash
+> git checkout dl
+> ```
+> Enjoy the visual and economic intelligence! 🧠💰
+
+---
+
 Hey Guys! This is our machine learning project that helps farmers decide what to grow and how much they can expect to harvest.
 
 ## Work in Progress 🚧
