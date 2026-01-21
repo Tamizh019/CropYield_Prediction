@@ -1,16 +1,58 @@
 [
   {
-    "timestamp": "2026-01-09T00:56:33.434330",
+    "timestamp": "2026-01-20T14:35:58.021365",
     "type": "crop",
     "input": {
-      "N": 54.0,
-      "P": 54.0,
-      "K": 54.0,
-      "Temperature": 34.0,
-      "Humidity": 24.0,
-      "pH": 5.0,
-      "Rainfall": 134.0
+      "N": 56.0,
+      "P": 42.0,
+      "K": 70.0,
+      "Temperature": 25.0,
+      "Humidity": 180.0,
+      "pH": 7.0,
+      "Rainfall": 500.0
     },
-    "prediction": "Chickpea"
+    "prediction": "Papaya"
+  },
+  {
+    "timestamp": "2026-01-20T14:36:08.747249",
+    "type": "crop",
+    "input": {
+      "N": 56.0,
+      "P": 42.0,
+      "K": 70.0,
+      "Temperature": 25.0,
+      "Humidity": 180.0,
+      "pH": 7.0,
+      "Rainfall": 500.0
+    },
+    "prediction": "Papaya"
+  },
+  {
+    "timestamp": "2026-01-20T14:36:30.085352",
+    "type": "crop",
+    "input": {
+      "N": 100.0,
+      "P": 40.0,
+      "K": 12.0,
+      "Temperature": 45.0,
+      "Humidity": 154.0,
+      "pH": 4.0,
+      "Rainfall": 200.0
+    },
+    "prediction": "Cotton"
+  },
+  {
+    "timestamp": "2026-01-20T14:36:31.521193",
+    "type": "crop",
+    "input": {
+      "N": 100.0,
+      "P": 40.0,
+      "K": 12.0,
+      "Temperature": 45.0,
+      "Humidity": 154.0,
+      "pH": 4.0,
+      "Rainfall": 200.0
+    },
+    "prediction": "Cotton"
   }
 ]

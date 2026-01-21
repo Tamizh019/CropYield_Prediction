@@ -1,0 +1,142 @@
+============================================================
+🌾 AGRIVISION MODEL TRAINING PIPELINE
+⏰ Started: 2026-01-09 12:58:40
+============================================================
+
+============================================================
+🌾 TRAINING YIELD PREDICTION MODEL (ADVANCED)
+============================================================
+✅ Dataset loaded: 50765 rows
+📊 Columns: ['Dist Code', 'Year', 'State Code', 'State Name', 'Dist Name', 'Crop', 'Area_ha', 'Yield_kg_per_ha', 'N_req_kg_per_ha', 'P_req_kg_per_ha', 'K_req_kg_per_ha', 'Total_N_kg', 'Total_P_kg', 'Total_K_kg', 'Temperature_C', 'Humidity_%', 'pH', 'Rainfall_mm', 'Wind_Speed_m_s', 'Solar_Radiation_MJ_m2_day']
+🎯 Target Column: Yield_kg_per_ha
+🧹 Cleaned data: 50765 rows (removed 0)
+✅ Features selected: ['State_Name', 'District_Name', 'Crop_Year', 'Crop', 'Area', 'Temperature', 'Humidity', 'pH', 'Rainfall']
+
+🔧 Feature Engineering...
+✅ Total features after engineering: 13
+🔤 Encoding 3 categorical columns...
+   - State_Name: 20 unique values
+   - District_Name: 311 unique values
+   - Crop: 4 unique values
+💾 Label encoders saved
+💾 Scaler saved
+
+📊 Training set: 40612 | Test set: 10153
+
+🤖 Training Multiple Models...
+
+1️⃣ Random Forest Regressor...
+   R² Score: 0.8635
+   RMSE: 355.24
+   MAE: 203.82
+
+2️⃣ Gradient Boosting Regressor...
+   R² Score: 0.8319
+   RMSE: 394.22
+   MAE: 233.54
+
+3️⃣ XGBoost Regressor...
+   R² Score: 0.8477
+   RMSE: 375.27
+   MAE: 224.06
+
+============================================================
+📊 MODEL COMPARISON
+============================================================
+RandomForest         | R²: 0.8635 | RMSE:   355.24 | MAE:   203.82
+GradientBoosting     | R²: 0.8319 | RMSE:   394.22 | MAE:   233.54
+XGBoost              | R²: 0.8477 | RMSE:   375.27 | MAE:   224.06
+
+🏆 BEST MODEL: RandomForest (R² = 0.8635)
+
+✅ Yield Model Training Complete!
+💾 Models saved in 'models/' directory
+
+============================================================
+🌾 TRAINING CROP RECOMMENDATION MODEL (ADVANCED)
+============================================================
+✅ Dataset loaded: 2200 rows
+📊 Columns: ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall', 'label']
+🎯 Target classes: 22 unique crops
+📊 Class distribution:
+label
+rice           100
+maize          100
+chickpea       100
+kidneybeans    100
+pigeonpeas     100
+mothbeans      100
+mungbean       100
+blackgram      100
+lentil         100
+pomegranate    100
+Name: count, dtype: int64
+💾 Target label encoder saved
+
+🔧 Feature Engineering...
+   ✅ NPK ratio features created
+   ✅ Temperature-Humidity interaction created
+   ✅ Rainfall-pH interaction created
+💾 Scaler saved
+
+📊 Training set: 1760 | Test set: 440
+
+🤖 Training Multiple Models...
+
+1️⃣ Random Forest Classifier...
+   Accuracy: 0.9909
+
+2️⃣ Gradient Boosting Classifier...
+   Accuracy: 0.9864
+
+3️⃣ XGBoost Classifier...
+   Accuracy: 0.9886
+
+============================================================
+📊 MODEL COMPARISON
+============================================================
+RandomForest         | Accuracy: 0.9909
+GradientBoosting     | Accuracy: 0.9864
+XGBoost              | Accuracy: 0.9886
+
+🏆 BEST MODEL: RandomForest (Accuracy = 0.9909)
+
+📋 Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00        20
+           1       1.00      1.00      1.00        20
+           2       1.00      0.95      0.97        20
+           3       1.00      1.00      1.00        20
+           4       1.00      1.00      1.00        20
+           5       1.00      1.00      1.00        20
+           6       1.00      1.00      1.00        20
+           7       1.00      1.00      1.00        20
+           8       0.95      1.00      0.98        20
+           9       1.00      1.00      1.00        20
+          10       1.00      0.90      0.95        20
+          11       0.95      1.00      0.98        20
+          12       1.00      1.00      1.00        20
+          13       0.91      1.00      0.95        20
+          14       1.00      1.00      1.00        20
+          15       1.00      1.00      1.00        20
+          16       1.00      1.00      1.00        20
+          17       1.00      1.00      1.00        20
+          18       1.00      1.00      1.00        20
+          19       1.00      1.00      1.00        20
+          20       1.00      0.95      0.97        20
+          21       1.00      1.00      1.00        20
+
+    accuracy                           0.99       440
+   macro avg       0.99      0.99      0.99       440
+weighted avg       0.99      0.99      0.99       440
+
+
+✅ Crop Recommendation Model Training Complete!
+💾 Model saved in 'models/' directory
+
+============================================================
+✅ ALL MODELS TRAINED SUCCESSFULLY!
+⏱️ Total Duration: 40.35 seconds
+📁 Log saved to: logs/training_log_20260109_125840.txt
+============================================================

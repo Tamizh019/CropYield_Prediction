@@ -5,7 +5,8 @@ import numpy as np
 import os
 import json
 from datetime import datetime
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 from functools import wraps
 
@@ -14,20 +15,11 @@ load_dotenv()
 
 # Configure Gemini AI with Pro settings
 gen_ai_key = os.getenv("GOOGLE_API_KEY")
+client = None
 if gen_ai_key:
-    genai.configure(api_key=gen_ai_key)
-    model = genai.GenerativeModel(
-        'gemini-2.0-flash-exp',
-        generation_config={
-            "temperature": 0.3,
-            "max_output_tokens": 2000,
-            "top_p": 0.9,
-            "top_k": 40,
-        }
-    )
-    print("✅ Gemini AI Model Configured")
+    client = genai.Client(api_key=gen_ai_key)
+    print("✅ Gemini AI Client Configured")
 else:
-    model = None
     print("⚠️ WARNING: GOOGLE_API_KEY not found in .env")
 
 # Initialize Flask App
@@ -40,6 +32,8 @@ yield_encoders = None
 yield_scaler = None
 recommend_model = None
 recommend_encoders = None
+recommend_le = None
+recommend_scaler = None
 
 # Statistics tracking
 prediction_history = []
@@ -53,7 +47,7 @@ MAX_HISTORY = 100
 def load_models():
     """Load all ML models at startup with error handling"""
     global yield_model, yield_encoders, yield_scaler
-    global recommend_model, recommend_encoders
+    global recommend_model, recommend_encoders, recommend_le, recommend_scaler
     
     try:
         # Load Yield Prediction Model
@@ -76,6 +70,15 @@ def load_models():
             # Optional: Load encoders if exists
             if os.path.exists('models/recommend_encoders.pkl'):
                 recommend_encoders = joblib.load('models/recommend_encoders.pkl')
+            
+            # Load Label Encoder for target
+            if os.path.exists('models/recommend_label_encoder.pkl'):
+                recommend_le = joblib.load('models/recommend_label_encoder.pkl')
+
+            # Load Scaler
+            if os.path.exists('models/recommend_scaler.pkl'):
+                recommend_scaler = joblib.load('models/recommend_scaler.pkl')
+                print("✅ Recommendation Scaler Loaded")
         else:
             print("⚠️ Recommendation model not found.")
             
@@ -93,7 +96,7 @@ def get_ai_insight(data, predicted_yield):
     """
     Generate detailed agronomic insights using Gemini AI
     """
-    if not model:
+    if not client:
         return None
     
     try:
@@ -128,7 +131,16 @@ Provide a structured analysis:
 
 Keep each section concise and farmer-friendly."""
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=2000,
+                top_p=0.9,
+                top_k=40
+            )
+        )
         return response.text
     
     except Exception as e:
@@ -140,7 +152,7 @@ def get_bulk_ai_summary(stats):
     """
     Generate comprehensive bulk dataset analysis
     """
-    if not model:
+    if not client:
         return None
     
     try:
@@ -169,7 +181,16 @@ Provide expert insights:
 
 Keep insights data-driven and practical."""
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=2000,
+                top_p=0.9,
+                top_k=40
+            )
+        )
         return response.text
     
     except Exception as e:
@@ -181,7 +202,7 @@ def get_crop_recommendation_insight(recommended_crop, input_data):
     """
     Get AI insights for crop recommendation
     """
-    if not model:
+    if not client:
         return None
     
     try:
@@ -212,7 +233,16 @@ Provide a structured, friendly, and professional analysis. Use emojis to make it
 
 Tone: Helpful expert. Keep it concise (max 100 words)."""
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=2000,
+                top_p=0.9,
+                top_k=40
+            )
+        )
         return response.text
     
     except Exception as e:
@@ -297,7 +327,7 @@ def get_model_info():
     info = {
         'yield_model': yield_model is not None,
         'recommend_model': recommend_model is not None,
-        'ai_model': model is not None,
+        'ai_model': client is not None,
         'prediction_count': len(prediction_history)
     }
     return info
@@ -553,11 +583,43 @@ def recommend_crop():
                 'Rainfall': float(request.form.get('rainfall'))
             }
             
-            features = list(input_data.values())
+            features_dict = {
+                'N': input_data['N'],
+                'P': input_data['P'],
+                'K': input_data['K'],
+                'temperature': input_data['Temperature'],
+                'humidity': input_data['Humidity'],
+                'ph': input_data['pH'],
+                'rainfall': input_data['Rainfall']
+            }
             
-            # Predict
-            pred = recommend_model.predict([features])[0]
-            recommendation = str(pred).title()
+            # Create DataFrame for feature engineering
+            X = pd.DataFrame([features_dict])
+            
+            # Feature Engineering (Must match training logic)
+            X['NPK_Sum'] = X['N'] + X['P'] + X['K']
+            X['NPK_Ratio'] = X['N'] / (X['P'] + X['K'] + 1)
+            X['NK_Ratio'] = X['N'] / (X['K'] + 1)
+            X['PK_Ratio'] = X['P'] / (X['K'] + 1)
+            
+            X['temp_humidity'] = X['temperature'] * X['humidity']
+            X['rainfall_ph'] = X['rainfall'] * X['ph']
+            
+            # Scale features if scaler is loaded
+            if recommend_scaler:
+                features_scaled = recommend_scaler.transform(X)
+                pred_idx = recommend_model.predict(features_scaled)[0]
+            else:
+                # Fallback if scaler missing (might fail if model expects scaled data)
+                pred_idx = recommend_model.predict(X)[0]
+            
+            # Decode prediction
+            if recommend_le:
+                recommendation = recommend_le.inverse_transform([pred_idx])[0]
+            else:
+                recommendation = str(pred_idx)
+            
+            recommendation = recommendation.title()
             
             # Generate AI insights
             ai_insight = get_crop_recommendation_insight(recommendation, input_data)
@@ -667,7 +729,7 @@ if __name__ == '__main__':
     print("="*50)
     print(f"✅ Yield Model: {'Loaded' if yield_model else 'Not Found'}")
     print(f"✅ Recommendation Model: {'Loaded' if recommend_model else 'Not Found'}")
-    print(f"✅ AI Model: {'Configured' if model else 'Not Configured'}")
+    print(f"✅ AI Model: {'Configured' if client else 'Not Configured'}")
     print(f"📊 Prediction History: {len(prediction_history)} records")
     print("="*50 + "\n")
     

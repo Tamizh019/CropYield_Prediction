@@ -329,6 +329,12 @@ def train_recommendation_model():
     
     print_log(f"🎯 Target classes: {y.nunique()} unique crops")
     print_log(f"📊 Class distribution:\n{y.value_counts().head(10)}")
+
+    # Encode target labels
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+    joblib.dump(le, 'models/recommend_label_encoder.pkl')
+    print_log("💾 Target label encoder saved")
     
     # Feature Engineering
     print_log("\n🔧 Feature Engineering...")
@@ -461,7 +467,7 @@ def train_recommendation_model():
     metadata = {
         'model_type': best_model_name,
         'accuracy': best_acc,
-        'num_classes': y.nunique(),
+        'num_classes': len(list(set(y))),
         'features': X.columns.tolist(),
         'trained_on': datetime.now().isoformat(),
         'training_samples': len(X_train),
