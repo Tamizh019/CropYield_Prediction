@@ -1,153 +1,863 @@
 {% extends "base.html" %}
 
-{% block title %}Crop Recommendation - AgriVision{% endblock %}
+{% block title %}Smart Crop Advisor - AgriVision{% endblock %}
+
+{% block head %}
+<style>
+    /* Wizard Styles */
+    .wizard-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .wizard-progress {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .wizard-progress::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 10%;
+        right: 10%;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 0;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 1;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 8px;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .progress-step.active .step-number {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .progress-step.completed .step-number {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+        color: var(--muted-text);
+        text-align: center;
+    }
+
+    .progress-step.active .step-label {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Step Content */
+    .wizard-step {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .wizard-step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .step-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .step-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .step-header p {
+        color: var(--muted-text);
+    }
+
+    /* Selection Cards */
+    .selection-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .selection-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .selection-card:hover {
+        border-color: var(--primary-color);
+        background: rgba(76, 175, 80, 0.1);
+    }
+
+    .selection-card.selected {
+        border-color: var(--primary-color);
+        background: rgba(76, 175, 80, 0.2);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .selection-card .card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .selection-card .card-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .selection-card .card-desc {
+        font-size: 0.8rem;
+        color: var(--muted-text);
+    }
+
+    /* Soil type specific colors */
+    .soil-sandy {
+        background: linear-gradient(135deg, rgba(244, 208, 63, 0.1), rgba(244, 208, 63, 0.05));
+    }
+
+    .soil-loamy {
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+    }
+
+    .soil-clay {
+        background: linear-gradient(135deg, rgba(149, 165, 166, 0.1), rgba(149, 165, 166, 0.05));
+    }
+
+    .soil-black {
+        background: linear-gradient(135deg, rgba(52, 73, 94, 0.2), rgba(52, 73, 94, 0.1));
+    }
+
+    .soil-red {
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.05));
+    }
+
+    .soil-alluvial {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), rgba(155, 89, 182, 0.05));
+    }
+
+    /* Navigation Buttons */
+    .wizard-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Mode Toggle */
+    .mode-toggle {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .mode-btn {
+        padding: 10px 25px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .mode-btn.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    /* Results Section */
+    .results-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .results-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .top-crops-card {
+        background: rgba(76, 175, 80, 0.1);
+        border: 1px solid var(--primary-color);
+        border-radius: 16px;
+        padding: 25px;
+    }
+
+    .crop-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        margin: 10px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        transition: all 0.3s;
+    }
+
+    .crop-item:first-child {
+        background: rgba(76, 175, 80, 0.2);
+        border: 1px solid var(--primary-color);
+    }
+
+    .crop-rank {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        min-width: 40px;
+    }
+
+    .crop-item:first-child .crop-rank {
+        color: #ffd700;
+    }
+
+    .crop-icon {
+        font-size: 2rem;
+    }
+
+    .crop-details h4 {
+        margin: 0 0 5px;
+    }
+
+    .confidence-bar {
+        width: 100px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), #8bc34a);
+        border-radius: 3px;
+    }
+
+    .estimated-values {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 25px;
+    }
+
+    .value-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .value-item {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .value-label {
+        font-size: 0.8rem;
+        color: var(--muted-text);
+        margin-bottom: 5px;
+    }
+
+    .value-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    /* Custom select styling */
+    .custom-select {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .custom-select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+
+    .custom-select option {
+        background: #1a1a2e;
+        color: var(--text-color);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">🧪 Crop Recommendation</h1>
-    <p class="page-subtitle">AI-powered intelligent crop selection based on soil & climate.</p>
+    <h1 class="page-title">🌱 Smart Crop Advisor</h1>
+    <p class="page-subtitle">Answer simple questions to get personalized crop recommendations</p>
 </div>
 
-<div class="dashboard-grid" style="grid-template-columns: 1.5fr 1fr;">
+{% if show_results and recommendations %}
+<!-- RESULTS VIEW -->
+<div class="glass-card">
+    <div class="card-header">
+        <h3>🎯 Your Personalized Crop Recommendations</h3>
+        <a href="/smart_crop_wizard" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9rem;">
+            ← Start New Analysis
+        </a>
+    </div>
 
-    <!-- INPUT FORM COLUMN -->
-    <div class="glass-card form-card">
-        <div class="card-header">
-            <h3>🌱 Soil & Climate Profile</h3>
-            <span class="badge badge-purple">AI Enabled</span>
+    <div class="results-container" style="margin-top: 20px;">
+        <!-- Top Crops -->
+        <div class="top-crops-card">
+            <h4 style="margin-bottom: 20px;">🏆 Top Recommended Crops</h4>
+            {% for rec in recommendations %}
+            <div class="crop-item">
+                <span class="crop-rank">#{{ loop.index }}</span>
+                <span class="crop-icon">
+                    {% if rec.crop == 'Rice' %}🍚
+                    {% elif rec.crop == 'Wheat' %}🌾
+                    {% elif rec.crop == 'Maize' %}🌽
+                    {% elif rec.crop == 'Cotton' %}👕
+                    {% elif rec.crop == 'Sugarcane' %}🎋
+                    {% elif rec.crop == 'Groundnut' %}🥜
+                    {% elif rec.crop == 'Banana' %}🍌
+                    {% elif rec.crop == 'Mango' %}🥭
+                    {% elif rec.crop == 'Orange' %}🍊
+                    {% elif rec.crop == 'Grapes' %}🍇
+                    {% elif rec.crop == 'Watermelon' %}🍉
+                    {% elif rec.crop == 'Coconut' %}🥥
+                    {% elif rec.crop == 'Coffee' %}☕
+                    {% elif rec.crop == 'Apple' %}🍎
+                    {% elif rec.crop == 'Papaya' %}🥝
+                    {% elif rec.crop == 'Chickpea' or rec.crop == 'Lentil' %}🥘
+                    {% else %}🌿{% endif %}
+                </span>
+                <div class="crop-details">
+                    <h4>{{ rec.crop }}</h4>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: {{ rec.confidence }}%;"></div>
+                        </div>
+                        <span style="color: var(--muted-text); font-size: 0.85rem;">{{ rec.confidence }}%</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
 
-        <form action="/recommend_crop" method="POST">
+        <!-- Estimated Values -->
+        <div class="estimated-values">
+            <h4 style="margin-bottom: 20px;">📊 Estimated Conditions</h4>
+            <div class="value-grid">
+                <div class="value-item">
+                    <div class="value-label">🧪 Nitrogen (N)</div>
+                    <div class="value-number">{{ estimated.N }}</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">🧪 Phosphorus (P)</div>
+                    <div class="value-number">{{ estimated.P }}</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">🧪 Potassium (K)</div>
+                    <div class="value-number">{{ estimated.K }}</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">🌡️ Temperature</div>
+                    <div class="value-number">{{ estimated.temperature }}°C</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">💧 Humidity</div>
+                    <div class="value-number">{{ estimated.humidity }}%</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">🌧️ Rainfall</div>
+                    <div class="value-number">{{ estimated.rainfall }}mm</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">⚗️ Soil pH</div>
+                    <div class="value-number">{{ estimated.ph }}</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-label">📍 Location</div>
+                    <div class="value-number" style="font-size: 0.9rem;">{{ user_inputs.state }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <!-- Soil Nutrients Section -->
+    {% if ai_insight %}
+    <div class="ai-insights-container" style="margin-top: 30px;">
+        <div class="ai-header">
+            <h3>🤖 AI Farming Guide</h3>
+        </div>
+        <div class="ai-content">
+            <div class="ai-formatted">{{ ai_insight | safe }}</div>
+        </div>
+        <div class="ai-footer">
+            <small>Powered by Gemini 2.0 Flash</small>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% else %}
+<!-- WIZARD FORM -->
+<div class="glass-card wizard-container">
+    <div class="card-header">
+        <h3>🌾 Answer Simple Questions</h3>
+        <span class="badge badge-green">Easy Mode</span>
+    </div>
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle" style="margin-top: 20px;">
+        <div class="mode-btn active" onclick="setMode('simple')">🌱 Simple Mode</div>
+        <div class="mode-btn" onclick="setMode('advanced')">🔬 Advanced Mode</div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="wizard-progress" id="simpleProgress">
+        <div class="progress-step active" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-label">Location</div>
+        </div>
+        <div class="progress-step" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-label">Season</div>
+        </div>
+        <div class="progress-step" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-label">Soil</div>
+        </div>
+        <div class="progress-step" data-step="4">
+            <div class="step-number">4</div>
+            <div class="step-label">Previous</div>
+        </div>
+        <div class="progress-step" data-step="5">
+            <div class="step-number">5</div>
+            <div class="step-label">Water</div>
+        </div>
+    </div>
+
+    <form action="/smart_crop_wizard" method="POST" id="wizardForm">
+        <input type="hidden" name="mode" id="modeInput" value="simple">
+
+        <!-- SIMPLE MODE STEPS -->
+        <div id="simpleMode">
+            <!-- Step 1: Location -->
+            <div class="wizard-step active" data-step="1">
+                <div class="step-header">
+                    <h2>📍 Where is your farm located?</h2>
+                    <p>Select your state and district</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>State</label>
+                        <select name="state" id="stateSelect" class="custom-select" required onchange="loadDistricts()">
+                            <option value="">-- Select State --</option>
+                            {% for state in states %}
+                            <option value="{{ state }}">{{ state }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>District</label>
+                        <select name="district" id="districtSelect" class="custom-select" required>
+                            <option value="">-- Select District --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Season -->
+            <div class="wizard-step" data-step="2">
+                <div class="step-header">
+                    <h2>🗓️ Which season are you planting?</h2>
+                    <p>Select the cropping season</p>
+                </div>
+
+                <div class="selection-grid">
+                    <div class="selection-card" data-value="kharif" onclick="selectCard(this, 'season')">
+                        <div class="card-icon">☔</div>
+                        <div class="card-title">Kharif</div>
+                        <div class="card-desc">June - October<br>Monsoon Season</div>
+                    </div>
+                    <div class="selection-card" data-value="rabi" onclick="selectCard(this, 'season')">
+                        <div class="card-icon">❄️</div>
+                        <div class="card-title">Rabi</div>
+                        <div class="card-desc">November - April<br>Winter Season</div>
+                    </div>
+                    <div class="selection-card" data-value="zaid" onclick="selectCard(this, 'season')">
+                        <div class="card-icon">☀️</div>
+                        <div class="card-title">Zaid</div>
+                        <div class="card-desc">March - June<br>Summer Season</div>
+                    </div>
+                </div>
+                <input type="hidden" name="season" id="seasonInput" value="kharif">
+            </div>
+
+            <!-- Step 3: Soil Type -->
+            <div class="wizard-step" data-step="3">
+                <div class="step-header">
+                    <h2>🌍 What does your soil look like?</h2>
+                    <p>Select the soil type that best matches your land</p>
+                </div>
+
+                <div class="selection-grid">
+                    <div class="selection-card soil-sandy" data-value="sandy" onclick="selectCard(this, 'soil_type')">
+                        <div class="card-icon">🏜️</div>
+                        <div class="card-title">Sandy</div>
+                        <div class="card-desc">Light, drains quickly</div>
+                    </div>
+                    <div class="selection-card soil-loamy" data-value="loamy" onclick="selectCard(this, 'soil_type')">
+                        <div class="card-icon">🌱</div>
+                        <div class="card-title">Loamy</div>
+                        <div class="card-desc">Ideal - balanced</div>
+                    </div>
+                    <div class="selection-card soil-clay" data-value="clay" onclick="selectCard(this, 'soil_type')">
+                        <div class="card-icon">🧱</div>
+                        <div class="card-title">Clay</div>
+                        <div class="card-desc">Heavy, holds water</div>
+                    </div>
+                    <div class="selection-card soil-black" data-value="black" onclick="selectCard(this, 'soil_type')">
+                        <div class="card-icon">🖤</div>
+                        <div class="card-title">Black (Cotton)</div>
+                        <div class="card-desc">Rich, retains moisture</div>
+                    </div>
+                    <div class="selection-card soil-red" data-value="red" onclick="selectCard(this, 'soil_type')">
+                        <div class="card-icon">🔴</div>
+                        <div class="card-title">Red</div>
+                        <div class="card-desc">Iron-rich, acidic</div>
+                    </div>
+                    <div class="selection-card soil-alluvial" data-value="alluvial"
+                        onclick="selectCard(this, 'soil_type')">
+                        <div class="card-icon">🌊</div>
+                        <div class="card-title">Alluvial</div>
+                        <div class="card-desc">River deposits, fertile</div>
+                    </div>
+                </div>
+                <input type="hidden" name="soil_type" id="soil_typeInput" value="loamy">
+            </div>
+
+            <!-- Step 4: Previous Crop -->
+            <div class="wizard-step" data-step="4">
+                <div class="step-header">
+                    <h2>🌾 What did you grow here last?</h2>
+                    <p>This helps us estimate soil nutrients</p>
+                </div>
+
+                <div class="selection-grid">
+                    <div class="selection-card" data-value="rice" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🍚</div>
+                        <div class="card-title">Rice</div>
+                    </div>
+                    <div class="selection-card" data-value="wheat" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🌾</div>
+                        <div class="card-title">Wheat</div>
+                    </div>
+                    <div class="selection-card" data-value="cotton" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">👕</div>
+                        <div class="card-title">Cotton</div>
+                    </div>
+                    <div class="selection-card" data-value="maize" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🌽</div>
+                        <div class="card-title">Maize</div>
+                    </div>
+                    <div class="selection-card" data-value="legumes" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🫘</div>
+                        <div class="card-title">Legumes/Pulses</div>
+                    </div>
+                    <div class="selection-card" data-value="vegetables" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🥬</div>
+                        <div class="card-title">Vegetables</div>
+                    </div>
+                    <div class="selection-card" data-value="fallow" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🏞️</div>
+                        <div class="card-title">Fallow (Rested)</div>
+                    </div>
+                    <div class="selection-card" data-value="none" onclick="selectCard(this, 'previous_crop')">
+                        <div class="card-icon">🆕</div>
+                        <div class="card-title">First Time</div>
+                    </div>
+                </div>
+                <input type="hidden" name="previous_crop" id="previous_cropInput" value="none">
+            </div>
+
+            <!-- Step 5: Water Source -->
+            <div class="wizard-step" data-step="5">
+                <div class="step-header">
+                    <h2>💧 How do you water your crops?</h2>
+                    <p>Select your primary water source</p>
+                </div>
+
+                <div class="selection-grid" style="max-width: 500px; margin: 0 auto;">
+                    <div class="selection-card" data-value="rainfed" onclick="selectCard(this, 'water_source')">
+                        <div class="card-icon">🌧️</div>
+                        <div class="card-title">Rain-fed</div>
+                        <div class="card-desc">Dependent on monsoon</div>
+                    </div>
+                    <div class="selection-card" data-value="irrigated" onclick="selectCard(this, 'water_source')">
+                        <div class="card-icon">💧</div>
+                        <div class="card-title">Irrigated</div>
+                        <div class="card-desc">Canal, well, or tube-well</div>
+                    </div>
+                    <div class="selection-card" data-value="both" onclick="selectCard(this, 'water_source')">
+                        <div class="card-icon">🌊</div>
+                        <div class="card-title">Both</div>
+                        <div class="card-desc">Rain + irrigation</div>
+                    </div>
+                </div>
+                <input type="hidden" name="water_source" id="water_sourceInput" value="rainfed">
+            </div>
+        </div>
+
+        <!-- ADVANCED MODE -->
+        <div id="advancedMode" style="display: none;">
             <div class="form-section">
                 <div class="section-label">🧪 Soil Composition (NPK)</div>
                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                     <div class="form-group">
                         <label>Nitrogen (N)</label>
-                        <input type="number" name="N" placeholder="90" required>
+                        <input type="number" name="N" placeholder="90">
                     </div>
                     <div class="form-group">
                         <label>Phosphorus (P)</label>
-                        <input type="number" name="P" placeholder="42" required>
+                        <input type="number" name="P" placeholder="42">
                     </div>
                     <div class="form-group">
                         <label>Potassium (K)</label>
-                        <input type="number" name="K" placeholder="43" required>
+                        <input type="number" name="K" placeholder="43">
                     </div>
                 </div>
             </div>
 
-            <!-- Climate Section -->
             <div class="form-section">
                 <div class="section-label">🌤️ Environmental Conditions</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Temperature (°C)</label>
-                        <input type="number" step="0.1" name="temperature" placeholder="20.8" required>
+                        <input type="number" step="0.1" name="temperature" placeholder="25">
                     </div>
                     <div class="form-group">
                         <label>Humidity (%)</label>
-                        <input type="number" step="0.1" name="humidity" placeholder="82.0" required>
+                        <input type="number" step="0.1" name="humidity" placeholder="65">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Soil pH</label>
-                        <input type="number" step="0.1" name="ph" placeholder="6.5" required>
+                        <input type="number" step="0.1" name="ph" placeholder="6.5">
                     </div>
                     <div class="form-group">
                         <label>Rainfall (mm)</label>
-                        <input type="number" step="0.1" name="rainfall" placeholder="202.9" required>
+                        <input type="number" step="0.1" name="rainfall" placeholder="1000">
                     </div>
                 </div>
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary">
-                <span>🔍 Find Best Crop</span>
+        <!-- Navigation -->
+        <div class="wizard-nav" id="simpleNav">
+            <button type="button" class="btn btn-back" id="prevBtn" onclick="changeStep(-1)"
+                style="visibility: hidden;">
+                ← Back
             </button>
-        </form>
-    </div>
-
-    <!-- RESULTS COLUMN -->
-    <div class="results-column">
-        {% if recommendation %}
-        <div class="glass-card result-card" style="border-color: var(--primary-color);">
-            <div class="card-header">
-                <h3>✅ Top Recommendation</h3>
-            </div>
-
-            <div style="text-align: center; padding: 20px 0;">
-                <div style="font-size: 4rem; margin-bottom: 10px;">
-                    {% if recommendation == 'Rice' %}🍚
-                    {% elif recommendation == 'Maize' %}🌽
-                    {% elif recommendation == 'Chickpea' %}🥘
-                    {% elif recommendation == 'Kidneybeans' %}🍲
-                    {% elif recommendation == 'Pigeonpeas' %}🫘
-                    {% elif recommendation == 'Mothbeans' %}🌾
-                    {% elif recommendation == 'Mungbean' %}🌱
-                    {% elif recommendation == 'Blackgram' %}⚫
-                    {% elif recommendation == 'Lentil' %}🥣
-                    {% elif recommendation == 'Pomegranate' %}🍎
-                    {% elif recommendation == 'Banana' %}🍌
-                    {% elif recommendation == 'Mango' %}🥭
-                    {% elif recommendation == 'Grapes' %}🍇
-                    {% elif recommendation == 'Watermelon' %}🍉
-                    {% elif recommendation == 'Muskmelon' %}🍈
-                    {% elif recommendation == 'Apple' %}🍎
-                    {% elif recommendation == 'Orange' %}🍊
-                    {% elif recommendation == 'Papaya' %}🥣
-                    {% elif recommendation == 'Coconut' %}🥥
-                    {% elif recommendation == 'Cotton' %}👕
-                    {% elif recommendation == 'Jute' %}🧶
-                    {% elif recommendation == 'Coffee' %}☕
-                    {% else %}🌿{% endif %}
-                </div>
-                <div
-                    style="font-size: 2.5rem; font-weight: 800; color: var(--primary-color); text-transform: capitalize;">
-                    {{ recommendation }}
-                </div>
-                <p style="color: var(--muted-text); margin-top: 10px;">Highest yield probability</p>
-            </div>
+            <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                Next →
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                🌱 Get Recommendations
+            </button>
         </div>
 
-        {% if ai_insight %}
-        <div class="ai-insights-container">
-            <div class="ai-header">
-                <svg class="ai-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                    <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-                <h3>🤖 AI Expert Analysis</h3>
-            </div>
-
-            <div class="ai-content">
-                <div class="ai-formatted">{{ ai_insight | safe }}</div>
-            </div>
-
-            <div class="ai-footer">
-                <small>Powered by Gemini 2.0 Flash</small>
-            </div>
+        <div id="advancedNav" style="display: none; padding-top: 20px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                🔬 Analyze with NPK Values
+            </button>
         </div>
-        {% endif %}
+    </form>
+</div>
+{% endif %}
 
-        {% else %}
-        <!-- Placeholder State -->
-        <div class="glass-card" style="text-align: center; padding: 40px 20px; opacity: 0.7;">
-            <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(1);">🌾</div>
-            <h3>Ready to Recommend</h3>
-            <p style="margin-top: 10px; color: var(--muted-text);">
-                Enter your soil and climate details to generate an optimal crop suggestion.
-            </p>
-        </div>
-        {% endif %}
-
-        {% if error %}
-        <div
-            style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.2); border: 1px solid var(--danger-color); border-radius: 8px; color: #ff6b6b; text-align: center;">
-            {{ error }}
-        </div>
-        {% endif %}
+{% if error %}
+<div class="glass-card" style="border-color: var(--danger-color); margin-top: 20px;">
+    <div style="padding: 15px; color: #ff6b6b; text-align: center;">
+        {{ error }}
     </div>
 </div>
+{% endif %}
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function setMode(mode) {
+        document.getElementById('modeInput').value = mode;
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        modeButtons.forEach(btn => btn.classList.remove('active'));
+
+        if (mode === 'simple') {
+            modeButtons[0].classList.add('active');
+            document.getElementById('simpleMode').style.display = 'block';
+            document.getElementById('advancedMode').style.display = 'none';
+            document.getElementById('simpleNav').style.display = 'flex';
+            document.getElementById('advancedNav').style.display = 'none';
+            document.getElementById('simpleProgress').style.display = 'flex';
+        } else {
+            modeButtons[1].classList.add('active');
+            document.getElementById('simpleMode').style.display = 'none';
+            document.getElementById('advancedMode').style.display = 'block';
+            document.getElementById('simpleNav').style.display = 'none';
+            document.getElementById('advancedNav').style.display = 'block';
+            document.getElementById('simpleProgress').style.display = 'none';
+        }
+    }
+
+    function changeStep(direction) {
+        const steps = document.querySelectorAll('#simpleMode .wizard-step');
+        const progressSteps = document.querySelectorAll('.progress-step');
+
+        // Validate current step before moving forward
+        if (direction === 1 && !validateStep(currentStep)) {
+            return;
+        }
+
+        // Hide current step
+        steps[currentStep - 1].classList.remove('active');
+        progressSteps[currentStep - 1].classList.remove('active');
+        progressSteps[currentStep - 1].classList.add('completed');
+
+        // Update step
+        currentStep += direction;
+
+        // Show new step
+        steps[currentStep - 1].classList.add('active');
+        progressSteps[currentStep - 1].classList.add('active');
+
+        // Update buttons
+        document.getElementById('prevBtn').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+
+        if (currentStep === totalSteps) {
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+        } else {
+            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+        }
+    }
+
+    function validateStep(step) {
+        if (step === 1) {
+            const state = document.getElementById('stateSelect').value;
+            const district = document.getElementById('districtSelect').value;
+            if (!state || !district) {
+                alert('Please select both state and district');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function selectCard(element, fieldName) {
+        // Remove selection from siblings
+        const parent = element.parentElement;
+        parent.querySelectorAll('.selection-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        // Add selection to clicked card
+        element.classList.add('selected');
+
+        // Update hidden input
+        const value = element.getAttribute('data-value');
+        document.getElementById(fieldName + 'Input').value = value;
+    }
+
+    function loadDistricts() {
+        const state = document.getElementById('stateSelect').value;
+        const districtSelect = document.getElementById('districtSelect');
+
+        if (!state) {
+            districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+            return;
+        }
+
+        fetch(`/api/districts/${encodeURIComponent(state)}`)
+            .then(response => response.json())
+            .then(data => {
+                districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+                data.districts.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
+                });
+            })
+            .catch(error => {
+                console.error('Error loading districts:', error);
+            });
+    }
+
+    // Set default selections
+    document.addEventListener('DOMContentLoaded', function () {
+        // Pre-select first option for each card group
+        const seasonCards = document.querySelectorAll('[data-step="2"] .selection-card');
+        if (seasonCards.length) seasonCards[0].classList.add('selected');
+
+        const soilCards = document.querySelectorAll('[data-step="3"] .selection-card');
+        if (soilCards.length > 1) soilCards[1].classList.add('selected'); // Loamy
+
+        const waterCards = document.querySelectorAll('[data-step="5"] .selection-card');
+        if (waterCards.length) waterCards[0].classList.add('selected');
+    });
+</script>
 {% endblock %}

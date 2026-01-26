@@ -105,6 +105,274 @@ load_models()
 
 
 # ========================================
+# REGIONAL DATA FOR SMART CROP WIZARD
+# ========================================
+
+REGIONAL_DATA = {}
+
+def load_regional_data():
+    """Load regional climate and soil data for smart recommendations"""
+    global REGIONAL_DATA
+    try:
+        with open('data/regional_data.json', 'r') as f:
+            REGIONAL_DATA = json.load(f)
+        print("✅ Regional Data Loaded (Smart Crop Wizard)")
+    except FileNotFoundError:
+        print("⚠️ Regional data not found. Smart wizard will use defaults.")
+        REGIONAL_DATA = {}
+    except Exception as e:
+        print(f"⚠️ Regional data error: {e}")
+        REGIONAL_DATA = {}
+
+load_regional_data()
+
+
+def estimate_npk_from_inputs(state, soil_type, season, previous_crop, water_source):
+    """Estimate NPK and climate values from simple user inputs"""
+    
+    # Default values
+    estimated = {
+        'N': 60, 'P': 35, 'K': 45,
+        'temperature': 25, 'humidity': 65, 'ph': 6.5, 'rainfall': 1000
+    }
+    
+    if not REGIONAL_DATA:
+        return estimated
+    
+    # Get state climate data
+    states_data = REGIONAL_DATA.get('states', {})
+    if state in states_data:
+        climate = states_data[state].get('climate', {})
+        estimated['temperature'] = climate.get('temp', 25)
+        estimated['humidity'] = climate.get('humidity', 65)
+        estimated['rainfall'] = climate.get('rainfall', 1000)
+    
+    # Get soil type NPK profile
+    soil_profiles = REGIONAL_DATA.get('soil_npk_profiles', {})
+    if soil_type in soil_profiles:
+        soil = soil_profiles[soil_type]
+        estimated['N'] = soil.get('N', 60)
+        estimated['P'] = soil.get('P', 35)
+        estimated['K'] = soil.get('K', 45)
+        ph_range = soil.get('ph_range', [6.0, 7.0])
+        estimated['ph'] = (ph_range[0] + ph_range[1]) / 2
+    
+    # Apply season adjustments
+    season_adjustments = REGIONAL_DATA.get('season_adjustments', {})
+    if season in season_adjustments:
+        adj = season_adjustments[season]
+        estimated['temperature'] += adj.get('temp_modifier', 0)
+        estimated['humidity'] += adj.get('humidity_modifier', 0)
+        estimated['rainfall'] *= adj.get('rainfall_modifier', 1.0)
+    
+    # Apply previous crop NPK effects
+    crop_effects = REGIONAL_DATA.get('previous_crop_npk_effect', {})
+    if previous_crop in crop_effects:
+        effect = crop_effects[previous_crop]
+        estimated['N'] = max(10, estimated['N'] + effect.get('N', 0))
+        estimated['P'] = max(10, estimated['P'] + effect.get('P', 0))
+        estimated['K'] = max(10, estimated['K'] + effect.get('K', 0))
+    
+    # Apply water source adjustments
+    water_effects = REGIONAL_DATA.get('water_availability_effect', {})
+    if water_source in water_effects:
+        effect = water_effects[water_source]
+        estimated['humidity'] += effect.get('humidity_modifier', 0)
+        estimated['rainfall'] *= effect.get('rainfall_modifier', 1.0)
+    
+    # Round values
+    estimated['temperature'] = round(estimated['temperature'], 1)
+    estimated['humidity'] = round(min(100, max(20, estimated['humidity'])), 1)
+    estimated['rainfall'] = round(estimated['rainfall'], 1)
+    estimated['ph'] = round(estimated['ph'], 1)
+    
+    return estimated
+
+
+def estimate_yield_conditions(state, district, season):
+    """Estimate environmental conditions for yield prediction"""
+    # Reuse the core logic but focus on yield factors
+    
+    # Default fallback
+    conditions = {
+        'Temperature': 25.0,
+        'Humidity': 65.0,
+        'Rainfall': 1000.0,
+        'pH': 6.5
+    }
+    
+    if not REGIONAL_DATA:
+        return conditions
+        
+    # 1. State Climate Baseline
+    states_data = REGIONAL_DATA.get('states', {})
+    if state in states_data:
+        climate = states_data[state].get('climate', {})
+        conditions['Temperature'] = float(climate.get('temp', 25.0))
+        conditions['Humidity'] = float(climate.get('humidity', 65.0))
+        conditions['Rainfall'] = float(climate.get('rainfall', 1000.0))
+        
+    # 2. Season Adjustment
+    season_adjustments = REGIONAL_DATA.get('season_adjustments', {})
+    season_key = season.lower()
+    if season_key in season_adjustments:
+        adj = season_adjustments[season_key]
+        conditions['Temperature'] += adj.get('temp_modifier', 0)
+        conditions['Humidity'] += adj.get('humidity_modifier', 0)
+        conditions['Rainfall'] *= adj.get('rainfall_modifier', 1.0)
+    
+    # 3. Round values
+    conditions['Temperature'] = round(conditions['Temperature'], 1)
+    conditions['Humidity'] = round(min(100, max(10, conditions['Humidity'])), 1)
+    conditions['Rainfall'] = round(max(0, conditions['Rainfall']), 1)
+    
+    return conditions
+
+
+def get_top_crop_recommendations(input_data, top_n=3):
+    """Get top N crop recommendations with probabilities"""
+    if not recommend_model:
+        return []
+    
+    try:
+        input_df = pd.DataFrame([{
+            'N': input_data['N'],
+            'P': input_data['P'],
+            'K': input_data['K'],
+            'Temperature': input_data['temperature'],
+            'Humidity': input_data['humidity'],
+            'pH': input_data['ph'],
+            'Rainfall': input_data['rainfall']
+        }])
+        
+        # Feature Engineering
+        input_df['NPK_Sum'] = input_df['N'] + input_df['P'] + input_df['K']
+        input_df['NPK_Ratio'] = input_df['N'] / (input_df['P'] + input_df['K'] + 1)
+        input_df['NK_Ratio'] = input_df['N'] / (input_df['K'] + 1)
+        input_df['PK_Ratio'] = input_df['P'] / (input_df['K'] + 1)
+        input_df['temp_humidity'] = input_df['Temperature'] * input_df['Humidity']
+        input_df['rainfall_ph'] = input_df['Rainfall'] * input_df['pH']
+        
+        rename_map = {
+            'Temperature': 'temperature',
+            'Humidity': 'humidity',
+            'pH': 'ph',
+            'Rainfall': 'rainfall'
+        }
+        input_df = input_df.rename(columns=rename_map)
+        
+        expected_cols = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall', 
+                         'NPK_Sum', 'NPK_Ratio', 'NK_Ratio', 'PK_Ratio', 'temp_humidity', 'rainfall_ph']
+        input_df = input_df[expected_cols]
+        
+        if recommend_scaler:
+            final_features = recommend_scaler.transform(input_df)
+        else:
+            final_features = input_df.values
+        
+        # Get probabilities if available
+        if hasattr(recommend_model, 'predict_proba'):
+            probs = recommend_model.predict_proba(final_features)[0]
+            classes = recommend_model.classes_
+            
+            # Get top N
+            top_indices = np.argsort(probs)[::-1][:top_n]
+            results = []
+            for idx in top_indices:
+                results.append({
+                    'crop': str(classes[idx]).title(),
+                    'confidence': round(probs[idx] * 100, 1)
+                })
+            return results
+        else:
+            # Fallback to single prediction
+            pred = recommend_model.predict(final_features)[0]
+            return [{'crop': str(pred).title(), 'confidence': 85.0}]
+            
+    except Exception as e:
+        print(f"Top recommendations error: {e}")
+        return []
+
+
+def get_wizard_ai_insight(recommendations, user_inputs, estimated_values):
+    """Generate enhanced AI insight for wizard results"""
+    if not model or not recommendations:
+        return None
+    
+    try:
+        top_crop = recommendations[0]['crop'] if recommendations else "Unknown"
+        other_crops = ", ".join([r['crop'] for r in recommendations[1:]]) if len(recommendations) > 1 else "None"
+        
+        prompt = f"""You are an expert agricultural advisor. Provide a PERSONALIZED farming guide based on this data:
+
+🌱 TOP RECOMMENDED CROP: {top_crop}
+📊 Alternative Options: {other_crops}
+
+👨‍🌾 FARMER'S INPUTS:
+- Location: {user_inputs.get('state', 'Unknown')}, {user_inputs.get('district', 'Unknown')}
+- Season: {user_inputs.get('season', 'Unknown').title()}
+- Soil Type: {user_inputs.get('soil_type', 'Unknown').title()}
+- Previous Crop: {user_inputs.get('previous_crop', 'None').title()}
+- Water Source: {user_inputs.get('water_source', 'Unknown').title()}
+
+🔬 ESTIMATED SOIL/CLIMATE:
+- NPK: N={estimated_values['N']}, P={estimated_values['P']}, K={estimated_values['K']}
+- Temperature: {estimated_values['temperature']}°C
+- Humidity: {estimated_values['humidity']}%
+- Rainfall: {estimated_values['rainfall']}mm
+- pH: {estimated_values['ph']}
+
+Output ONLY raw HTML with ACTIONABLE farming advice:
+
+<div class="wizard-insight">
+    <div class="insight-section">
+        <h4>🌟 Why {top_crop}?</h4>
+        <p>[Explain why this crop suits their specific conditions - soil, season, location]</p>
+    </div>
+    <div class="insight-section">
+        <h4>📅 Best Planting Time</h4>
+        <p>[Specific month/week for their season and location]</p>
+    </div>
+    <div class="insight-section">
+        <h4>🚜 Soil Preparation Tips</h4>
+        <ul>
+            <li>[Specific tip for their soil type]</li>
+            <li>[Fertilizer recommendation based on NPK]</li>
+        </ul>
+    </div>
+    <div class="insight-section">
+        <h4>💧 Water Management</h4>
+        <p>[Advice based on their water source - rainfed vs irrigated]</p>
+    </div>
+    <div class="insight-section">
+        <h4>📈 Expected Yield</h4>
+        <p>[Realistic yield range for their conditions]</p>
+    </div>
+    <div class="insight-section">
+        <h4>⚠️ Watch Out For</h4>
+        <ul>
+            <li>[Potential pest/disease for this crop in their region]</li>
+            <li>[Weather risk for their season]</li>
+        </ul>
+    </div>
+</div>
+
+Be specific to their location and conditions. Keep it practical and actionable."""
+
+        response = model.generate_content(prompt)
+        result = response.text.strip()
+        if result.startswith('```'):
+            result = result.split('\n', 1)[1] if '\n' in result else result[3:]
+        if result.endswith('```'):
+            result = result[:-3]
+        return result.strip()
+    
+    except Exception as e:
+        print(f"Wizard AI Insight Error: {e}")
+        return None
+
+
+# ========================================
 # AI INSIGHT FUNCTIONS
 # ========================================
 
@@ -393,17 +661,53 @@ def predict_yield():
                 error = "⚠️ Yield prediction model not loaded. Please train the model first."
                 return render_template('predict_yield.html', error=error)
             
-            data = {
-                'State_Name': request.form.get('State_Name'),
-                'District_Name': request.form.get('District_Name'),
-                'Crop_Year': float(request.form.get('Crop_Year', 2024)),
-                'Crop': request.form.get('Crop'),
-                'Area': float(request.form.get('Area')),
-                'Temperature': float(request.form.get('Temperature')),
-                'Humidity': float(request.form.get('Humidity')),
-                'pH': float(request.form.get('pH')),
-                'Rainfall': float(request.form.get('Rainfall'))
-            }
+            # Helper to safely get float or None
+            def get_float(key, default=None):
+                val = request.form.get(key)
+                if val and val.strip():
+                    return float(val)
+                return default
+
+            # Get basic inputs
+            state = request.form.get('State_Name')
+            district = request.form.get('District_Name')
+            season = request.form.get('Season', 'Kharif') # Default if missing
+            crop = request.form.get('Crop')
+            
+            # Check mode: Smart (missing env data) vs Advanced (has env data)
+            temp = get_float('Temperature')
+            
+            if temp is None:
+                # SMART MODE: Estimate conditions
+                estimated = estimate_yield_conditions(state, district, season)
+                data = {
+                    'State_Name': state,
+                    'District_Name': district,
+                    'Crop_Year': get_float('Crop_Year', 2025),
+                    'Crop': crop,
+                    'Area': get_float('Area'),
+                    'Temperature': estimated['Temperature'],
+                    'Humidity': estimated['Humidity'],
+                    'pH': estimated['pH'],
+                    'Rainfall': estimated['Rainfall'],
+                    'Season': season,  # Pass for AI context
+                    'is_estimated': True  # Flag for UI
+                }
+            else:
+                # ADVANCED MODE: Use provided data
+                data = {
+                    'State_Name': state,
+                    'District_Name': district,
+                    'Crop_Year': get_float('Crop_Year', 2025),
+                    'Crop': crop,
+                    'Area': get_float('Area'),
+                    'Temperature': temp,
+                    'Humidity': get_float('Humidity'),
+                    'pH': get_float('pH'),
+                    'Rainfall': get_float('Rainfall'),
+                    'Season': season,
+                    'is_estimated': False
+                }
             
             is_valid, validation_msg = validate_input(data, 'yield')
             if not is_valid:
@@ -444,6 +748,7 @@ def predict_yield():
     return render_template('predict_yield.html', 
                          prediction=prediction, 
                          ai_insight=ai_insight,
+                         input_data=data if prediction else None, # Return calculated data to UI
                          error=error)
 
 
@@ -698,6 +1003,99 @@ def recommend_crop():
                          recommendation=recommendation,
                          ai_insight=ai_insight,
                          error=error)
+
+
+@app.route('/smart_crop_wizard', methods=['GET', 'POST'])
+def smart_crop_wizard():
+    """Smart Crop Recommendation Wizard - Farmer-friendly questionnaire"""
+    
+    # Get available states and soil types from regional data
+    states = list(REGIONAL_DATA.get('states', {}).keys()) if REGIONAL_DATA else []
+    soil_types = list(REGIONAL_DATA.get('soil_npk_profiles', {}).keys()) if REGIONAL_DATA else ['loamy', 'sandy', 'clay', 'black', 'red']
+    
+    if request.method == 'POST':
+        try:
+            # Collect user inputs
+            user_inputs = {
+                'state': request.form.get('state', ''),
+                'district': request.form.get('district', ''),
+                'season': request.form.get('season', 'kharif'),
+                'soil_type': request.form.get('soil_type', 'loamy'),
+                'previous_crop': request.form.get('previous_crop', 'none'),
+                'water_source': request.form.get('water_source', 'rainfed')
+            }
+            
+            # Check for advanced mode
+            is_advanced = request.form.get('mode') == 'advanced'
+            
+            if is_advanced:
+                # Use direct NPK values from advanced form
+                estimated = {
+                    'N': float(request.form.get('N', 60)),
+                    'P': float(request.form.get('P', 35)),
+                    'K': float(request.form.get('K', 45)),
+                    'temperature': float(request.form.get('temperature', 25)),
+                    'humidity': float(request.form.get('humidity', 65)),
+                    'ph': float(request.form.get('ph', 6.5)),
+                    'rainfall': float(request.form.get('rainfall', 1000))
+                }
+            else:
+                # Estimate NPK from simple inputs
+                estimated = estimate_npk_from_inputs(
+                    user_inputs['state'],
+                    user_inputs['soil_type'],
+                    user_inputs['season'],
+                    user_inputs['previous_crop'],
+                    user_inputs['water_source']
+                )
+            
+            # Get top 3 recommendations
+            recommendations = get_top_crop_recommendations(estimated, top_n=3)
+            
+            if not recommendations:
+                return render_template('recommend.html',
+                    states=states,
+                    soil_types=soil_types,
+                    error="⚠️ Could not generate recommendations. Model may not be loaded.")
+            
+            # Get AI farming guide
+            ai_insight = get_wizard_ai_insight(recommendations, user_inputs, estimated)
+            
+            # Save to history
+            save_prediction_history(user_inputs, recommendations[0]['crop'] if recommendations else 'None', 'crop_wizard')
+            
+            return render_template('recommend.html',
+                states=states,
+                soil_types=soil_types,
+                recommendations=recommendations,
+                user_inputs=user_inputs,
+                estimated=estimated,
+                ai_insight=ai_insight,
+                show_results=True
+            )
+            
+        except Exception as e:
+            print(f"Smart Wizard Error: {e}")
+            return render_template('recommend.html',
+                states=states,
+                soil_types=soil_types,
+                error=f"❌ Error: {str(e)}")
+    
+    # GET request - show wizard form
+    return render_template('recommend.html',
+        states=states,
+        soil_types=soil_types,
+        regional_data=REGIONAL_DATA
+    )
+
+
+@app.route('/api/districts/<state>')
+def get_districts(state):
+    """API endpoint to get districts for a state"""
+    if REGIONAL_DATA and 'states' in REGIONAL_DATA:
+        districts = REGIONAL_DATA['states'].get(state, {}).get('districts', [])
+        return jsonify({'districts': districts})
+    return jsonify({'districts': []})
 
 
 # ========================================

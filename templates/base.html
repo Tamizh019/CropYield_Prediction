@@ -25,8 +25,9 @@
                     class="nav-item {{ 'active' if request.path.startswith('/predict_yield') else '' }}">
                     <span class="nav-icon">🌾</span> Yield Prediction
                 </a>
-                <a href="/recommend_crop" class="nav-item {{ 'active' if request.path == '/recommend_crop' else '' }}">
-                    <span class="nav-icon">🧪</span> Crop Recommend
+                <a href="/smart_crop_wizard"
+                    class="nav-item {{ 'active' if '/smart_crop_wizard' in request.path or '/recommend_crop' in request.path else '' }}">
+                    <span class="nav-icon">🌱</span> Smart Advisor
                 </a>
                 <a href="/plant_doctor" class="nav-item {{ 'active' if request.path == '/plant_doctor' else '' }}">
                     <span class="nav-icon">🩺</span> Plant Doctor

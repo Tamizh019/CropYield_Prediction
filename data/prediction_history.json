@@ -1,18 +1,56 @@
 [
   {
-    "timestamp": "2026-01-27T00:24:43.248198",
+    "timestamp": "2026-01-27T01:43:42.269732",
     "type": "yield",
     "input": {
       "State_Name": "Tamil Nadu",
-      "District_Name": "chennai ",
-      "Crop_Year": 2024.0,
-      "Crop": "Rice ",
-      "Area": 4.0,
-      "Temperature": 25.0,
-      "Humidity": 80.0,
-      "pH": 7.0,
-      "Rainfall": 205.0
+      "District_Name": "Chennai",
+      "Crop_Year": 2025.0,
+      "Crop": "Wheat",
+      "Area": 3.0,
+      "Temperature": 33.5,
+      "Humidity": 65.0,
+      "pH": 6.5,
+      "Rainfall": 190.0,
+      "Season": "Zaid",
+      "is_estimated": true
     },
-    "prediction": "4711.35"
+    "prediction": "4600.46"
+  },
+  {
+    "timestamp": "2026-01-27T01:43:42.477688",
+    "type": "yield",
+    "input": {
+      "State_Name": "Tamil Nadu",
+      "District_Name": "Chennai",
+      "Crop_Year": 2025.0,
+      "Crop": "Wheat",
+      "Area": 3.0,
+      "Temperature": 33.5,
+      "Humidity": 65.0,
+      "pH": 6.5,
+      "Rainfall": 190.0,
+      "Season": "Zaid",
+      "is_estimated": true
+    },
+    "prediction": "4600.46"
+  },
+  {
+    "timestamp": "2026-01-27T01:55:07.107781",
+    "type": "yield",
+    "input": {
+      "State_Name": "Tamil Nadu",
+      "District_Name": "Chennai",
+      "Crop_Year": 2025.0,
+      "Crop": "Rice",
+      "Area": 2.0,
+      "Temperature": 30.5,
+      "Humidity": 85.0,
+      "pH": 6.5,
+      "Rainfall": 1425.0,
+      "Season": "Kharif",
+      "is_estimated": true
+    },
+    "prediction": "4618.93"
   }
 ]
