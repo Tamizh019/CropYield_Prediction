@@ -17,12 +17,11 @@ Double-click run.bat
 ```bash
 # 1. Create .env file with API keys
 GOOGLE_API_KEY=your_gemini_api_key
-OPENWEATHER_API_KEY=your_weather_key  # Optional
 
 # 2. Install & Run
 pip install -r requirements.txt
-python train_models.py   # First time only
-python app.py            # Start server
+python scripts/train_models.py   # First time only
+python app.py                    # Start server
 ```
 
 Open **http://127.0.0.1:5000**
@@ -36,9 +35,6 @@ Open **http://127.0.0.1:5000**
 | 📊 **Yield Prediction** | XGBoost | Predict crop yields with bulk CSV upload |
 | 🌱 **Crop Recommendation** | Random Forest | Find best crops for your land |
 | 🩺 **Plant Doctor** | CNN (MobileNetV2) | Diagnose plant diseases from photos |
-| 💰 **Market Prices** | LSTM | 7-day price forecasting |
-| 🌦️ **Weather Intel** | OpenWeatherMap API | Farming alerts & 5-day forecast |
-| 🧪 **Fertilizer Calc** | Optimization | NPK-based recommendations |
 | 🤖 **AI Insights** | Gemini 2.0 Flash | Smart analysis on every page |
 
 ---
@@ -56,21 +52,16 @@ Open **http://127.0.0.1:5000**
 - **Risk Mitigation** - Potential issues & solutions
 - **Growth Opportunities** - Where to expand cultivation
 
-### Bug Fixes
-- Fixed state name display (was showing codes, now shows names)
-- Improved page spacing for better readability
-- Reduced table preview to 10 rows for cleaner UI
-
 ---
 
 ## 🧠 Tech Stack
 
 | Layer | Technologies |
 |-------|--------------|
-| **ML Models** | XGBoost, Random Forest, MobileNetV2 CNN, LSTM |
+| **ML Models** | XGBoost, Random Forest, MobileNetV2 CNN |
 | **Backend** | Flask, TensorFlow/Keras, Gemini 2.0 |
 | **Frontend** | Glassmorphism UI, Chart.js |
-| **APIs** | OpenWeatherMap, Google Gemini |
+| **APIs** | Google Gemini |
 
 ---
 
@@ -78,17 +69,15 @@ Open **http://127.0.0.1:5000**
 
 ```
 CropYield_Prediction/
-├── app.py                 # Main Flask app (all routes)
-├── train_models.py        # ML model training
-├── train_disease_model.py # CNN training
-├── disease_detection.py   # Plant Doctor module
-├── price_forecast.py      # LSTM predictions
-├── weather_service.py     # Weather API
-├── models/                # Trained .pkl & .h5 files
-├── templates/             # HTML pages
-├── static/                # CSS, JS, images
-├── Datasets/              # Training data
-└── Docs/                  # Full documentation
+├── app.py                         # Main Flask app (all routes)
+├── disease_detection.py           # Plant Doctor module
+├── scripts/train_models.py        # ML model training
+├── scripts/train_disease_model.py # CNN training
+├── models/                        # Trained .pkl & .h5 files
+├── templates/                     # HTML pages
+├── static/                        # CSS, JS, images
+├── Datasets/                      # Training data
+└── Docs/                          # Full documentation
 ```
 
 ---

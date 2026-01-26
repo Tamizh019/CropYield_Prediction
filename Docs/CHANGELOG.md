@@ -36,10 +36,8 @@ All notable changes to AgriVision, organized by version.
 
 ### Added
 - **🩺 Plant Doctor**: CNN-based disease detection (MobileNetV2)
-- **💰 Market Prices**: LSTM price forecasting with real datasets
-- **🌦️ Weather Service**: Live weather with 5-day forecast
-- **🧪 Fertilizer Calculator**: NPK optimization recommendations
 - **📊 Dashboard Status**: Real-time model status indicators
+- **🤖 Dynamic Disease Info**: Gemini AI generates treatment details
 
 ### Changed
 - Upgraded to Gemini 2.0 Flash Experimental

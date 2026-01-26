@@ -1,11 +1,11 @@
 # 🧠 How Deep Learning Works in AgriVision
 
-> 👋 HI Guys , Hope you’ve already seen how our Machine Learning models work!  
+> 👋 HI Guys , Hope you've already seen how our Machine Learning models work!  
 If not, no worries — you can check it out here first:  
 *Previous: [MACHINE_LEARNING.md](./MACHINE_LEARNING.md)*
 
-🚀 Now that you’re all set, welcome to the **Deep Learning zone**!  
-Let’s explore how CNN and LSTM models power **Plant Doctor** and **Price Forecasting**.
+🚀 Now that you're all set, welcome to the **Deep Learning zone**!  
+Let's explore how CNN powers our **Plant Doctor** feature.
 
 ---
 
@@ -22,10 +22,6 @@ Let’s explore how CNN and LSTM models power **Plant Doctor** and **Price Forec
 │   │                                       │   │
 │   │   ┌───────────────────────────────┐   │   │
 │   │   │   CNN (Image-based Models)    │   │   │
-│   │   └───────────────────────────────┘   │   │
-│   │                                       │   │
-│   │   ┌───────────────────────────────┐   │   │
-│   │   │  LSTM (Sequence / Time-Series)│   │   │
 │   │   └───────────────────────────────┘   │   │
 │   │                                       │   │
 │   └───────────────────────────────────────┘   │
@@ -46,7 +42,7 @@ Let’s explore how CNN and LSTM models power **Plant Doctor** and **Price Forec
 
 ---
 
-## 🩺 1. Plant Doctor: CNN (Convolutional Neural Network)
+## 🩺 Plant Doctor: CNN (Convolutional Neural Network)
 
 ### What it does
 Takes a leaf image → Detects if the plant has a disease.
@@ -121,78 +117,9 @@ Dense Layer (256 neurons) + ReLU
     ↓
 Dropout (0.3) - prevents overfitting
     ↓
-Dense Layer (15 neurons) + Softmax
+Dense Layer (N neurons) + Softmax
     ↓
-Output: 15 disease probabilities
-```
-
----
-
-## 💰 2. Market Prices: LSTM (Long Short-Term Memory)
-
-### What it does
-Takes historical prices → Predicts future prices (7 days).
-
-### Why LSTM for Time Series?
-
-Regular neural networks have no "memory"—they treat each input independently. But **prices depend on past prices**!
-
-```
-Traditional NN:  Price today = f(today's features)
-LSTM:            Price today = f(today's features + yesterday + last week...)
-```
-
-### How LSTM "Remembers"
-
-```
-Day 1 Price: ₹2000 ──→ 🧠 LSTM Cell ──→ Remember: "Started at ₹2000"
-                              │
-Day 2 Price: ₹2050 ──→ 🧠 LSTM Cell ──→ Update: "Rising trend (+₹50)"
-                              │
-Day 3 Price: ₹2100 ──→ 🧠 LSTM Cell ──→ Update: "Still rising (+₹50/day)"
-                              │
-Day 4 Price: ₹2080 ──→ 🧠 LSTM Cell ──→ Update: "Slight correction"
-                              │
-                              ↓
-                   📈 Predict Day 5-11
-```
-
-### LSTM Cell: The Memory Unit
-
-Each LSTM cell has **3 gates**:
-
-```
-┌──────────────────────────────────────────────────────┐
-│                    LSTM CELL                         │
-│                                                      │
-│  ┌─────────┐    ┌─────────┐    ┌─────────┐           │
-│  │ FORGET  │    │  INPUT  │    │ OUTPUT  │           │
-│  │  GATE   │    │  GATE   │    │  GATE   │           │
-│  └────┬────┘    └────┬────┘    └────┬────┘           │
-│       │              │              │                │
-│       ↓              ↓              ↓                │
-│  "What to      "What new      "What to               │
-│   forget?"      info to add?"   output?"             │
-│                                                      │
-│  Example:       Example:        Example:             │
-│  Forget last    Add today's     Output the           │
-│  year's data    price trend     prediction           │
-└──────────────────────────────────────────────────────┘
-```
-
-### LSTM Architecture for Price Forecasting
-```python
-Input: 60 days of prices → Shape: (60, 1)
-    ↓
-LSTM Layer (50 units, return_sequences=True)
-    ↓
-LSTM Layer (50 units)
-    ↓
-Dense Layer (25 units)
-    ↓
-Dense Layer (7 units) ← 7-day forecast
-    ↓
-Output: [Day1, Day2, Day3, Day4, Day5, Day6, Day7] prices
+Output: N disease probabilities
 ```
 
 ---
@@ -221,7 +148,6 @@ Output: [0.65, 0.24, 0.11]  ← probabilities that sum to 1
 | Task | Loss Function | What it measures |
 |------|---------------|------------------|
 | Classification (Disease) | CrossEntropy | How wrong the probability is |
-| Regression (Price) | MSE | Average squared error |
 
 ### Optimizer: Adam
 
@@ -248,7 +174,7 @@ Training: 30 epochs = See each image 30 times
 ```
             ┌─────────────────────┐
             │   Load Dataset      │
-            │   (Images/Prices)   │
+            │   (Images)          │
             └──────────┬──────────┘
                        ↓
             ┌─────────────────────┐
@@ -293,25 +219,25 @@ Training: 30 epochs = See each image 30 times
 
 ---
 
-## 💡 Summary Comparison
+## 💡 Summary
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
 │                      DEEP LEARNING                             │
 │                                                                │
-│   ┌─────────────────────┐    ┌─────────────────────┐           │
-│   │        CNN          │    │        LSTM         │           │
-│   │   (Plant Doctor)    │    │   (Price Forecast)  │           │
-│   ├─────────────────────┤    ├─────────────────────┤           │
-│   │ Input: Images       │    │ Input: Time Series  │           │
-│   │ Learns: Patterns    │    │ Learns: Sequences   │           │
-│   │ Output: Class       │    │ Output: Future vals │           │
-│   │                     │    │                     │           │
-│   │ Used for:           │    │ Used for:           │           │
-│   │ • Image classify    │    │ • Stock prediction  │           │
-│   │ • Object detection  │    │ • Weather forecast  │           │
-│   │ • Face recognition  │    │ • Language models   │           │
-│   └─────────────────────┘    └─────────────────────┘           │
+│   ┌─────────────────────────────────────────────────────┐      │
+│   │                     CNN                             │      │
+│   │              (Plant Doctor)                         │      │
+│   ├─────────────────────────────────────────────────────┤      │
+│   │ Input: Leaf Images                                  │      │
+│   │ Learns: Visual patterns in diseased leaves          │      │
+│   │ Output: Disease class + confidence                  │      │
+│   │                                                     │      │
+│   │ Used for:                                           │      │
+│   │ • Image classification                              │      │
+│   │ • Object detection                                  │      │
+│   │ • Face recognition                                  │      │
+│   └─────────────────────────────────────────────────────┘      │
 │                                                                │
 │   Key Difference from ML:                                      │
 │   • Automatically learns features (no manual engineering)      │
@@ -319,7 +245,7 @@ Training: 30 epochs = See each image 30 times
 │   • Needs MORE compute (GPU recommended)                       │
 │   • Better for unstructured data (images, audio, text)         │
 │                                                                │
-│   AgriVision uses: MobileNetV2 (CNN), LSTM                     │
+│   AgriVision uses: MobileNetV2 (CNN)                          │
 └────────────────────────────────────────────────────────────────┘
 ```
 
@@ -327,11 +253,10 @@ Training: 30 epochs = See each image 30 times
 
 ## 🔗 Quick Reference
 
-| What | ML (XGBoost/RF) | DL (CNN/LSTM) |
-|------|-----------------|---------------|
+| What | ML (XGBoost/RF) | DL (CNN) |
+|------|-----------------|----------|
 | Yield Prediction | ✅ Best choice | Overkill |
 | Crop Recommendation | ✅ Best choice | Overkill |
 | Disease Detection | ❌ Can't handle images | ✅ Best choice |
-| Price Forecasting | ⚠️ Works okay | ✅ Better for trends |
 
 ---

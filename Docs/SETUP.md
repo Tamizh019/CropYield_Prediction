@@ -8,7 +8,7 @@ Complete installation and configuration guide for developers.
 
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
-| Python | 3.9 - 3.11 | Core runtime |
+| Python | 3.9 - 3.12 | Core runtime |
 | pip | Latest | Package manager |
 | Git | Any | Version control |
 | 8GB+ RAM | - | For training models |
@@ -48,7 +48,7 @@ pip install -r requirements.txt
 | Package | Purpose |
 |---------|---------|
 | `flask` | Web framework |
-| `tensorflow` | Deep learning (CNN, LSTM) |
+| `tensorflow` | Deep learning (CNN) |
 | `xgboost` | Yield prediction model |
 | `scikit-learn` | ML utilities |
 | `pandas`, `numpy` | Data processing |
@@ -64,16 +64,12 @@ Create a `.env` file in the root directory:
 # Required
 GOOGLE_API_KEY=your_gemini_api_key_here
 
-# Optional (for live weather)
-OPENWEATHER_API_KEY=your_openweather_key_here
-
 # Flask
 SECRET_KEY=your_random_secret_key
 ```
 
 ### Getting API Keys
 1. **Gemini AI**: [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. **OpenWeather**: [OpenWeatherMap API](https://openweathermap.org/api)
 
 ---
 
@@ -97,17 +93,14 @@ If models are not pre-trained:
 
 ```bash
 # Train Yield + Recommendation models
-python train_models.py
+python scripts/train_models.py
 
 # Train Plant Disease CNN
-python train_disease_model.py
-
-# Train Price LSTM
-python train_price_model.py
+python scripts/train_disease_model.py
 ```
 
 > [!TIP]
-> **Low-Spec PC?** Training deep learning models (CNN, LSTM) can take 1-2 hours and requires 8GB+ RAM.
+> **Low-Spec PC?** Training the CNN can take 1-2 hours and requires 8GB+ RAM.
 > 
 > **Alternative:** Download our pre-trained models instead!
 > 
@@ -132,11 +125,13 @@ Open your browser: **http://127.0.0.1:5000**
 ```
 CropYield_Prediction/
 ├── app.py                 # Main Flask application
+├── disease_detection.py   # Plant Doctor module
 ├── models/                # Trained model files (.pkl, .h5)
 ├── templates/             # HTML templates
 ├── static/                # CSS, JS, images
 ├── Datasets/              # Training data (gitignored)
 ├── Docs/                  # Documentation
+├── scripts/               # Training scripts
 ├── .env                   # Environment variables (gitignored)
 └── requirements.txt       # Python dependencies
 ```

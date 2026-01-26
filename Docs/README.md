@@ -22,7 +22,7 @@ Welcome to the technical documentation for AgriVision v3.1
 | Doc | Description |
 |-----|-------------|
 | [MACHINE_LEARNING.md](./MACHINE_LEARNING.md) | XGBoost, Random Forest details |
-| [DEEP_LEARNING.md](./DEEP_LEARNING.md) | CNN, LSTM, TensorFlow |
+| [DEEP_LEARNING.md](./DEEP_LEARNING.md) | CNN, TensorFlow |
 | [CNN_Training_Explained.md](./CNN_Training_Explained.md) | Plant disease model training |
 
 ### History

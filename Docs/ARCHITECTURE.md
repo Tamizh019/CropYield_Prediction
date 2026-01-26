@@ -10,7 +10,7 @@ High-level overview of how AgriVision components connect.
 ┌─────────────────────────────────────────────────────────────────┐
 │                        USER (Browser)                           │
 │                    http://127.0.0.1:5000                        │
-└─────────────────────────────┬───────────────────────────────────┘
+└─────────────────────────────────┬───────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -20,44 +20,44 @@ High-level overview of how AgriVision components connect.
 │  │   Routes    │  │  Templates  │  │   Static    │             │
 │  │  /predict   │  │   (HTML)    │  │  (CSS/JS)   │             │
 │  │  /recommend │  │             │  │             │             │
-│  │  /weather   │  │             │  │             │             │
+│  │  /plant_doc │  │             │  │             │             │
 │  └──────┬──────┘  └─────────────┘  └─────────────┘             │
 └─────────┼───────────────────────────────────────────────────────┘
           │
           ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      SERVICE LAYER                              │
-│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐       │
-│  │ disease_      │  │ price_        │  │ weather_      │       │
-│  │ detection.py  │  │ forecast.py   │  │ service.py    │       │
-│  │               │  │               │  │               │       │
-│  │  CNN Model    │  │  LSTM Model   │  │  API Client   │       │
-│  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘       │
-└──────────┼──────────────────┼──────────────────┼────────────────┘
-           │                  │                  │
-           ▼                  ▼                  ▼
+│  ┌───────────────────────────────────────────────────┐          │
+│  │ disease_detection.py                              │          │
+│  │                                                   │          │
+│  │  CNN Model + Gemini AI (Dynamic Disease Info)     │          │
+│  └───────────────────────┬───────────────────────────┘          │
+└──────────────────────────┼──────────────────────────────────────┘
+                           │
+                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                         MODELS                                  │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
-│  │ disease_    │  │ price_      │  │ yield_      │             │
-│  │ model.h5    │  │ lstm.h5     │  │ model.pkl   │             │
-│  │ (TensorFlow)│  │ (Keras)     │  │ (XGBoost)   │             │
+│  │ disease_    │  │ yield_      │  │ recommend_  │             │
+│  │ model.h5    │  │ model.pkl   │  │ model.pkl   │             │
+│  │ (TensorFlow)│  │ (XGBoost)   │  │ (RandomFor) │             │
 │  └─────────────┘  └─────────────┘  └─────────────┘             │
 │                                                                 │
-│  ┌─────────────┐  ┌─────────────┐                              │
-│  │ recommend_  │  │ classes.    │                              │
-│  │ model.pkl   │  │ json        │                              │
-│  │ (RandomFor) │  │ (Labels)    │                              │
-│  └─────────────┘  └─────────────┘                              │
+│  ┌─────────────┐                                               │
+│  │ classes.    │                                               │
+│  │ json        │                                               │
+│  │ (Labels)    │                                               │
+│  └─────────────┘                                               │
 └─────────────────────────────────────────────────────────────────┘
-           │
-           ▼
+          │
+          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                            │
-│  ┌─────────────┐  ┌─────────────┐                              │
-│  │ Gemini AI   │  │ OpenWeather │                              │
-│  │ (Insights)  │  │ (Forecast)  │                              │
-│  └─────────────┘  └─────────────┘                              │
+│  ┌─────────────┐                                               │
+│  │ Gemini AI   │                                               │
+│  │ (Insights & │                                               │
+│  │  Disease DB)│                                               │
+│  └─────────────┘                                               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -70,14 +70,14 @@ High-level overview of how AgriVision components connect.
 User Input → Flask Route → XGBoost Model → Prediction → Gemini AI → Insight
 ```
 
-### 2. Disease Detection Flow
+### 2. Crop Recommendation Flow
 ```
-Image Upload → Preprocess (224x224) → CNN Model → Class Prediction → Treatment Info
+Soil/Climate Input → Flask Route → Random Forest Model → Best Crop → Gemini AI → Insight
 ```
 
-### 3. Price Forecast Flow
+### 3. Disease Detection Flow
 ```
-Crop Selection → Historical Data → LSTM Model → 7-Day Forecast → Chart
+Image Upload → Gemini Validation → Preprocess (224x224) → CNN Model → Class Prediction → Gemini AI → Dynamic Treatment Info
 ```
 
 ---
@@ -87,19 +87,16 @@ Crop Selection → Historical Data → LSTM Model → 7-Day Forecast → Chart
 | File | Responsibility |
 |------|----------------|
 | `app.py` | Main application, routes, model loading |
-| `disease_detection.py` | CNN model wrapper, image preprocessing |
-| `price_forecast.py` | LSTM model, price simulation |
-| `weather_service.py` | OpenWeather API integration |
-| `fertilizer_optimizer.py` | NPK calculations |
-| `train_models.py` | XGBoost/RandomForest training |
-| `train_disease_model.py` | CNN training pipeline |
-| `train_price_model.py` | LSTM training pipeline |
+| `disease_detection.py` | CNN model wrapper, image preprocessing, Gemini integration |
+| `scripts/train_models.py` | XGBoost/RandomForest training |
+| `scripts/train_disease_model.py` | CNN training pipeline |
 
 ---
 
 ## Key Design Decisions
 
-1. **Modular Services**: Each feature (disease, price, weather) is a separate Python module for maintainability.
-2. **Fallback Mode**: All services have "simulation" fallback when models/APIs are unavailable.
+1. **Modular Services**: Disease detection is a separate Python module for maintainability.
+2. **Dynamic Disease Info**: Gemini AI generates treatment info for any disease class (no hardcoded database).
 3. **Transfer Learning**: CNN uses MobileNetV2 base for efficient training with limited data.
-4. **Gemini AI Integration**: Provides human-readable insights on top of ML predictions.
+4. **AI Validation**: Uploaded plant images are verified by Gemini before processing.
+5. **Gemini AI Integration**: Provides human-readable insights on top of ML predictions.

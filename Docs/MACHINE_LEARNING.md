@@ -1,7 +1,7 @@
 # 🤖 How Machine Learning Works in AgriVision
 
 > Are you ready Guys ?
-Alright, let’s jump in and see how our ML models actually work behind the scenes to power Yield Prediction & Crop Recommendation.
+Alright, let's jump in and see how our ML models actually work behind the scenes to power Yield Prediction & Crop Recommendation.
 
 ---
 
@@ -180,4 +180,4 @@ Rainfall: 200mm → 0.4 (on 0-1 scale)
 
 ---
 
-*Next: Read [DEEP_LEARNING.md](./DEEP_LEARNING.md) to learn about CNN and LSTM models!*
+*Next: Read [DEEP_LEARNING.md](./DEEP_LEARNING.md) to learn about CNN for Plant Doctor!*
