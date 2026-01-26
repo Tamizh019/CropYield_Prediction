@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgriVision{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">🌱</span>
+                <span class="brand-text">AgriVision</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-item {{ 'active' if request.path == '/' else '' }}">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a href="/predict_yield"
+                    class="nav-item {{ 'active' if request.path.startswith('/predict_yield') else '' }}">
+                    <span class="nav-icon">🌾</span> Yield Prediction
+                </a>
+                <a href="/recommend_crop" class="nav-item {{ 'active' if request.path == '/recommend_crop' else '' }}">
+                    <span class="nav-icon">🧪</span> Crop Recommend
+                </a>
+                <a href="/plant_doctor" class="nav-item {{ 'active' if request.path == '/plant_doctor' else '' }}">
+                    <span class="nav-icon">🩺</span> Plant Doctor
+                </a>
+                <div class="nav-divider">Model Analytics</div>
+                <a href="/model_dashboard"
+                    class="nav-item {{ 'active' if request.path == '/model_dashboard' else '' }}">
+                    <span class="nav-icon">📊</span> Performance
+                </a>
+                <a href="/model_comparison"
+                    class="nav-item {{ 'active' if request.path == '/model_comparison' else '' }}">
+                    <span class="nav-icon">⚖️</span> Comparison
+                </a>
+            </div>
+
+            <!-- System Status in Sidebar -->
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>System Online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Common Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

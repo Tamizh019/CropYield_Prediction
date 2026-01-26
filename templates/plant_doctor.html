@@ -1,232 +1,239 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plant Doctor - AgriVision</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .upload-zone {
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            padding: 60px 40px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.05);
-        }
+{% block title %}Plant Doctor - AgriVision{% endblock %}
 
-        .upload-zone:hover {
-            border-color: var(--success);
-            background: rgba(76, 175, 80, 0.1);
-        }
+{% block head %}
+<style>
+    .upload-zone {
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 60px 40px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.05);
+    }
 
-        .upload-zone.dragover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
+    .upload-zone:hover {
+        border-color: var(--success);
+        background: rgba(76, 175, 80, 0.1);
+    }
 
-        .upload-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
+    .upload-zone.dragover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.1);
+    }
 
-        .preview-image {
-            max-width: 300px;
-            border-radius: 12px;
-            margin: 20px auto;
-            display: block;
-        }
+    .upload-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
 
-        .diagnosis-card {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.05));
-            border-radius: 16px;
-            padding: 30px;
-            margin-top: 30px;
-        }
+    .preview-image {
+        max-width: 300px;
+        border-radius: 12px;
+        margin: 20px auto;
+        display: block;
+    }
 
-        .severity-badge {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: inline-block;
-        }
+    .diagnosis-card {
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.05));
+        border-radius: 16px;
+        padding: 30px;
+        margin-top: 30px;
+    }
 
-        .severity-None {
-            background: rgba(76, 175, 80, 0.3);
-            color: #4caf50;
-        }
+    .severity-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        display: inline-block;
+    }
 
-        .severity-Moderate {
-            background: rgba(255, 193, 7, 0.3);
-            color: #ffc107;
-        }
+    .severity-None {
+        background: rgba(76, 175, 80, 0.3);
+        color: #4caf50;
+    }
 
-        .severity-Severe,
-        .severity-Critical {
-            background: rgba(244, 67, 54, 0.3);
-            color: #f44336;
-        }
+    .severity-Moderate {
+        background: rgba(255, 193, 7, 0.3);
+        color: #ffc107;
+    }
 
-        .confidence-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
+    .severity-Severe,
+    .severity-Critical {
+        background: rgba(244, 67, 54, 0.3);
+        color: #f44336;
+    }
 
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success), #8bc34a);
-            border-radius: 4px;
-            transition: width 0.5s;
-        }
+    .confidence-bar {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
 
-        .treatment-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
-        }
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--success), #8bc34a);
+        border-radius: 4px;
+        transition: width 0.5s;
+    }
 
-        .treatment-card h4 {
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
+    .treatment-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+    }
 
-<body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="brand">
-                <span class="brand-icon">🌱</span>
-                <span class="brand-text">AgriVision</span>
-            </div>
-            <div class="nav-links">
-                <a href="/" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
-                <a href="/predict_yield" class="nav-item"><span class="nav-icon">🌾</span> Yield Prediction</a>
-                <a href="/recommend_crop" class="nav-item"><span class="nav-icon">🧪</span> Crop Recommend</a>
-                <div class="nav-divider">v3.0 Features</div>
-                <a href="/plant_doctor" class="nav-item active"><span class="nav-icon">🩺</span> Plant Doctor</a>
-                <a href="/market_prices" class="nav-item"><span class="nav-icon">💰</span> Market Prices</a>
-                <a href="/weather" class="nav-item"><span class="nav-icon">🌦️</span> Weather</a>
-                <a href="/fertilizer" class="nav-item"><span class="nav-icon">🧪</span> Fertilizer Calc</a>
-            </div>
-        </div>
+    .treatment-card h4 {
+        margin-bottom: 10px;
+    }
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">🩺 AI Plant Doctor</h1>
-                <p class="page-subtitle">Upload a photo of a leaf to detect diseases instantly</p>
-            </div>
+    /* AI Advice specific styling */
+    .ai-advice-content ul,
+    .ai-advice-content ol {
+        padding-left: 20px;
+        margin: 10px 0;
+    }
 
-            <div class="glass-card">
-                <form method="POST" enctype="multipart/form-data" id="uploadForm">
-                    <div class="upload-zone" id="dropZone" onclick="document.getElementById('imageInput').click()">
-                        <div class="upload-icon">📷</div>
-                        <h3>Drop leaf image here</h3>
-                        <p style="color: var(--muted-text)">or click to browse (JPG, PNG)</p>
-                        <input type="file" name="image" id="imageInput" accept="image/*" hidden required>
-                    </div>
-                    <img id="preview" class="preview-image" style="display:none">
-                    <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:20px">
-                        🔬 Analyze Leaf
-                    </button>
-                </form>
+    .ai-advice-content li {
+        margin-bottom: 8px;
+    }
 
-                {% if error %}
-                <div class="alert alert-error" style="margin-top:20px">{{ error }}</div>
-                {% endif %}
+    .ai-advice-content strong {
+        color: #8bc34a;
+        /* Matches success theme */
+    }
 
-                {% if result and result.success %}
-                <div class="diagnosis-card">
-                    <div
-                        style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px">
-                        <div>
-                            <h2 style="margin:0">{{ result.prediction.disease_name }}</h2>
-                            <p style="color:var(--muted-text); margin:5px 0">{{ result.prediction.crop }}</p>
-                        </div>
-                        <span class="severity-badge severity-{{ result.prediction.severity }}">
-                            {{ result.prediction.severity }}
-                        </span>
-                    </div>
+    .ai-advice-content p {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
 
-                    <div style="margin-top:20px">
-                        <div style="display:flex; justify-content:space-between">
-                            <span>Confidence</span>
-                            <span>{{ result.prediction.confidence }}%</span>
-                        </div>
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" style="width:{{ result.prediction.confidence }}%"></div>
-                        </div>
-                    </div>
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🩺 AI Plant Doctor</h1>
+    <p class="page-subtitle">Upload a photo of a leaf to detect diseases instantly</p>
 
-                    {% if result.diagnosis %}
-                    <div class="treatment-card">
-                        <h4>📋 Symptoms</h4>
-                        <p>{{ result.diagnosis.symptoms }}</p>
-                        <h4 style="margin-top:15px">🦠 Cause</h4>
-                        <p>{{ result.diagnosis.cause }}</p>
-                    </div>
-                    {% endif %}
-
-                    {% if result.treatment %}
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px">
-                        <div class="treatment-card">
-                            <h4>💊 Chemical Treatment</h4>
-                            <p>{{ result.treatment.chemical }}</p>
-                        </div>
-                        <div class="treatment-card">
-                            <h4>🌿 Organic Treatment</h4>
-                            <p>{{ result.treatment.organic }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if result.ai_advice %}
-                    <div class="treatment-card" style="border-left:3px solid var(--primary)">
-                        <h4>🤖 AI Advice</h4>
-                        <p>{{ result.ai_advice }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-            </div>
-        </div>
+    {% if supported_crops %}
+    <div style="margin-top:15px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <span style="font-size:0.9rem; color:var(--muted-text); align-self:center;">Supports:</span>
+        {% for crop in supported_crops %}
+        <span
+            style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px; font-size:0.85rem; color: #fff;">
+            {{ crop }}
+        </span>
+        {% endfor %}
     </div>
+    {% endif %}
+</div>
 
-    <script>
-        const dropZone = document.getElementById('dropZone');
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
+<div class="glass-card">
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('imageInput').click()">
+            <div class="upload-icon">📷</div>
+            <h3>Drop leaf image here</h3>
+            <p style="color: var(--muted-text)">or click to browse (JPG, PNG)</p>
+            <input type="file" name="image" id="imageInput" accept="image/*" hidden required>
+        </div>
+        <img id="preview" class="preview-image" style="display:none">
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:20px">
+            🔬 Analyze Leaf
+        </button>
+    </form>
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
-            dropZone.addEventListener(e, ev => ev.preventDefault());
-        });
-        dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', e => {
-            dropZone.classList.remove('dragover');
-            imageInput.files = e.dataTransfer.files;
-            showPreview(e.dataTransfer.files[0]);
-        });
-        imageInput.addEventListener('change', e => showPreview(e.target.files[0]));
+    {% if error %}
+    <div class="alert alert-error" style="margin-top:20px">{{ error }}</div>
+    {% endif %}
 
-        function showPreview(file) {
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+    {% if result and result.success %}
+    <div class="diagnosis-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px">
+            <div>
+                <h2 style="margin:0">{{ result.prediction.disease_name }}</h2>
+                <p style="color:var(--muted-text); margin:5px 0">{{ result.prediction.crop }}</p>
+            </div>
+            <span class="severity-badge severity-{{ result.prediction.severity }}">
+                {{ result.prediction.severity }}
+            </span>
+        </div>
+
+        <div style="margin-top:20px">
+            <div style="display:flex; justify-content:space-between">
+                <span>Confidence</span>
+                <span>{{ result.prediction.confidence }}%</span>
+            </div>
+            <div class="confidence-bar">
+                <div class="confidence-fill" style="width:{{ result.prediction.confidence }}%"></div>
+            </div>
+        </div>
+
+        {% if result.diagnosis %}
+        <div class="treatment-card">
+            <h4>📋 Symptoms</h4>
+            <p>{{ result.diagnosis.symptoms }}</p>
+            <h4 style="margin-top:15px">🦠 Cause</h4>
+            <p>{{ result.diagnosis.cause }}</p>
+        </div>
+        {% endif %}
+
+        {% if result.treatment %}
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px">
+            <div class="treatment-card">
+                <h4>💊 Chemical Treatment</h4>
+                <p>{{ result.treatment.chemical }}</p>
+            </div>
+            <div class="treatment-card">
+                <h4>🌿 Organic Treatment</h4>
+                <p>{{ result.treatment.organic }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if result.ai_advice %}
+        <div class="treatment-card" style="border-left:3px solid var(--primary)">
+            <h4>🤖 AI Advice</h4>
+            <div class="ai-advice-content">
+                {{ result.ai_advice | safe }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+        dropZone.addEventListener(e, ev => ev.preventDefault());
+    });
+    dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+        dropZone.classList.remove('dragover');
+        imageInput.files = e.dataTransfer.files;
+        showPreview(e.dataTransfer.files[0]);
+    });
+    imageInput.addEventListener('change', e => showPreview(e.target.files[0]));
+
+    function showPreview(file) {
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
         }
-    </script>
-</body>
-
-</html>
+    }
+</script>
+{% endblock %}

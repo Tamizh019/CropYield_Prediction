@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Model Dashboard - AgriVision{% endblock %}
+
+{% block head %}
+<style>
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    .metric-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .metric-card h3 {
+        font-size: 1rem;
+        color: #ffffff;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, var(--primary-color), var(--success));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .metric-label {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+
+    .model-section {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .model-section h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .model-type-badge {
+        background: rgba(46, 204, 113, 0.15);
+        color: var(--success);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .info-item {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .info-item label {
+        color: #b0b0b0;
+        font-size: 0.85rem;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .info-item span {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .tech-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .tech-badge {
+        background: rgba(108, 92, 231, 0.15);
+        color: #a29bfe;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">📊 Model Performance Dashboard</h1>
+    <p class="page-subtitle">Training metrics and model statistics</p>
+</div>
+
+<!-- Quick Stats -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <h3>🎯 Yield Model</h3>
+        {% if model_info.yield_metadata %}
+        <div class="metric-value">{{ "%.4f"|format(model_info.yield_metadata.r2_score) }}</div>
+        <div class="metric-label">R² Score</div>
+        {% else %}
+        <div class="metric-value">--</div>
+        <div class="metric-label">No metadata available</div>
+        {% endif %}
+    </div>
+
+    <div class="metric-card">
+        <h3>🧪 Recommendation Model</h3>
+        {% if model_info.recommend_metadata %}
+        <div class="metric-value">{{ "%.2f"|format(model_info.recommend_metadata.accuracy * 100) }}%</div>
+        <div class="metric-label">Accuracy</div>
+        {% else %}
+        <div class="metric-value">--</div>
+        <div class="metric-label">No metadata available</div>
+        {% endif %}
+    </div>
+
+    <div class="metric-card">
+        <h3>🩺 Disease Detection</h3>
+        <div class="metric-value">{{ "Active" if model_info.disease_model else "Inactive" }}</div>
+        <div class="metric-label">CNN Model Status</div>
+    </div>
+
+    <div class="metric-card">
+        <h3>🤖 AI Engine</h3>
+        <div class="metric-value">{{ "Online" if model_info.ai_model else "Offline" }}</div>
+        <div class="metric-label">Gemini 2.0 Flash</div>
+    </div>
+</div>
+
+<!-- Yield Model Details -->
+<div class="model-section">
+    <h2>
+        🌾 Yield Prediction Model
+        {% if model_info.yield_metadata %}
+        <span class="model-type-badge">{{ model_info.yield_metadata.model_type }}</span>
+        {% endif %}
+    </h2>
+
+    {% if model_info.yield_metadata %}
+    <div class="info-grid">
+        <div class="info-item">
+            <label>R² Score</label>
+            <span style="color: var(--success)">{{ "%.4f"|format(model_info.yield_metadata.r2_score) }}</span>
+        </div>
+        <div class="info-item">
+            <label>RMSE</label>
+            <span>{{ "%.2f"|format(model_info.yield_metadata.rmse) }}</span>
+        </div>
+        <div class="info-item">
+            <label>MAE</label>
+            <span>{{ "%.2f"|format(model_info.yield_metadata.mae) }}</span>
+        </div>
+        <div class="info-item">
+            <label>Training Samples</label>
+            <span>{{ model_info.yield_metadata.training_samples | default('N/A') }}</span>
+        </div>
+        <div class="info-item">
+            <label>Test Samples</label>
+            <span>{{ model_info.yield_metadata.test_samples | default('N/A') }}</span>
+        </div>
+        <div class="info-item">
+            <label>Features Used</label>
+            <span>{{ model_info.yield_metadata.features | length }}</span>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: var(--muted-text)">No training metadata available. Run the training script to generate metrics.</p>
+    {% endif %}
+</div>
+
+<!-- Recommendation Model Details -->
+<div class="model-section">
+    <h2>
+        🧪 Crop Recommendation Model
+        {% if model_info.recommend_metadata %}
+        <span class="model-type-badge">{{ model_info.recommend_metadata.model_type }}</span>
+        {% endif %}
+    </h2>
+
+    {% if model_info.recommend_metadata %}
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Accuracy</label>
+            <span style="color: var(--success)">{{ "%.2f"|format(model_info.recommend_metadata.accuracy * 100)
+                }}%</span>
+        </div>
+        <div class="info-item">
+            <label>Number of Classes</label>
+            <span>{{ model_info.recommend_metadata.num_classes }}</span>
+        </div>
+        <div class="info-item">
+            <label>Training Samples</label>
+            <span>{{ model_info.recommend_metadata.training_samples | default('N/A') }}</span>
+        </div>
+        <div class="info-item">
+            <label>Test Samples</label>
+            <span>{{ model_info.recommend_metadata.test_samples | default('N/A') }}</span>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: var(--muted-text)">No training metadata available. Run the training script to generate metrics.</p>
+    {% endif %}
+</div>
+
+<!-- Tech Stack -->
+<div class="model-section">
+    <h2>🛠️ Technology Stack</h2>
+    <div class="tech-badges">
+        <span class="tech-badge">Python 3.12</span>
+        <span class="tech-badge">Flask</span>
+        <span class="tech-badge">TensorFlow / Keras</span>
+        <span class="tech-badge">XGBoost</span>
+        <span class="tech-badge">Scikit-learn</span>
+        <span class="tech-badge">Gemini AI</span>
+        <span class="tech-badge">Pandas</span>
+        <span class="tech-badge">NumPy</span>
+    </div>
+</div>
+{% endblock %}

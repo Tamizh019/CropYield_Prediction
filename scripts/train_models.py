@@ -13,15 +13,15 @@ from datetime import datetime
 
 warnings.filterwarnings('ignore')
 
-# Create directories
-if not os.path.exists('models'):
-    os.makedirs('models')
+# Create directories (relative to project root)
+if not os.path.exists('../models'):
+    os.makedirs('../models')
 
-if not os.path.exists('logs'):
-    os.makedirs('logs')
+if not os.path.exists('../logs'):
+    os.makedirs('../logs')
 
 # Setup logging
-log_file = f'logs/training_log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
+log_file = f'../logs/training_log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
 log = open(log_file, 'w', encoding='utf-8')
 
 def print_log(message):
@@ -48,7 +48,7 @@ def train_yield_model():
     print_log("="*60)
     
     try:
-        df = pd.read_csv('Datasets/Crop_yield_india.csv')
+        df = pd.read_csv('../Datasets/Crop_yield_india.csv')
         print_log(f"✅ Dataset loaded: {len(df)} rows")
     except Exception as e:
         print_log(f"❌ Failed to read Yield CSV: {e}")
@@ -147,14 +147,14 @@ def train_yield_model():
         print_log(f"   - {col}: {len(le.classes_)} unique values")
     
     # Save encoders
-    joblib.dump(label_encoders, 'models/yield_label_encoders.pkl')
+    joblib.dump(label_encoders, '../models/yield_label_encoders.pkl')
     print_log("💾 Label encoders saved")
     
     # Scale numerical features (optional but improves XGBoost)
     numerical_cols = X.select_dtypes(include=[np.number]).columns
     scaler = RobustScaler()  # Robust to outliers
     X[numerical_cols] = scaler.fit_transform(X[numerical_cols])
-    joblib.dump(scaler, 'models/yield_scaler.pkl')
+    joblib.dump(scaler, '../models/yield_scaler.pkl')
     print_log("💾 Scaler saved")
     
     # Train-test split with stratification
@@ -269,8 +269,8 @@ def train_yield_model():
     print_log(f"\n🏆 BEST MODEL: {best_model_name} (R² = {best_r2:.4f})")
     
     # Save best model
-    joblib.dump(best_model, 'models/yield_model.pkl')
-    joblib.dump(selected_features, 'models/yield_features.pkl')
+    joblib.dump(best_model, '../models/yield_model.pkl')
+    joblib.dump(selected_features, '../models/yield_features.pkl')
     
     # Save model metadata
     metadata = {
@@ -281,9 +281,10 @@ def train_yield_model():
         'features': selected_features,
         'trained_on': datetime.now().isoformat(),
         'training_samples': len(X_train),
-        'test_samples': len(X_test)
+        'test_samples': len(X_test),
+        'all_models_comparison': scores  # Save all model scores for comparison page
     }
-    joblib.dump(metadata, 'models/yield_metadata.pkl')
+    joblib.dump(metadata, '../models/yield_metadata.pkl')
     
     print_log("\n✅ Yield Model Training Complete!")
     print_log(f"💾 Models saved in 'models/' directory")
@@ -302,7 +303,7 @@ def train_recommendation_model():
     print_log("="*60)
     
     try:
-        df = pd.read_csv('Datasets/Crop_recommendation.csv')
+        df = pd.read_csv('../Datasets/Crop_recommendation.csv')
         print_log(f"✅ Dataset loaded: {len(df)} rows")
     except Exception as e:
         print_log(f"❌ Failed to read Recommendation CSV: {e}")
@@ -354,7 +355,7 @@ def train_recommendation_model():
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     X = pd.DataFrame(X_scaled, columns=X.columns)
-    joblib.dump(scaler, 'models/recommend_scaler.pkl')
+    joblib.dump(scaler, '../models/recommend_scaler.pkl')
     print_log("💾 Scaler saved")
     
     # Train-test split
@@ -412,25 +413,28 @@ def train_recommendation_model():
     print_log(f"   Accuracy: {gb_acc:.4f}")
     
     # 3. XGBoost
-    print_log("\n3️⃣ XGBoost Classifier...")
-    xgb_model = XGBClassifier(
-        n_estimators=300,
-        learning_rate=0.05,
-        max_depth=8,
-        random_state=42,
-        n_jobs=-1,
-        verbosity=0,
-        use_label_encoder=False,
-        eval_metric='mlogloss'
-    )
-    xgb_model.fit(X_train, y_train)
-    xgb_pred = xgb_model.predict(X_test)
-    xgb_acc = accuracy_score(y_test, xgb_pred)
-    
-    models['XGBoost'] = xgb_model
-    scores['XGBoost'] = xgb_acc
-    
-    print_log(f"   Accuracy: {xgb_acc:.4f}")
+    # print_log("\n3️⃣ XGBoost Classifier...")
+    # try:
+    #     xgb_model = XGBClassifier(
+    #         n_estimators=300,
+    #         learning_rate=0.05,
+    #         max_depth=8,
+    #         random_state=42,
+    #         n_jobs=-1,
+    #         verbosity=0,
+    #         use_label_encoder=False,
+    #         eval_metric='mlogloss'
+    #     )
+    #     xgb_model.fit(X_train, y_train)
+    #     xgb_pred = xgb_model.predict(X_test)
+    #     xgb_acc = accuracy_score(y_test, xgb_pred)
+    #     
+    #     models['XGBoost'] = xgb_model
+    #     scores['XGBoost'] = xgb_acc
+    #     print_log(f"   Accuracy: {xgb_acc:.4f}")
+    # except Exception as e:
+    #     print_log(f"\n⚠️ XGBoost failed (likely due to string labels): {e}")
+    #     print_log("   Skipping XGBoost for recommendation...")
     
     # ========================================
     # SELECT BEST MODEL
@@ -455,7 +459,7 @@ def train_recommendation_model():
     print_log(classification_report(y_test, best_pred))
     
     # Save best model
-    joblib.dump(best_model, 'models/recommend_model.pkl')
+    joblib.dump(best_model, '../models/recommend_model.pkl')
     
     # Save metadata
     metadata = {
@@ -465,9 +469,10 @@ def train_recommendation_model():
         'features': X.columns.tolist(),
         'trained_on': datetime.now().isoformat(),
         'training_samples': len(X_train),
-        'test_samples': len(X_test)
+        'test_samples': len(X_test),
+        'all_models_comparison': scores  # Save all model scores for comparison page
     }
-    joblib.dump(metadata, 'models/recommend_metadata.pkl')
+    joblib.dump(metadata, '../models/recommend_metadata.pkl')
     
     print_log("\n✅ Crop Recommendation Model Training Complete!")
     print_log(f"💾 Model saved in 'models/' directory")

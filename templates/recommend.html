@@ -1,190 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crop Recommendation - AgriVision</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+{% block title %}Crop Recommendation - AgriVision{% endblock %}
 
-<body>
-    <div class="app-container">
-        <div class="sidebar">
-            <div class="brand">
-                <span class="brand-icon">🌱</span>
-                <span class="brand-text">AgriVision</span>
-            </div>
-            <div class="nav-links">
-                <a href="/" class="nav-item">
-                    <span class="nav-icon">🏠</span> Dashboard
-                </a>
-                <a href="/predict_yield" class="nav-item">
-                    <span class="nav-icon">🌾</span> Yield Prediction
-                </a>
-                <a href="/recommend_crop" class="nav-item active">
-                    <span class="nav-icon">🧪</span> Crop Recommend
-                </a>
-            </div>
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🧪 Crop Recommendation</h1>
+    <p class="page-subtitle">AI-powered intelligent crop selection based on soil & climate.</p>
+</div>
 
-            <div class="sidebar-footer">
-                <div class="status-indicator">
-                    <div class="status-dot"></div>
-                    <span>System Online</span>
-                </div>
-            </div>
+<div class="dashboard-grid" style="grid-template-columns: 1.5fr 1fr;">
+
+    <!-- INPUT FORM COLUMN -->
+    <div class="glass-card form-card">
+        <div class="card-header">
+            <h3>🌱 Soil & Climate Profile</h3>
+            <span class="badge badge-purple">AI Enabled</span>
         </div>
 
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">🧪 Crop Recommendation</h1>
-                <p class="page-subtitle">AI-powered intelligent crop selection based on soil & climate.</p>
-            </div>
+        <form action="/recommend_crop" method="POST">
 
-            <div class="dashboard-grid" style="grid-template-columns: 1.5fr 1fr;">
-
-                <!-- INPUT FORM COLUMN -->
-                <div class="glass-card form-card">
-                    <div class="card-header">
-                        <h3>🌱 Soil & Climate Profile</h3>
-                        <span class="badge badge-purple">AI Enabled</span>
+            <!-- Soil Nutrients Section -->
+            <div class="form-section">
+                <div class="section-label">🧪 Soil Composition (NPK)</div>
+                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="form-group">
+                        <label>Nitrogen (N)</label>
+                        <input type="number" name="N" placeholder="90" required>
                     </div>
-
-                    <form action="/recommend_crop" method="POST">
-
-                        <!-- Soil Nutrients Section -->
-                        <div class="form-section">
-                            <div class="section-label">🧪 Soil Composition (NPK)</div>
-                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
-                                <div class="form-group">
-                                    <label>Nitrogen (N)</label>
-                                    <input type="number" name="N" placeholder="90" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Phosphorus (P)</label>
-                                    <input type="number" name="P" placeholder="42" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Potassium (K)</label>
-                                    <input type="number" name="K" placeholder="43" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Climate Section -->
-                        <div class="form-section">
-                            <div class="section-label">🌤️ Environmental Conditions</div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Temperature (°C)</label>
-                                    <input type="number" step="0.1" name="temperature" placeholder="20.8" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Humidity (%)</label>
-                                    <input type="number" step="0.1" name="humidity" placeholder="82.0" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Soil pH</label>
-                                    <input type="number" step="0.1" name="ph" placeholder="6.5" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Rainfall (mm)</label>
-                                    <input type="number" step="0.1" name="rainfall" placeholder="202.9" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">
-                            <span>🔍 Find Best Crop</span>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- RESULTS COLUMN -->
-                <div class="results-column">
-                    {% if recommendation %}
-                    <div class="glass-card result-card" style="border-color: var(--primary-color);">
-                        <div class="card-header">
-                            <h3>✅ Top Recommendation</h3>
-                        </div>
-
-                        <div style="text-align: center; padding: 20px 0;">
-                            <div style="font-size: 4rem; margin-bottom: 10px;">
-                                {% if recommendation == 'Rice' %}🍚
-                                {% elif recommendation == 'Maize' %}🌽
-                                {% elif recommendation == 'Chickpea' %}🥘
-                                {% elif recommendation == 'Kidneybeans' %}🍲
-                                {% elif recommendation == 'Pigeonpeas' %}🫘
-                                {% elif recommendation == 'Mothbeans' %}🌾
-                                {% elif recommendation == 'Mungbean' %}🌱
-                                {% elif recommendation == 'Blackgram' %}⚫
-                                {% elif recommendation == 'Lentil' %}🥣
-                                {% elif recommendation == 'Pomegranate' %}🍎
-                                {% elif recommendation == 'Banana' %}🍌
-                                {% elif recommendation == 'Mango' %}🥭
-                                {% elif recommendation == 'Grapes' %}🍇
-                                {% elif recommendation == 'Watermelon' %}🍉
-                                {% elif recommendation == 'Muskmelon' %}🍈
-                                {% elif recommendation == 'Apple' %}🍎
-                                {% elif recommendation == 'Orange' %}🍊
-                                {% elif recommendation == 'Papaya' %}🥣
-                                {% elif recommendation == 'Coconut' %}🥥
-                                {% elif recommendation == 'Cotton' %}👕
-                                {% elif recommendation == 'Jute' %}🧶
-                                {% elif recommendation == 'Coffee' %}☕
-                                {% else %}🌿{% endif %}
-                            </div>
-                            <div
-                                style="font-size: 2.5rem; font-weight: 800; color: var(--primary-color); text-transform: capitalize;">
-                                {{ recommendation }}
-                            </div>
-                            <p style="color: var(--muted-text); margin-top: 10px;">Highest yield probability</p>
-                        </div>
+                    <div class="form-group">
+                        <label>Phosphorus (P)</label>
+                        <input type="number" name="P" placeholder="42" required>
                     </div>
-
-                    {% if ai_insight %}
-                    <div class="ai-insights-container">
-                        <div class="ai-header">
-                            <svg class="ai-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                                <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                            </svg>
-                            <h3>🤖 AI Expert Analysis</h3>
-                        </div>
-
-                        <div class="ai-content">
-                            <div class="ai-formatted">{{ ai_insight | safe }}</div>
-                        </div>
-
-                        <div class="ai-footer">
-                            <small>Powered by Gemini 2.0 Flash</small>
-                        </div>
+                    <div class="form-group">
+                        <label>Potassium (K)</label>
+                        <input type="number" name="K" placeholder="43" required>
                     </div>
-                    {% endif %}
-
-                    {% else %}
-                    <!-- Placeholder State -->
-                    <div class="glass-card" style="text-align: center; padding: 40px 20px; opacity: 0.7;">
-                        <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(1);">🌾</div>
-                        <h3>Ready to Recommend</h3>
-                        <p style="margin-top: 10px; color: var(--muted-text);">
-                            Enter your soil and climate details to generate an optimal crop suggestion.
-                        </p>
-                    </div>
-                    {% endif %}
-
-                    {% if error %}
-                    <div
-                        style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.2); border: 1px solid var(--danger-color); border-radius: 8px; color: #ff6b6b; text-align: center;">
-                        {{ error }}
-                    </div>
-                    {% endif %}
                 </div>
             </div>
-        </div>
+
+            <!-- Climate Section -->
+            <div class="form-section">
+                <div class="section-label">🌤️ Environmental Conditions</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Temperature (°C)</label>
+                        <input type="number" step="0.1" name="temperature" placeholder="20.8" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Humidity (%)</label>
+                        <input type="number" step="0.1" name="humidity" placeholder="82.0" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Soil pH</label>
+                        <input type="number" step="0.1" name="ph" placeholder="6.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rainfall (mm)</label>
+                        <input type="number" step="0.1" name="rainfall" placeholder="202.9" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <span>🔍 Find Best Crop</span>
+            </button>
+        </form>
     </div>
-</body>
 
-</html>
+    <!-- RESULTS COLUMN -->
+    <div class="results-column">
+        {% if recommendation %}
+        <div class="glass-card result-card" style="border-color: var(--primary-color);">
+            <div class="card-header">
+                <h3>✅ Top Recommendation</h3>
+            </div>
+
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 4rem; margin-bottom: 10px;">
+                    {% if recommendation == 'Rice' %}🍚
+                    {% elif recommendation == 'Maize' %}🌽
+                    {% elif recommendation == 'Chickpea' %}🥘
+                    {% elif recommendation == 'Kidneybeans' %}🍲
+                    {% elif recommendation == 'Pigeonpeas' %}🫘
+                    {% elif recommendation == 'Mothbeans' %}🌾
+                    {% elif recommendation == 'Mungbean' %}🌱
+                    {% elif recommendation == 'Blackgram' %}⚫
+                    {% elif recommendation == 'Lentil' %}🥣
+                    {% elif recommendation == 'Pomegranate' %}🍎
+                    {% elif recommendation == 'Banana' %}🍌
+                    {% elif recommendation == 'Mango' %}🥭
+                    {% elif recommendation == 'Grapes' %}🍇
+                    {% elif recommendation == 'Watermelon' %}🍉
+                    {% elif recommendation == 'Muskmelon' %}🍈
+                    {% elif recommendation == 'Apple' %}🍎
+                    {% elif recommendation == 'Orange' %}🍊
+                    {% elif recommendation == 'Papaya' %}🥣
+                    {% elif recommendation == 'Coconut' %}🥥
+                    {% elif recommendation == 'Cotton' %}👕
+                    {% elif recommendation == 'Jute' %}🧶
+                    {% elif recommendation == 'Coffee' %}☕
+                    {% else %}🌿{% endif %}
+                </div>
+                <div
+                    style="font-size: 2.5rem; font-weight: 800; color: var(--primary-color); text-transform: capitalize;">
+                    {{ recommendation }}
+                </div>
+                <p style="color: var(--muted-text); margin-top: 10px;">Highest yield probability</p>
+            </div>
+        </div>
+
+        {% if ai_insight %}
+        <div class="ai-insights-container">
+            <div class="ai-header">
+                <svg class="ai-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                    <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <h3>🤖 AI Expert Analysis</h3>
+            </div>
+
+            <div class="ai-content">
+                <div class="ai-formatted">{{ ai_insight | safe }}</div>
+            </div>
+
+            <div class="ai-footer">
+                <small>Powered by Gemini 2.0 Flash</small>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Placeholder State -->
+        <div class="glass-card" style="text-align: center; padding: 40px 20px; opacity: 0.7;">
+            <div style="font-size: 4rem; margin-bottom: 20px; filter: grayscale(1);">🌾</div>
+            <h3>Ready to Recommend</h3>
+            <p style="margin-top: 10px; color: var(--muted-text);">
+                Enter your soil and climate details to generate an optimal crop suggestion.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div
+            style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.2); border: 1px solid var(--danger-color); border-radius: 8px; color: #ff6b6b; text-align: center;">
+            {{ error }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

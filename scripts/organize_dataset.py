@@ -5,7 +5,7 @@ import random
 from pathlib import Path
 
 # Config
-BASE_DIR = Path("Datasets/PlantVillage")
+BASE_DIR = Path("../Datasets/PlantVillage")
 SOURCE_DIR = BASE_DIR / "color"
 TRAIN_DIR = BASE_DIR / "train"
 VAL_DIR = BASE_DIR / "val"
@@ -29,8 +29,30 @@ FOLDER_MAPPING = {
     "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": "Corn_Gray_Leaf_Spot",
     "Corn_(maize)___healthy": "Corn_Healthy",
     
-    # Rice and Wheat are seemingly missing from the standard PlantVillage 'color' dataset subset
-    # We will skip them if not found, but if you have them in a different folder, add them here.
+    # Apple
+    "Apple___Apple_scab": "Apple_Scab",
+    "Apple___Black_rot": "Apple_Black_Rot",
+    "Apple___Cedar_apple_rust": "Apple_Cedar_Rust",
+    "Apple___healthy": "Apple_Healthy",
+    
+    # Raspberry
+    "Raspberry___healthy": "Raspberry_Healthy",
+    
+    # Strawberry
+    "Strawberry___Leaf_scorch": "Strawberry_Leaf_Scorch",
+    "Strawberry___healthy": "Strawberry_Healthy",
+
+    # Rice (Nested in rice_leaf_diseases folder)
+    "rice_leaf_diseases/Bacterial leaf blight": "Rice_Bacterial_Leaf_Blight",
+    "rice_leaf_diseases/Brown spot": "Rice_Brown_Spot",
+    "rice_leaf_diseases/Leaf smut": "Rice_Leaf_Smut",
+
+    # Wheat (Nested in wheat folder)
+    "wheat/Brown rust": "Wheat_Brown_Rust",
+    "wheat/Healthy": "Wheat_Healthy",
+    "wheat/Loose Smut": "Wheat_Loose_Smut",
+    "wheat/Septoria": "Wheat_Septoria",
+    "wheat/Yellow rust": "Wheat_Yellow_Rust",
 }
 
 def organize_dataset():

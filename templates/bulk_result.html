@@ -1,237 +1,665 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard - AgriVision</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+{% block title %}ML Analytics Dashboard - AgriVision{% endblock %}
 
-<body>
-    <div class="app-container">
-        <div class="sidebar">
-            <div class="brand">
-                <span class="brand-icon">🌱</span>
-                <span class="brand-text">AgriVision</span>
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Enhanced Stats Grid */
+    .stats-grid-5 {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 24px 20px;
+        text-align: center;
+    }
+
+    .stat-icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #a0a0a0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #fff;
+        margin: 8px 0;
+    }
+
+    .stat-unit {
+        font-size: 14px;
+        color: #888;
+    }
+
+    .stat-primary .stat-value {
+        color: #3498db;
+    }
+
+    .stat-success .stat-value {
+        color: #2ecc71;
+    }
+
+    .stat-warning .stat-value {
+        color: #f39c12;
+    }
+
+    .stat-info .stat-value {
+        color: #9b59b6;
+    }
+
+    .stat-danger .stat-value {
+        color: #e74c3c;
+    }
+
+    /* ML Metrics Section */
+    .ml-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .metric-box {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.02));
+        border: 1px solid rgba(46, 204, 113, 0.2);
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    .metric-box h4 {
+        color: #2ecc71;
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    .yield-breakdown {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .yield-item {
+        flex: 1;
+        text-align: center;
+        padding: 12px 8px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+    }
+
+    .yield-item .count {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .yield-item .label {
+        font-size: 11px;
+        color: #888;
+        margin-top: 4px;
+    }
+
+    .yield-item.high .count {
+        color: #2ecc71;
+    }
+
+    .yield-item.medium .count {
+        color: #f39c12;
+    }
+
+    .yield-item.low .count {
+        color: #e74c3c;
+    }
+
+    /* Confidence Gauge */
+    .confidence-display {
+        text-align: center;
+    }
+
+    .confidence-value {
+        font-size: 48px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .confidence-bar {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        margin-top: 12px;
+        overflow: hidden;
+    }
+
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71);
+        border-radius: 4px;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    .chart-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 28px;
+    }
+
+    .chart-card h3 {
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: #fff;
+    }
+
+    .chart-container {
+        height: 280px;
+        position: relative;
+    }
+
+    /* Feature Importance */
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .feature-name {
+        width: 120px;
+        font-size: 13px;
+        color: #ccc;
+    }
+
+    .feature-bar {
+        flex: 1;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .feature-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    /* AI Suggestions */
+    .ai-suggestions-section {
+        background: linear-gradient(135deg, #1a2a4a, #2d3a5a);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 40px;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+
+    .ai-suggestions-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ai-suggestions-header h3 {
+        color: #60a5fa;
+        font-size: 18px;
+    }
+
+    /* AI Suggestion Cards */
+    .suggestion-card {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        border-left: 4px solid;
+    }
+
+    .suggestion-card.priority-high {
+        border-left-color: #e74c3c;
+    }
+
+    .suggestion-card.improvement {
+        border-left-color: #2ecc71;
+    }
+
+    .suggestion-card.risk {
+        border-left-color: #f39c12;
+    }
+
+    .suggestion-card.opportunity {
+        border-left-color: #9b59b6;
+    }
+
+    .suggestion-card h4 {
+        color: #fff;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .suggestion-card ul {
+        padding-left: 20px;
+        margin: 0;
+    }
+
+    .suggestion-card li {
+        color: #ccc;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    /* Data Table */
+    .table-section {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .table-header h3 {
+        color: #fff;
+        font-size: 16px;
+    }
+
+    .badge-small {
+        background: rgba(46, 204, 113, 0.15);
+        color: #2ecc71;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .data-table th {
+        background: rgba(0, 0, 0, 0.3);
+        color: #2ecc71;
+        padding: 12px 10px;
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    .data-table td {
+        padding: 10px;
+        color: #ccc;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .data-table tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    @media (max-width: 1200px) {
+        .stats-grid-5 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ml-metrics {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="analytics-header">
+    <div>
+        <h1 class="page-title">🧠 ML Analytics Dashboard</h1>
+        <p class="page-subtitle">Advanced machine learning predictions & actionable insights</p>
+    </div>
+    <a href="{{ url_for('download_file', filename='predicted_yield.csv') }}" class="btn btn-download">
+        <span>⬇️ Download Results</span>
+    </a>
+</div>
+
+<!-- Main Stats (5 cards) -->
+<div class="stats-grid-5">
+    <div class="stat-card stat-primary">
+        <div class="stat-icon">📝</div>
+        <div class="stat-label">Records Analyzed</div>
+        <div class="stat-value">{{ total_rows }}</div>
+    </div>
+    <div class="stat-card stat-success">
+        <div class="stat-icon">🌾</div>
+        <div class="stat-label">Total Forecast</div>
+        <div class="stat-value">{{ total_yield }} <span class="stat-unit">T</span></div>
+    </div>
+    <div class="stat-card stat-warning">
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">Avg Yield</div>
+        <div class="stat-value">{{ avg_yield }} <span class="stat-unit">T/Ha</span></div>
+    </div>
+    <div class="stat-card stat-info">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">Model Confidence</div>
+        <div class="stat-value">{{ model_confidence }}%</div>
+    </div>
+    <div class="stat-card stat-danger">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-label">Top Region</div>
+        <div class="stat-value" style="font-size: 18px;">{{ top_state }}</div>
+    </div>
+</div>
+
+<!-- ML Metrics Section -->
+<div class="ml-metrics">
+    <!-- Yield Classification -->
+    <div class="metric-box">
+        <h4>📊 Prediction Classification</h4>
+        <div class="yield-breakdown">
+            <div class="yield-item high">
+                <div class="count">{{ high_yield_count }}</div>
+                <div class="label">High Yield<br>(>3000 T/Ha)</div>
             </div>
-            <div class="nav-links">
-                <a href="/" class="nav-item">
-                    <span class="nav-icon">🏠</span> Dashboard
-                </a>
-                <a href="/predict_yield" class="nav-item active">
-                    <span class="nav-icon">🌾</span> Yield Prediction
-                </a>
-                <a href="/recommend_crop" class="nav-item">
-                    <span class="nav-icon">🧪</span> Crop Recommend
-                </a>
+            <div class="yield-item medium">
+                <div class="count">{{ medium_yield_count }}</div>
+                <div class="label">Medium<br>(1000-3000)</div>
+            </div>
+            <div class="yield-item low">
+                <div class="count">{{ low_yield_count }}</div>
+                <div class="label">Low Yield<br>(<1000 T/Ha)</div>
+                </div>
             </div>
         </div>
 
-        <div class="main-content">
-            <!-- Header with Download -->
-            <div class="analytics-header">
-                <div>
-                    <h1 class="page-title">📊 Analytics Dashboard</h1>
-                    <p class="page-subtitle">Comprehensive analysis of your agricultural data</p>
+        <!-- Model Confidence -->
+        <div class="metric-box">
+            <h4>🎯 Model Confidence Score</h4>
+            <div class="confidence-display">
+                <div class="confidence-value">{{ model_confidence }}%</div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: {{ model_confidence }}%"></div>
                 </div>
-                <a href="{{ url_for('download_file', filename='predicted_yield.csv') }}" class="btn btn-download">
-                    <span>⬇️ Download CSV</span>
-                </a>
+                <p style="color: #888; font-size: 12px; margin-top: 8px;">
+                    Based on prediction consistency & variance analysis
+                </p>
             </div>
+        </div>
 
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card stat-primary">
-                    <div class="stat-icon">📝</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Records Processed</div>
-                        <div class="stat-value">{{ total_rows }}</div>
-                    </div>
+        <!-- Quick Stats -->
+        <div class="metric-box">
+            <h4>📈 Analysis Summary</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; color: #ccc;">
+                    <span>Max Yield:</span>
+                    <span style="color: #2ecc71; font-weight: 600;">{{ max_yield }} T/Ha</span>
                 </div>
-
-                <div class="stat-card stat-success">
-                    <div class="stat-icon">🌾</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Forecast</div>
-                        <div class="stat-value">{{ total_yield }} <span class="stat-unit">T</span></div>
-                    </div>
+                <div style="display: flex; justify-content: space-between; color: #ccc;">
+                    <span>Min Yield:</span>
+                    <span style="color: #e74c3c; font-weight: 600;">{{ min_yield }} T/Ha</span>
                 </div>
-
-                <div class="stat-card stat-warning">
-                    <div class="stat-icon">📈</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Average Yield</div>
-                        <div class="stat-value">{{ avg_yield }} <span class="stat-unit">T/Ha</span></div>
-                    </div>
+                <div style="display: flex; justify-content: space-between; color: #ccc;">
+                    <span>Total States:</span>
+                    <span style="color: #3498db; font-weight: 600;">{{ all_states_count }}</span>
                 </div>
-
-                <div class="stat-card stat-info">
-                    <div class="stat-icon">🏆</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Top Performer</div>
-                        <div class="stat-value stat-text">{{ top_state }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>🗺️ Regional Performance</h3>
-                        <span class="badge">Top 5 States</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="stateChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>🌾 Crop Distribution</h3>
-                        <span class="badge badge-purple">Top 5 Crops</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="cropChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Insights -->
-            {% if ai_insight %}
-            <div class="ai-insights-container bulk-ai">
-                <div class="ai-header">
-                    <svg class="ai-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                        <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    <h3>🤖 AI Data Analyst Report</h3>
-                </div>
-
-                <div class="ai-content">
-                    <div class="ai-formatted">{{ ai_insight | safe }}</div>
-                </div>
-
-                <div class="ai-footer">
-                    <small>Powered by Gemini 2.0 Flash • Advanced Analytics</small>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Data Table -->
-            <div class="glass-card table-card">
-                <div class="card-header">
-                    <h3>📋 Data Preview</h3>
-                    <span class="badge">First 25 Rows</span>
-                </div>
-
-                <div class="table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                {% for col in columns %}
-                                <th>{{ col }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in preview_data %}
-                            <tr>
-                                {% for item in row %}
-                                <td>{{ item }}</td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div style="display: flex; justify-content: space-between; color: #ccc;">
+                    <span>Total Crops:</span>
+                    <span style="color: #9b59b6; font-weight: 600;">{{ all_crops_count }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const stateLabels = JSON.parse('{{ state_labels | tojson | safe }}');
-        const stateData = JSON.parse('{{ state_yields | tojson | safe }}');
-        const cropLabels = JSON.parse('{{ crop_labels | tojson | safe }}');
-        const cropData = JSON.parse('{{ crop_counts | tojson | safe }}');
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Yield Distribution Histogram -->
+        <div class="chart-card">
+            <h3>📊 Yield Distribution (Histogram)</h3>
+            <div class="chart-container">
+                <canvas id="yieldHistogram"></canvas>
+            </div>
+        </div>
 
-        // State Performance Chart
-        new Chart(document.getElementById('stateChart'), {
+        <!-- Feature Importance -->
+        <div class="chart-card">
+            <h3>🎯 Feature Importance (ML Model)</h3>
+            <div class="feature-list">
+                {% for feature, importance in feature_importance.items() %}
+                <div class="feature-item">
+                    <span class="feature-name">{{ feature }}</span>
+                    <div class="feature-bar">
+                        <div class="feature-fill" style="width: {{ importance }}%">{{ importance }}%</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Regional Performance -->
+        <div class="chart-card">
+            <h3>🗺️ Regional Performance (Top 5)</h3>
+            <div class="chart-container">
+                <canvas id="stateChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Crop Analysis -->
+        <div class="chart-card">
+            <h3>🌾 Crop Yield Analysis (Top 5)</h3>
+            <div class="chart-container">
+                <canvas id="cropChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Suggestions Section -->
+    {% if ai_insight %}
+    <div class="ai-suggestions-section">
+        <div class="ai-suggestions-header">
+            <span style="font-size: 28px;">🤖</span>
+            <h3>AI Farming Advisor — Actionable Recommendations</h3>
+        </div>
+        <div class="ai-suggestions-content">
+            {{ ai_insight | safe }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Data Preview -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3>📋 Prediction Preview</h3>
+            <span class="badge-small">First 10 Rows</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {% for col in columns %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in preview_data %}
+                    <tr>
+                        {% for item in row %}
+                        <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block scripts %}
+    <script>
+        // Yield Distribution Histogram
+        new Chart(document.getElementById('yieldHistogram'), {
             type: 'bar',
             data: {
-                labels: stateLabels,
+                labels: JSON.parse('{{ yield_dist_labels | tojson | safe }}'),
                 datasets: [{
-                    label: 'Average Yield (Tonnes)',
-                    data: stateData,
-                    backgroundColor: 'rgba(46, 204, 113, 0.8)',
-                    borderColor: '#2ecc71',
-                    borderWidth: 2,
-                    borderRadius: 8,
+                    label: 'Number of Records',
+                    data: JSON.parse('{{ yield_dist_data | tojson | safe }}'),
+                    backgroundColor: [
+                        'rgba(231, 76, 60, 0.8)',
+                        'rgba(243, 156, 18, 0.8)',
+                        'rgba(46, 204, 113, 0.8)',
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(155, 89, 182, 0.8)'
+                    ],
+                    borderRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 }
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { color: '#ddd', font: { size: 12 } },
-                        grid: { color: 'rgba(255,255,255,0.08)' }
+                        ticks: { color: '#aaa' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
                     },
                     x: {
-                        ticks: { color: '#ddd', font: { size: 12 } },
+                        ticks: { color: '#aaa' },
                         grid: { display: false }
                     }
                 }
             }
         });
 
-        // Crop Distribution Chart
-        new Chart(document.getElementById('cropChart'), {
-            type: 'doughnut',
+        // State Performance Chart
+        new Chart(document.getElementById('stateChart'), {
+            type: 'bar',
             data: {
-                labels: cropLabels,
+                labels: JSON.parse('{{ state_labels | tojson | safe }}'),
                 datasets: [{
-                    data: cropData,
-                    backgroundColor: [
-                        '#f1c40f', '#e67e22', '#e74c3c',
-                        '#9b59b6', '#3498db', '#2ecc71'
-                    ],
-                    borderColor: '#1e1e1e',
-                    borderWidth: 3
+                    label: 'Avg Yield (T/Ha)',
+                    data: JSON.parse('{{ state_yields | tojson | safe }}'),
+                    backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                    borderRadius: 6
                 }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: { color: '#aaa' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        ticks: { color: '#aaa' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Crop Analysis Chart
+        new Chart(document.getElementById('cropChart'), {
+            type: 'bar',
+            data: {
+                labels: JSON.parse('{{ crop_labels | tojson | safe }}'),
+                datasets: [
+                    {
+                        label: 'Avg Yield (T/Ha)',
+                        data: JSON.parse('{{ crop_yields | tojson | safe }}'),
+                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Count',
+                        data: JSON.parse('{{ crop_counts | tojson | safe }}'),
+                        backgroundColor: 'rgba(155, 89, 182, 0.6)',
+                        borderRadius: 6,
+                        yAxisID: 'y1'
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right',
-                        labels: {
-                            color: '#fff',
-                            padding: 15,
-                            font: { size: 13 }
-                        }
+                        labels: { color: '#aaa' },
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: { color: '#3498db' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: { display: true, text: 'Avg Yield', color: '#3498db' }
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: { color: '#9b59b6' },
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'Count', color: '#9b59b6' }
+                    },
+                    x: {
+                        ticks: { color: '#aaa' },
+                        grid: { display: false }
                     }
                 }
             }
         });
     </script>
-</body>
-
-</html>
+    {% endblock %}

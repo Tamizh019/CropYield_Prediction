@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Model Comparison - AgriVision{% endblock %}
+
+{% block head %}
+<style>
+    .comparison-section {
+        margin-bottom: 40px;
+    }
+
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .comparison-table th {
+        background: rgba(46, 204, 113, 0.15);
+        color: var(--success);
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .comparison-table td {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+    }
+
+    .comparison-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .comparison-table tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .winner-badge {
+        background: linear-gradient(135deg, var(--success), #27ae60);
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .bar-container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        height: 24px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .bar-rf {
+        background: linear-gradient(90deg, #3498db, #2980b9);
+    }
+
+    .bar-gb {
+        background: linear-gradient(90deg, #e67e22, #d35400);
+    }
+
+    .bar-xgb {
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+    }
+
+    .legend {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 20px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ffffff;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+    }
+
+    .note-box {
+        background: rgba(52, 152, 219, 0.1);
+        border-left: 4px solid #3498db;
+        padding: 16px;
+        border-radius: 0 8px 8px 0;
+        color: #b0b0b0;
+        margin-top: 24px;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #b0b0b0;
+    }
+
+    .no-data code {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: #3498db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">⚖️ Model Comparison</h1>
+    <p class="page-subtitle">Algorithm performance comparison from training</p>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(90deg, #3498db, #2980b9)"></div>
+        <span>Random Forest</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(90deg, #e67e22, #d35400)"></div>
+        <span>Gradient Boosting</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background: linear-gradient(90deg, #2ecc71, #27ae60)"></div>
+        <span>XGBoost</span>
+    </div>
+</div>
+
+<!-- Yield Model Comparison -->
+<div class="glass-card comparison-section">
+    <h2 style="margin-bottom: 24px;">🌾 Yield Prediction - R² Score Comparison</h2>
+
+    {% if model_info.yield_metadata and model_info.yield_metadata.all_models_comparison %}
+    {% set scores = model_info.yield_metadata.all_models_comparison %}
+    {% set best_model = model_info.yield_metadata.model_type %}
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Algorithm</th>
+                <th>R² Score</th>
+                <th>RMSE</th>
+                <th>Visual</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if 'RandomForest' in scores %}
+            <tr>
+                <td>
+                    Random Forest
+                    {% if best_model == 'RandomForest' %}
+                    <span class="winner-badge">🏆 BEST</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.4f"|format(scores.RandomForest.R2) }}</td>
+                <td>{{ "%.2f"|format(scores.RandomForest.RMSE) }}</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar-fill bar-rf" style="width: {{ scores.RandomForest.R2 * 100 }}%">{{
+                            "%.2f"|format(scores.RandomForest.R2) }}</div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if 'GradientBoosting' in scores %}
+            <tr>
+                <td>
+                    Gradient Boosting
+                    {% if best_model == 'GradientBoosting' %}
+                    <span class="winner-badge">🏆 BEST</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.4f"|format(scores.GradientBoosting.R2) }}</td>
+                <td>{{ "%.2f"|format(scores.GradientBoosting.RMSE) }}</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar-fill bar-gb" style="width: {{ scores.GradientBoosting.R2 * 100 }}%">{{
+                            "%.2f"|format(scores.GradientBoosting.R2) }}</div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if 'XGBoost' in scores %}
+            <tr>
+                <td>
+                    XGBoost
+                    {% if best_model == 'XGBoost' %}
+                    <span class="winner-badge">🏆 BEST</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.4f"|format(scores.XGBoost.R2) }}</td>
+                <td>{{ "%.2f"|format(scores.XGBoost.RMSE) }}</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar-fill bar-xgb" style="width: {{ scores.XGBoost.R2 * 100 }}%">{{
+                            "%.2f"|format(scores.XGBoost.R2) }}</div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-data">
+        <p>⚠️ No comparison data available. Please retrain the models using <code>python scripts/train_models.py</code>
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Recommendation Model Comparison -->
+<div class="glass-card comparison-section">
+    <h2 style="margin-bottom: 24px;">🧪 Crop Recommendation - Accuracy Comparison</h2>
+
+    {% if model_info.recommend_metadata and model_info.recommend_metadata.all_models_comparison %}
+    {% set scores = model_info.recommend_metadata.all_models_comparison %}
+    {% set best_model = model_info.recommend_metadata.model_type %}
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Algorithm</th>
+                <th>Accuracy</th>
+                <th>Visual</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if 'RandomForest' in scores %}
+            <tr>
+                <td>
+                    Random Forest
+                    {% if best_model == 'RandomForest' %}
+                    <span class="winner-badge">🏆 BEST</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.2f"|format(scores.RandomForest * 100) }}%</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar-fill bar-rf" style="width: {{ scores.RandomForest * 100 }}%">{{
+                            "%.1f"|format(scores.RandomForest * 100) }}%</div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if 'GradientBoosting' in scores %}
+            <tr>
+                <td>
+                    Gradient Boosting
+                    {% if best_model == 'GradientBoosting' %}
+                    <span class="winner-badge">🏆 BEST</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.2f"|format(scores.GradientBoosting * 100) }}%</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar-fill bar-gb" style="width: {{ scores.GradientBoosting * 100 }}%">{{
+                            "%.1f"|format(scores.GradientBoosting * 100) }}%</div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if 'XGBoost' in scores %}
+            <tr>
+                <td>
+                    XGBoost
+                    {% if best_model == 'XGBoost' %}
+                    <span class="winner-badge">🏆 BEST</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.2f"|format(scores.XGBoost * 100) }}%</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar-fill bar-xgb" style="width: {{ scores.XGBoost * 100 }}%">{{
+                            "%.1f"|format(scores.XGBoost * 100) }}%</div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-data">
+        <p>⚠️ No comparison data available. Please retrain the models using <code>python scripts/train_models.py</code>
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Disease Detection -->
+<div class="glass-card comparison-section">
+    <h2 style="margin-bottom: 24px;">🩺 Disease Detection - CNN Architecture</h2>
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Base Architecture</td>
+                <td>MobileNetV2 (Transfer Learning)</td>
+            </tr>
+            <tr>
+                <td>Input Size</td>
+                <td>224 × 224 × 3</td>
+            </tr>
+            <tr>
+                <td>Framework</td>
+                <td>TensorFlow / Keras 3.0</td>
+            </tr>
+            <tr>
+                <td>Dataset</td>
+                <td>PlantVillage (Multi-crop)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="note-box">
+    <strong>📝 Note:</strong> The comparison metrics are dynamically loaded from training results.
+    {% if model_info.yield_metadata %}
+    <strong>{{ model_info.yield_metadata.model_type }}</strong> was selected for yield prediction (R² = {{
+    "%.4f"|format(model_info.yield_metadata.r2_score) }}).
+    {% endif %}
+    {% if model_info.recommend_metadata %}
+    <strong>{{ model_info.recommend_metadata.model_type }}</strong> was selected for crop recommendation (Accuracy = {{
+    "%.2f"|format(model_info.recommend_metadata.accuracy * 100) }}%).
+    {% endif %}
+</div>
+{% endblock %}

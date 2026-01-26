@@ -1,191 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample Data - AgriVision</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .dataset-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            transition: var(--transition);
-        }
+{% block title %}Sample Data - AgriVision{% endblock %}
 
-        .dataset-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary-color);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
+{% block head %}
+<style>
+    .dataset-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        transition: var(--transition);
+    }
 
-        .dataset-icon {
-            font-size: 32px;
-            margin-right: 20px;
-        }
+    .dataset-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
 
-        .dataset-info h3 {
-            margin: 0 0 5px 0;
-            color: #fff;
-        }
+    .dataset-icon {
+        font-size: 32px;
+        margin-right: 20px;
+    }
 
-        .dataset-info p {
-            margin: 0;
-            color: var(--muted-text);
-            font-size: 0.9rem;
-        }
+    .dataset-info h3 {
+        margin: 0 0 5px 0;
+        color: #fff;
+    }
 
-        .download-btn {
-            background: rgba(46, 204, 113, 0.15);
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-        }
+    .dataset-info p {
+        margin: 0;
+        color: var(--muted-text);
+        font-size: 0.9rem;
+    }
 
-        .download-btn:hover {
-            background: var(--primary-color);
-            color: #fff;
-        }
-    </style>
-</head>
+    .download-btn {
+        background: rgba(46, 204, 113, 0.15);
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: var(--transition);
+    }
 
-<body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="brand">
-                <span class="brand-icon">🌱</span>
-                <span class="brand-text">AgriVision</span>
-            </div>
-            <div class="nav-links">
-                <a href="/" class="nav-item">
-                    <span class="nav-icon">🏠</span> Dashboard
-                </a>
-                <a href="/predict_yield" class="nav-item">
-                    <span class="nav-icon">🌾</span> Yield Prediction
-                </a>
-                <a href="/recommend_crop" class="nav-item">
-                    <span class="nav-icon">🧪</span> Crop Recommend
-                </a>
-                <a href="/sample_data" class="nav-item active">
-                    <span class="nav-icon">📊</span> Sample Data
-                </a>
-                <a href="/documentation" class="nav-item">
-                    <span class="nav-icon">📚</span> Documentation
-                </a>
-            </div>
-            <div class="sidebar-footer">
-                <div class="status-indicator">
-                    <div class="status-dot"></div>
-                    <span>System Online</span>
-                </div>
-            </div>
-        </div>
+    .download-btn:hover {
+        background: var(--primary-color);
+        color: #fff;
+    }
+</style>
+{% endblock %}
 
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">📊 Sample Datasets</h1>
-                <p class="page-subtitle">Download high-quality CSV datasets for testing and research.</p>
-            </div>
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">📊 Sample Datasets</h1>
+    <p class="page-subtitle">Download high-quality CSV datasets for testing and research.</p>
+</div>
 
-            <div class="glass-card">
-                <div class="card-header">
-                    <h3>Available CSV Files</h3>
-                    <span class="badge">Datasets/</span>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <!-- Crop Yield Dataset -->
-                    <div class="dataset-card">
-                        <div style="display: flex; align-items: center;">
-                            <div class="dataset-icon">🌾</div>
-                            <div class="dataset-info">  
-                                <h3>Crop_yield_india.csv</h3>
-                                <p>Historical yield data with State, District, Crop, and Environmental factors.</p>
-                                <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
-                                    Size: ~7.5 MB • Rows: ~19K+
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('download_dataset', filename='Crop_yield_india.csv') }}"
-                            class="download-btn">
-                            ⬇️ Download
-                        </a>
-                    </div>
-
-                    <!-- Crop Yield Dataset - 2 -->
-                    <div class="dataset-card">
-                        <div style="display: flex; align-items: center;">
-                            <div class="dataset-icon">🌾</div>
-                            <div class="dataset-info">
-                                <h3>Crop_yield.csv</h3>
-                                <p>Sample dataset for yield prediction.</p>
-                                <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
-                                    Size: ~1.5 MB • Rows: ~19K+
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('download_dataset', filename='Crop_yield.csv') }}"
-                            class="download-btn">
-                            ⬇️ Download
-                        </a>
-                    </div>
-
-                    <!-- Crop Recommendation Dataset -->
-                    <div class="dataset-card">
-                        <div style="display: flex; align-items: center;">
-                            <div class="dataset-icon">🧪</div>
-                            <div class="dataset-info">
-                                <h3>Crop_recommendation.csv</h3>
-                                <p>NPK values, pH, rainfall, and temperature data for crop classification.</p>
-                                <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
-                                    Size: ~150 KB • Rows: ~2200
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('download_dataset', filename='Crop_recommendation.csv') }}"
-                            class="download-btn">
-                            ⬇️ Download
-                        </a>
-                    </div>
-
-                    <!-- Prediction Template -->
-                    <div class="dataset-card">
-                        <div style="display: flex; align-items: center;">
-                            <div class="dataset-icon">📋</div>
-                            <div class="dataset-info">
-                                <h3>Bulk_Upload_Template.csv</h3>
-                                <p>Empty template with correct headers for using the Bulk Prediction tool.</p>
-                                <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
-                                    For testing /predict_yield_bulk
-                                </div>
-                            </div>
-                        </div>
-                        <a href="#"
-                            onclick="alert('Template generation coming soon! Please use Crop_yield_india.csv headers for now.')"
-                            class="download-btn" style="opacity: 0.7; border-color: #666; color: #aaa;">
-                            🚧 Coming Soon
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-        </div>
+<div class="glass-card">
+    <div class="card-header">
+        <h3>Available CSV Files</h3>
+        <span class="badge">Datasets/</span>
     </div>
-</body>
 
-</html>
+    <div style="margin-top: 20px;">
+        <!-- Crop Yield Dataset -->
+        <div class="dataset-card">
+            <div style="display: flex; align-items: center;">
+                <div class="dataset-icon">🌾</div>
+                <div class="dataset-info">
+                    <h3>Crop_yield_india.csv</h3>
+                    <p>Historical yield data with State, District, Crop, and Environmental factors.</p>
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
+                        Size: ~7.5 MB • Rows: ~19K+
+                    </div>
+                </div>
+            </div>
+            <a href="{{ url_for('download_dataset', filename='Crop_yield_india.csv') }}" class="download-btn">
+                ⬇️ Download
+            </a>
+        </div>
+
+        <!-- Crop Yield Dataset - 2 -->
+        <div class="dataset-card">
+            <div style="display: flex; align-items: center;">
+                <div class="dataset-icon">🌾</div>
+                <div class="dataset-info">
+                    <h3>Crop_yield.csv</h3>
+                    <p>Sample dataset for yield prediction.</p>
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
+                        Size: ~1.5 MB • Rows: ~19K+
+                    </div>
+                </div>
+            </div>
+            <a href="{{ url_for('download_dataset', filename='Crop_yield.csv') }}" class="download-btn">
+                ⬇️ Download
+            </a>
+        </div>
+
+        <!-- Crop Recommendation Dataset -->
+        <div class="dataset-card">
+            <div style="display: flex; align-items: center;">
+                <div class="dataset-icon">🧪</div>
+                <div class="dataset-info">
+                    <h3>Crop_recommendation.csv</h3>
+                    <p>NPK values, pH, rainfall, and temperature data for crop classification.</p>
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
+                        Size: ~150 KB • Rows: ~2200
+                    </div>
+                </div>
+            </div>
+            <a href="{{ url_for('download_dataset', filename='Crop_recommendation.csv') }}" class="download-btn">
+                ⬇️ Download
+            </a>
+        </div>
+
+        <!-- Prediction Template -->
+        <div class="dataset-card">
+            <div style="display: flex; align-items: center;">
+                <div class="dataset-icon">📋</div>
+                <div class="dataset-info">
+                    <h3>Bulk_Upload_Template.csv</h3>
+                    <p>Empty template with correct headers for using the Bulk Prediction tool.</p>
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: #aaa;">
+                        For testing /predict_yield_bulk
+                    </div>
+                </div>
+            </div>
+            <a href="#"
+                onclick="alert('Template generation coming soon! Please use Crop_yield_india.csv headers for now.')"
+                class="download-btn" style="opacity: 0.7; border-color: #666; color: #aaa;">
+                🚧 Coming Soon
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

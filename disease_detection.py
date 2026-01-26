@@ -1,6 +1,6 @@
 """
 🌿 AI Plant Doctor - Disease Detection Module
-Part of AgriVision v3.0
+Part of AgriVision
 
 Uses a CNN (MobileNetV2) to detect plant diseases from leaf images.
 """
@@ -12,245 +12,94 @@ import io
 import json
 from datetime import datetime
 
-# TensorFlow imports (with graceful fallback)
+# ========================================
+# TENSORFLOW CONFIGURATION
+# ========================================
+
+# Suppress TensorFlow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['KERAS_BACKEND'] = 'tensorflow'
+
 try:
     import tensorflow as tf
-    from tensorflow.keras.models import load_model
-    from tensorflow.keras.preprocessing import image as keras_image
-    from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+    
+    # Memory optimization - only allocate GPU memory as needed
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    
+    import keras
+    from keras.models import load_model
+    from keras.utils import img_to_array
+    from keras.applications.mobilenet_v2 import preprocess_input
+    
     TF_AVAILABLE = True
+    print(f"✅ TensorFlow {tf.__version__} loaded")
 except ImportError:
     TF_AVAILABLE = False
-    print("⚠️ TensorFlow not installed. Disease detection will use mock mode.")
+    print("⚠️ TensorFlow not installed - using mock mode")
 
 
 # ========================================
 # DISEASE DATABASE
 # ========================================
 
-DISEASE_DATABASE = {
-    "Tomato_Early_Blight": {
-        "name": "Early Blight",
-        "crop": "Tomato",
-        "severity": "Moderate",
-        "symptoms": "Dark brown spots with concentric rings on lower leaves",
-        "cause": "Fungus (Alternaria solani)",
-        "treatment": {
-            "chemical": "Apply Mancozeb or Chlorothalonil fungicide every 7-10 days",
-            "organic": "Remove infected leaves, apply neem oil spray, ensure proper spacing"
-        },
-        "prevention": "Crop rotation, avoid overhead watering, mulching"
-    },
-    "Tomato_Late_Blight": {
-        "name": "Late Blight",
-        "crop": "Tomato",
-        "severity": "Severe",
-        "symptoms": "Water-soaked spots, white mold on leaf undersides",
-        "cause": "Oomycete (Phytophthora infestans)",
-        "treatment": {
-            "chemical": "Copper-based fungicides or Metalaxyl immediately",
-            "organic": "Remove and destroy all infected plants, do not compost"
-        },
-        "prevention": "Resistant varieties, good air circulation, avoid wet foliage"
-    },
-    "Tomato_Leaf_Mold": {
-        "name": "Leaf Mold",
-        "crop": "Tomato",
-        "severity": "Moderate",
-        "symptoms": "Yellow patches on upper leaf, olive-green mold below",
-        "cause": "Fungus (Passalora fulva)",
-        "treatment": {
-            "chemical": "Apply fungicides with chlorothalonil",
-            "organic": "Improve ventilation, reduce humidity, prune lower leaves"
-        },
-        "prevention": "Greenhouse ventilation, resistant varieties"
-    },
-    "Tomato_Healthy": {
-        "name": "Healthy",
-        "crop": "Tomato",
-        "severity": "None",
-        "symptoms": "No disease symptoms detected",
-        "cause": "N/A",
-        "treatment": {
-            "chemical": "No treatment needed",
-            "organic": "Continue regular care"
-        },
-        "prevention": "Maintain current practices"
-    },
-    "Potato_Early_Blight": {
-        "name": "Early Blight",
-        "crop": "Potato",
-        "severity": "Moderate",
-        "symptoms": "Brown spots with target-like rings, yellowing leaves",
-        "cause": "Fungus (Alternaria solani)",
-        "treatment": {
-            "chemical": "Apply Mancozeb or Azoxystrobin",
-            "organic": "Remove infected foliage, apply copper spray"
-        },
-        "prevention": "Certified seed potatoes, proper spacing"
-    },
-    "Potato_Late_Blight": {
-        "name": "Late Blight",
-        "crop": "Potato",
-        "severity": "Critical",
-        "symptoms": "Dark water-soaked lesions, white fuzzy growth",
-        "cause": "Oomycete (Phytophthora infestans)",
-        "treatment": {
-            "chemical": "Metalaxyl-M + Mancozeb immediately",
-            "organic": "Destroy all infected plants, copper fungicide"
-        },
-        "prevention": "Resistant varieties, avoid overhead irrigation"
-    },
-    "Potato_Healthy": {
-        "name": "Healthy",
-        "crop": "Potato",
-        "severity": "None",
-        "symptoms": "No disease symptoms detected",
-        "cause": "N/A",
-        "treatment": {
-            "chemical": "No treatment needed",
-            "organic": "Continue regular care"
-        },
-        "prevention": "Maintain current practices"
-    },
-    "Corn_Common_Rust": {
-        "name": "Common Rust",
-        "crop": "Corn/Maize",
-        "severity": "Moderate",
-        "symptoms": "Reddish-brown pustules on both leaf surfaces",
-        "cause": "Fungus (Puccinia sorghi)",
-        "treatment": {
-            "chemical": "Foliar fungicides (Triazoles, Strobilurins)",
-            "organic": "Plant resistant hybrids, remove infected debris"
-        },
-        "prevention": "Early planting, resistant varieties"
-    },
-    "Corn_Gray_Leaf_Spot": {
-        "name": "Gray Leaf Spot",
-        "crop": "Corn/Maize",
-        "severity": "Severe",
-        "symptoms": "Rectangular gray-brown lesions parallel to leaf veins",
-        "cause": "Fungus (Cercospora zeae-maydis)",
-        "treatment": {
-            "chemical": "Strobilurin or Triazole fungicides at tasseling",
-            "organic": "Crop rotation, tillage to bury residue"
-        },
-        "prevention": "Resistant hybrids, residue management"
-    },
-    "Corn_Healthy": {
-        "name": "Healthy",
-        "crop": "Corn/Maize",
-        "severity": "None",
-        "symptoms": "No disease symptoms detected",
-        "cause": "N/A",
-        "treatment": {
-            "chemical": "No treatment needed",
-            "organic": "Continue regular care"
-        },
-        "prevention": "Maintain current practices"
-    },
-    "Rice_Brown_Spot": {
-        "name": "Brown Spot",
-        "crop": "Rice",
-        "severity": "Moderate",
-        "symptoms": "Oval brown spots with gray centers on leaves",
-        "cause": "Fungus (Bipolaris oryzae)",
-        "treatment": {
-            "chemical": "Propiconazole or Tricyclazole spray",
-            "organic": "Balanced fertilization, seed treatment with Trichoderma"
-        },
-        "prevention": "Use clean certified seeds, balanced NPK"
-    },
-    "Rice_Leaf_Blast": {
-        "name": "Leaf Blast",
-        "crop": "Rice",
-        "severity": "Severe",
-        "symptoms": "Diamond-shaped lesions with gray centers",
-        "cause": "Fungus (Magnaporthe oryzae)",
-        "treatment": {
-            "chemical": "Tricyclazole or Isoprothiolane spray",
-            "organic": "Silicon fertilization, resistant varieties"
-        },
-        "prevention": "Avoid excess nitrogen, use resistant varieties"
-    },
-    "Rice_Healthy": {
-        "name": "Healthy",
-        "crop": "Rice",
-        "severity": "None",
-        "symptoms": "No disease symptoms detected",
-        "cause": "N/A",
-        "treatment": {
-            "chemical": "No treatment needed",
-            "organic": "Continue regular care"
-        },
-        "prevention": "Maintain current practices"
-    },
-    "Wheat_Leaf_Rust": {
-        "name": "Leaf Rust",
-        "crop": "Wheat",
-        "severity": "Moderate",
-        "symptoms": "Orange-brown pustules scattered on leaves",
-        "cause": "Fungus (Puccinia triticina)",
-        "treatment": {
-            "chemical": "Propiconazole or Tebuconazole spray",
-            "organic": "Resistant varieties, early sowing"
-        },
-        "prevention": "Resistant varieties, eliminate volunteer wheat"
-    },
-    "Wheat_Healthy": {
-        "name": "Healthy",
-        "crop": "Wheat",
-        "severity": "None",
-        "symptoms": "No disease symptoms detected",
-        "cause": "N/A",
-        "treatment": {
-            "chemical": "No treatment needed",
-            "organic": "Continue regular care"
-        },
-        "prevention": "Maintain current practices"
-    }
-}
+DISEASE_DATABASE = {}
+CACHE_PATH = 'models/disease_cache.json'
 
-# Class names matching PlantVillage dataset style
-CLASS_NAMES = list(DISEASE_DATABASE.keys())
+if os.path.exists(CACHE_PATH):
+    try:
+        with open(CACHE_PATH, 'r') as f:
+            DISEASE_DATABASE = json.load(f)
+        print(f"✅ Loaded {len(DISEASE_DATABASE)} diseases from cache")
+    except Exception as e:
+        print(f"⚠️ Failed to load disease cache: {e}")
 
 
 # ========================================
-# DISEASE DETECTION CLASS
+# PLANT DOCTOR CLASS
 # ========================================
 
 class PlantDoctor:
     """
-    AI-powered plant disease detection using CNN
+    CNN-based plant disease detection using MobileNetV2.
+    
+    Attributes:
+        model_path: Path to the trained .h5 model
+        model: Loaded Keras model
+        img_size: Input image dimensions (224x224 for MobileNetV2)
+        class_names: List of disease class names
     """
     
     def __init__(self, model_path='models/disease_model.h5'):
+        """Initialize PlantDoctor with model path."""
         self.model_path = model_path
         self.model = None
-        self.img_size = (224, 224)  # MobileNetV2 default
+        self.img_size = (224, 224)
         self.class_names = []
-        self._load_class_names()
         
-        # Load model if available
+        self._load_class_names()
         self._load_model()
     
     def _load_class_names(self):
-        """Load class names from JSON or fallback to database"""
+        """Load class names from JSON file."""
         json_path = os.path.join(os.path.dirname(self.model_path), 'classes.json')
+        
         if os.path.exists(json_path):
             try:
                 with open(json_path, 'r') as f:
                     self.class_names = json.load(f)
-                print(f"✅ Loaded {len(self.class_names)} classes from {json_path}")
+                print(f"✅ Loaded {len(self.class_names)} disease classes")
             except Exception as e:
                 print(f"⚠️ Failed to load classes.json: {e}")
-                self.class_names = CLASS_NAMES
+                self.class_names = list(DISEASE_DATABASE.keys())
         else:
-            print("⚠️ classes.json not found. Using default database keys (may be mismatched!)")
-            self.class_names = CLASS_NAMES
+            print("⚠️ classes.json not found")
+            self.class_names = list(DISEASE_DATABASE.keys())
     
     def _load_model(self):
-        """Load the trained CNN model"""
+        """Load the trained CNN model."""
         if not TF_AVAILABLE:
             print("⚠️ TensorFlow not available - using mock predictions")
             return
@@ -258,100 +107,100 @@ class PlantDoctor:
         if os.path.exists(self.model_path):
             try:
                 self.model = load_model(self.model_path)
-                print(f"✅ Disease detection model loaded from {self.model_path}")
+                print(f"✅ Disease model loaded: {self.model_path}")
             except Exception as e:
-                print(f"❌ Failed to load disease model: {e}")
+                print(f"❌ Failed to load model: {e}")
                 self.model = None
         else:
-            print(f"⚠️ Disease model not found at {self.model_path}")
-            print("   Run train_disease_model.py to train the model")
+            print(f"⚠️ Model not found: {self.model_path}")
     
     def preprocess_image(self, img_input):
         """
-        Preprocess image for model prediction
+        Preprocess image for model prediction.
         
         Args:
-            img_input: Can be file path, PIL Image, or bytes
+            img_input: File path (str), bytes, or PIL Image
         
         Returns:
-            Preprocessed numpy array ready for model
+            Preprocessed numpy array with shape (1, 224, 224, 3)
         """
         # Handle different input types
         if isinstance(img_input, str):
-            # File path
             img = Image.open(img_input)
         elif isinstance(img_input, bytes):
-            # Raw bytes
             img = Image.open(io.BytesIO(img_input))
         elif hasattr(img_input, 'read'):
-            # File-like object
             img = Image.open(img_input)
         else:
-            # Assume PIL Image
             img = img_input
         
-        # Convert to RGB if necessary
+        # Convert to RGB
         if img.mode != 'RGB':
             img = img.convert('RGB')
         
-        # Resize to model input size
+        # Resize
         img = img.resize(self.img_size)
         
-        # Convert to array and preprocess
-        img_array = keras_image.img_to_array(img) if TF_AVAILABLE else np.array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        
+        # Convert to array
         if TF_AVAILABLE:
+            img_array = img_to_array(img)
+            img_array = np.expand_dims(img_array, axis=0)
             img_array = preprocess_input(img_array)
         else:
-            img_array = img_array / 255.0
+            img_array = np.array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
         
         return img_array
     
     def predict(self, img_input):
         """
-        Predict disease from image
+        Predict disease from leaf image.
         
         Args:
-            img_input: Image file path, bytes, or PIL Image
+            img_input: Image as file path, bytes, or PIL Image
         
         Returns:
-            dict with prediction results
+            dict with prediction results including:
+            - success: bool
+            - prediction: disease info
+            - diagnosis: symptoms and cause
+            - treatment: chemical and organic options
+            - top_predictions: top 3 predictions
         """
         try:
-            # Preprocess image
             processed_img = self.preprocess_image(img_input)
             
             if self.model is not None and TF_AVAILABLE:
-                # Real prediction
+                # Real CNN prediction
                 predictions = self.model.predict(processed_img, verbose=0)
                 predicted_idx = np.argmax(predictions[0])
                 confidence = float(predictions[0][predicted_idx])
                 
-                # Get top 3 predictions
+                # Top 3 predictions
                 top_indices = np.argsort(predictions[0])[-3:][::-1]
                 top_predictions = [
                     {
-                        "disease": self.class_names[i],
+                        "disease": self.class_names[i] if i < len(self.class_names) else f"Class_{i}",
                         "confidence": float(predictions[0][i])
                     }
                     for i in top_indices
                 ]
             else:
-                # Mock prediction for demo/testing
-                predicted_idx = np.random.choice(len(self.class_names))
+                # Mock prediction for testing
+                if len(self.class_names) > 0:
+                    predicted_idx = np.random.choice(len(self.class_names))
+                else:
+                    predicted_idx = 0
                 confidence = np.random.uniform(0.75, 0.98)
                 top_predictions = [
-                    {"disease": self.class_names[predicted_idx], "confidence": confidence},
-                    {"disease": self.class_names[(predicted_idx + 1) % len(self.class_names)], "confidence": 0.1},
-                    {"disease": self.class_names[(predicted_idx + 2) % len(self.class_names)], "confidence": 0.05}
+                    {"disease": self.class_names[predicted_idx] if self.class_names else "Unknown", "confidence": confidence}
                 ]
             
-            # Get disease info
-            disease_key = self.class_names[predicted_idx]
+            # Get disease key
+            disease_key = self.class_names[predicted_idx] if predicted_idx < len(self.class_names) else "Unknown"
             disease_info = DISEASE_DATABASE.get(disease_key, {})
             
-            result = {
+            return {
                 "success": True,
                 "timestamp": datetime.now().isoformat(),
                 "prediction": {
@@ -371,8 +220,6 @@ class PlantDoctor:
                 "model_used": "CNN (MobileNetV2)" if self.model else "Mock Mode"
             }
             
-            return result
-            
         except Exception as e:
             return {
                 "success": False,
@@ -381,36 +228,35 @@ class PlantDoctor:
             }
     
     def get_supported_diseases(self):
-        """Get list of all detectable diseases"""
+        """Get list of all detectable diseases."""
         return [
             {
                 "key": key,
-                "name": info["name"],
-                "crop": info["crop"],
-                "severity": info["severity"]
+                "name": info.get("name", key),
+                "crop": info.get("crop", "Unknown"),
+                "severity": info.get("severity", "Unknown")
             }
             for key, info in DISEASE_DATABASE.items()
         ]
     
     def get_supported_crops(self):
-        """Get unique list of supported crops"""
-        crops = set(info["crop"] for info in DISEASE_DATABASE.values())
-        return sorted(list(crops))
+        """Get unique list of supported crops."""
+        crops = set(info.get("crop", "") for info in DISEASE_DATABASE.values())
+        return sorted([c for c in crops if c])
 
 
 # ========================================
 # SINGLETON INSTANCE
 # ========================================
 
-# Global instance for Flask app
-plant_doctor = None
+_plant_doctor = None
 
 def get_plant_doctor():
-    """Get or create PlantDoctor instance"""
-    global plant_doctor
-    if plant_doctor is None:
-        plant_doctor = PlantDoctor()
-    return plant_doctor
+    """Get or create PlantDoctor singleton instance."""
+    global _plant_doctor
+    if _plant_doctor is None:
+        _plant_doctor = PlantDoctor()
+    return _plant_doctor
 
 
 # ========================================
@@ -426,16 +272,4 @@ if __name__ == "__main__":
     
     print(f"\n📋 Supported Crops: {doctor.get_supported_crops()}")
     print(f"📋 Total Diseases: {len(doctor.get_supported_diseases())}")
-    
-    # Test with mock prediction
-    print("\n🧪 Testing mock prediction...")
-    result = doctor.predict(np.random.rand(224, 224, 3))
-    
-    print(f"\n📊 Prediction Result:")
-    print(f"   Disease: {result['prediction']['disease_name']}")
-    print(f"   Crop: {result['prediction']['crop']}")
-    print(f"   Confidence: {result['prediction']['confidence']}%")
-    print(f"   Severity: {result['prediction']['severity']}")
-    print(f"\n💊 Treatment:")
-    print(f"   Chemical: {result['treatment'].get('chemical', 'N/A')}")
-    print(f"   Organic: {result['treatment'].get('organic', 'N/A')}")
+    print(f"🤖 Model Status: {'Loaded' if doctor.model else 'Mock Mode'}")

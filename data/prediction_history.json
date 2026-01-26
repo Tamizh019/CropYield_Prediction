@@ -1,18 +1,18 @@
 [
   {
-    "timestamp": "2026-01-12T12:37:18.538528",
+    "timestamp": "2026-01-27T00:24:43.248198",
     "type": "yield",
     "input": {
       "State_Name": "Tamil Nadu",
-      "District_Name": "Chennai",
-      "Crop_Year": 2012.0,
-      "Crop": "Rice",
-      "Area": 39.92,
+      "District_Name": "chennai ",
+      "Crop_Year": 2024.0,
+      "Crop": "Rice ",
+      "Area": 4.0,
       "Temperature": 25.0,
-      "Humidity": 100.0,
-      "pH": 6.0,
-      "Rainfall": 150.0
+      "Humidity": 80.0,
+      "pH": 7.0,
+      "Rainfall": 205.0
     },
-    "prediction": "4714.07"
+    "prediction": "4711.35"
   }
 ]

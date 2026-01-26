@@ -1,0 +1,194 @@
+{
+    "Tomato_Early_Blight": {
+        "name": "Early Blight",
+        "crop": "Tomato",
+        "severity": "Moderate",
+        "symptoms": "Dark brown spots with concentric rings on lower leaves",
+        "cause": "Fungus (Alternaria solani)",
+        "treatment": {
+            "chemical": "Apply Mancozeb or Chlorothalonil fungicide every 7-10 days",
+            "organic": "Remove infected leaves, apply neem oil spray, ensure proper spacing"
+        },
+        "prevention": "Crop rotation, avoid overhead watering, mulching"
+    },
+    "Tomato_Late_Blight": {
+        "name": "Late Blight",
+        "crop": "Tomato",
+        "severity": "Severe",
+        "symptoms": "Water-soaked spots, white mold on leaf undersides",
+        "cause": "Oomycete (Phytophthora infestans)",
+        "treatment": {
+            "chemical": "Copper-based fungicides or Metalaxyl immediately",
+            "organic": "Remove and destroy all infected plants, do not compost"
+        },
+        "prevention": "Resistant varieties, good air circulation, avoid wet foliage"
+    },
+    "Tomato_Leaf_Mold": {
+        "name": "Leaf Mold",
+        "crop": "Tomato",
+        "severity": "Moderate",
+        "symptoms": "Yellow patches on upper leaf, olive-green mold below",
+        "cause": "Fungus (Passalora fulva)",
+        "treatment": {
+            "chemical": "Apply fungicides with chlorothalonil",
+            "organic": "Improve ventilation, reduce humidity, prune lower leaves"
+        },
+        "prevention": "Greenhouse ventilation, resistant varieties"
+    },
+    "Tomato_Healthy": {
+        "name": "Healthy",
+        "crop": "Tomato",
+        "severity": "None",
+        "symptoms": "No disease symptoms detected",
+        "cause": "N/A",
+        "treatment": {
+            "chemical": "No treatment needed",
+            "organic": "Continue regular care"
+        },
+        "prevention": "Maintain current practices"
+    },
+    "Potato_Early_Blight": {
+        "name": "Early Blight",
+        "crop": "Potato",
+        "severity": "Moderate",
+        "symptoms": "Brown spots with target-like rings, yellowing leaves",
+        "cause": "Fungus (Alternaria solani)",
+        "treatment": {
+            "chemical": "Apply Mancozeb or Azoxystrobin",
+            "organic": "Remove infected foliage, apply copper spray"
+        },
+        "prevention": "Certified seed potatoes, proper spacing"
+    },
+    "Potato_Late_Blight": {
+        "name": "Late Blight",
+        "crop": "Potato",
+        "severity": "Critical",
+        "symptoms": "Dark water-soaked lesions, white fuzzy growth",
+        "cause": "Oomycete (Phytophthora infestans)",
+        "treatment": {
+            "chemical": "Metalaxyl-M + Mancozeb immediately",
+            "organic": "Destroy all infected plants, copper fungicide"
+        },
+        "prevention": "Resistant varieties, avoid overhead irrigation"
+    },
+    "Potato_Healthy": {
+        "name": "Healthy",
+        "crop": "Potato",
+        "severity": "None",
+        "symptoms": "No disease symptoms detected",
+        "cause": "N/A",
+        "treatment": {
+            "chemical": "No treatment needed",
+            "organic": "Continue regular care"
+        },
+        "prevention": "Maintain current practices"
+    },
+    "Corn_Common_Rust": {
+        "name": "Common Rust",
+        "crop": "Corn/Maize",
+        "severity": "Moderate",
+        "symptoms": "Reddish-brown pustules on both leaf surfaces",
+        "cause": "Fungus (Puccinia sorghi)",
+        "treatment": {
+            "chemical": "Foliar fungicides (Triazoles, Strobilurins)",
+            "organic": "Plant resistant hybrids, remove infected debris"
+        },
+        "prevention": "Early planting, resistant varieties"
+    },
+    "Corn_Gray_Leaf_Spot": {
+        "name": "Gray Leaf Spot",
+        "crop": "Corn/Maize",
+        "severity": "Severe",
+        "symptoms": "Rectangular gray-brown lesions parallel to leaf veins",
+        "cause": "Fungus (Cercospora zeae-maydis)",
+        "treatment": {
+            "chemical": "Strobilurin or Triazole fungicides at tasseling",
+            "organic": "Crop rotation, tillage to bury residue"
+        },
+        "prevention": "Resistant hybrids, residue management"
+    },
+    "Corn_Healthy": {
+        "name": "Healthy",
+        "crop": "Corn/Maize",
+        "severity": "None",
+        "symptoms": "No disease symptoms detected",
+        "cause": "N/A",
+        "treatment": {
+            "chemical": "No treatment needed",
+            "organic": "Continue regular care"
+        },
+        "prevention": "Maintain current practices"
+    },
+    "Rice_Brown_Spot": {
+        "name": "Brown Spot",
+        "crop": "Rice",
+        "severity": "Moderate",
+        "symptoms": "Oval brown spots with gray centers on leaves",
+        "cause": "Fungus (Bipolaris oryzae)",
+        "treatment": {
+            "chemical": "Propiconazole or Tricyclazole spray",
+            "organic": "Balanced fertilization, seed treatment with Trichoderma"
+        },
+        "prevention": "Use clean certified seeds, balanced NPK"
+    },
+    "Rice_Leaf_Blast": {
+        "name": "Leaf Blast",
+        "crop": "Rice",
+        "severity": "Severe",
+        "symptoms": "Diamond-shaped lesions with gray centers",
+        "cause": "Fungus (Magnaporthe oryzae)",
+        "treatment": {
+            "chemical": "Tricyclazole or Isoprothiolane spray",
+            "organic": "Silicon fertilization, resistant varieties"
+        },
+        "prevention": "Avoid excess nitrogen, use resistant varieties"
+    },
+    "Rice_Healthy": {
+        "name": "Healthy",
+        "crop": "Rice",
+        "severity": "None",
+        "symptoms": "No disease symptoms detected",
+        "cause": "N/A",
+        "treatment": {
+            "chemical": "No treatment needed",
+            "organic": "Continue regular care"
+        },
+        "prevention": "Maintain current practices"
+    },
+    "Wheat_Leaf_Rust": {
+        "name": "Leaf Rust",
+        "crop": "Wheat",
+        "severity": "Moderate",
+        "symptoms": "Orange-brown pustules scattered on leaves",
+        "cause": "Fungus (Puccinia triticina)",
+        "treatment": {
+            "chemical": "Propiconazole or Tebuconazole spray",
+            "organic": "Resistant varieties, early sowing"
+        },
+        "prevention": "Resistant varieties, eliminate volunteer wheat"
+    },
+    "Wheat_Healthy": {
+        "name": "Healthy",
+        "crop": "Wheat",
+        "severity": "None",
+        "symptoms": "No disease symptoms detected",
+        "cause": "N/A",
+        "treatment": {
+            "chemical": "No treatment needed",
+            "organic": "Continue regular care"
+        },
+        "prevention": "Maintain current practices"
+    },
+    "Tomato_Yellow_Leaf": {
+        "name": "Tomato Yellow Leaf Curl",
+        "crop": "Tomato",
+        "severity": "Severe",
+        "symptoms": "Upward curling of leaflets, yellowing of leaves, stunted plant growth",
+        "cause": "Tomato yellow leaf curl virus (TYLCV)",
+        "treatment": {
+            "chemical": "Insecticides to control whitefly vectors (e.g., neonicotinoids, pyrethroids, or organophosphates), although resistance is common. Systemic insecticides are preferred.",
+            "organic": "Insecticidal soap or horticultural oil to control whitefly vectors. Remove and destroy infected plants immediately."
+        },
+        "prevention": "Use virus-free transplants, control whitefly populations with sticky traps and reflective mulches, practice crop rotation, and choose resistant tomato varieties if available."
+    }
+}

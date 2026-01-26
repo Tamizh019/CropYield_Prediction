@@ -10,6 +10,7 @@
     --warning-color: #f39c12;
     --danger-color: #e74c3c;
     --purple-color: #9b59b6;
+    --success: #2ecc71;
 
     --dark-bg: #0f0f0f;
     --sidebar-bg: #1a1a1a;
@@ -1380,4 +1381,19 @@ input[type="file"] {
 .insight-text {
     font-size: 14px;
     color: var(--light-text);
+}
+
+/* ========================================
+   AI SUGGESTIONS (Bulk Result Page)
+   ======================================== */
+.ai-suggestions-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .ai-suggestions-container {
+        grid-template-columns: 1fr;
+    }
 }

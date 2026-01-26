@@ -1,92 +1,76 @@
-# AgriVision v3.0 🌾🤖
-
-> **⚠️ Welcome to the Deep Learning Branch!**  
-> This branch uses **Deep Learning models** (CNN, LSTM) in addition to ML algorithms.  
-> If you only need **Machine Learning models** (XGBoost, Random Forest), switch to the `main` branch.
+# 🌾 AgriVision v3.1
 
 **AI-Powered Agricultural Intelligence Platform**
 
-Transform farming decisions with Machine Learning, Deep Learning, and real-time insights.
+> Transform farming decisions with Machine Learning, Deep Learning, and real-time AI insights.
 
 ---
 
-## 🚀 What's New in v3.0
+## ⚡ Quick Start
 
-| Feature | Technology | Description |
-|---------|------------|-------------|
-| 🩺 **Plant Doctor** | CNN (MobileNetV2) | Upload leaf photos → Instant disease diagnosis |
-| 💰 **Market Prices** | LSTM Neural Network | 7-day crop price forecasting |
-| 🌦️ **Weather Intelligence** | OpenWeatherMap API | Agricultural alerts & farming calendar |
-| 🧪 **Fertilizer Calculator** | Optimization Algorithm | NPK-based cost-effective recommendations |
+**Option 1: One-Click Run**
+```
+Double-click run.bat
+```
 
----
-
-## 📋 Quick Start
-
-> [!IMPORTANT]
-> **New to the project?** 
-> - If manual setup feels complicated, just double-click **`run.bat`**! It will handle the environment, dependencies, and start the app for you automatically.
-> - For a deep understanding of the system, models, and API, check out our **[Docs/ Directory](./Docs/README.md)**.
-
-### 1. Setup API Keys
-Create a `.env` file:
-```env
+**Option 2: Manual Setup**
+```bash
+# 1. Create .env file with API keys
 GOOGLE_API_KEY=your_gemini_api_key
-OPENWEATHER_API_KEY=your_openweather_key  # Optional
-```
+OPENWEATHER_API_KEY=your_weather_key  # Optional
 
-### 2. Install Dependencies
-```bash
+# 2. Install & Run
 pip install -r requirements.txt
+python train_models.py   # First time only
+python app.py            # Start server
 ```
 
-### 3. Train Models (First Time)
-```bash
-python train_models.py          # ML models (Yield, Recommendation)
-```
-
-### 3.1 Setup Plant Disease Dataset (Deep Learning)
-Required for `train_disease_model.py`.
-1. Download **PlantVillage** dataset from Kaggle:
-   - **Full Dataset (Recommended):** [PlantVillage Dataset (2.18 GB)](https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset) - Better accuracy.
-   - **Lightweight (Fast):** [PlantDisease (342 MB)](https://www.kaggle.com/datasets/emmarex/plantdisease) - Quicker training.
-2. Extract it into `Datasets/PlantVillage`.
-3. Run the organization script:
-```bash
-python organize_dataset.py      # Fixes folder structure & class names
-python train_disease_model.py   # Trains the CNN model
-```
-
-### 3.2 Train Market Price Model (Optional)
-Enable the real LSTM forecasting model:
-```bash
-python train_price_model.py
-```
-
-### 4. Run the App
-```bash
-python app.py
-```
-Open `http://127.0.0.1:5000`
+Open **http://127.0.0.1:5000**
 
 ---
 
-## 🧠 Technology Stack
+## 🎯 Features
 
-### Machine Learning
-- **XGBoost & Random Forest** - Yield prediction & crop recommendation
-- **MobileNetV2 CNN** - Plant disease detection (Transfer Learning)
-- **LSTM RNN** - Time-series price forecasting
+| Module | Technology | What it Does |
+|--------|------------|--------------|
+| 📊 **Yield Prediction** | XGBoost | Predict crop yields with bulk CSV upload |
+| 🌱 **Crop Recommendation** | Random Forest | Find best crops for your land |
+| 🩺 **Plant Doctor** | CNN (MobileNetV2) | Diagnose plant diseases from photos |
+| 💰 **Market Prices** | LSTM | 7-day price forecasting |
+| 🌦️ **Weather Intel** | OpenWeatherMap API | Farming alerts & 5-day forecast |
+| 🧪 **Fertilizer Calc** | Optimization | NPK-based recommendations |
+| 🤖 **AI Insights** | Gemini 2.0 Flash | Smart analysis on every page |
 
-### Backend
-- **Flask** - Web framework
-- **TensorFlow/Keras** - Deep Learning
-- **Gemini 2.0 Flash** - AI insights generation
+---
 
-### Frontend
-- **Glassmorphism UI** - Modern design
-- **Chart.js** - Data visualization
-- **Responsive** - Mobile-friendly
+## 🆕 What's New (v3.1)
+
+### ML Analytics Dashboard
+- **Model Confidence Score** - Shows prediction reliability
+- **Feature Importance Chart** - Which factors affect yield most
+- **Yield Distribution Histogram** - Visualize prediction ranges
+- **Prediction Classification** - High/Medium/Low yield breakdown
+
+### AI Farming Advisor
+- **Actionable Recommendations** - Priority actions, not just data description
+- **Risk Mitigation** - Potential issues & solutions
+- **Growth Opportunities** - Where to expand cultivation
+
+### Bug Fixes
+- Fixed state name display (was showing codes, now shows names)
+- Improved page spacing for better readability
+- Reduced table preview to 10 rows for cleaner UI
+
+---
+
+## 🧠 Tech Stack
+
+| Layer | Technologies |
+|-------|--------------|
+| **ML Models** | XGBoost, Random Forest, MobileNetV2 CNN, LSTM |
+| **Backend** | Flask, TensorFlow/Keras, Gemini 2.0 |
+| **Frontend** | Glassmorphism UI, Chart.js |
+| **APIs** | OpenWeatherMap, Google Gemini |
 
 ---
 
@@ -94,24 +78,28 @@ Open `http://127.0.0.1:5000`
 
 ```
 CropYield_Prediction/
-├── app.py                      # Main Flask application
-├── train_models.py             # ML model training
-├── train_disease_model.py      # CNN training script
-├── organize_dataset.py         # Dataset helper script
-├── disease_detection.py        # Plant Doctor module
-├── price_forecast.py           # LSTM price prediction
-├── weather_service.py          # Weather API integration
-├── fertilizer_optimizer.py     # NPK calculator
-├── models/                     # Trained models (.pkl, .h5)
-├── templates/                  # HTML templates
-│   ├── index.html
-│   ├── plant_doctor.html
-│   ├── market_prices.html
-│   ├── weather.html
-│   └── fertilizer.html
-├── Datasets/                   # Training data
-└── static/                     # CSS, JS, images
+├── app.py                 # Main Flask app (all routes)
+├── train_models.py        # ML model training
+├── train_disease_model.py # CNN training
+├── disease_detection.py   # Plant Doctor module
+├── price_forecast.py      # LSTM predictions
+├── weather_service.py     # Weather API
+├── models/                # Trained .pkl & .h5 files
+├── templates/             # HTML pages
+├── static/                # CSS, JS, images
+├── Datasets/              # Training data
+└── Docs/                  # Full documentation
 ```
+
+---
+
+## 📚 Documentation
+
+See **[Docs/README.md](./Docs/README.md)** for:
+- System architecture & data flow
+- ML/DL model explanations
+- API reference
+- Training guides
 
 ---
 
@@ -133,9 +121,6 @@ CropYield_Prediction/
 > 📥 **[Download Pre-Trained Models (Google Drive)](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5)**
 > 
 > Extract files into the `models/` folder and you're ready to go!
-
-- Disease detection works in "mock mode" without trained CNN
-- Price forecasting uses simulation when LSTM model is not trained
 
 ---
 
