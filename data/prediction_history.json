@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "timestamp": "2026-01-20T14:35:58.021365",
     "type": "crop",
     "input": {
@@ -54,5 +55,21 @@
       "Rainfall": 200.0
     },
     "prediction": "Cotton"
+=======
+    "timestamp": "2026-01-12T12:37:18.538528",
+    "type": "yield",
+    "input": {
+      "State_Name": "Tamil Nadu",
+      "District_Name": "Chennai",
+      "Crop_Year": 2012.0,
+      "Crop": "Rice",
+      "Area": 39.92,
+      "Temperature": 25.0,
+      "Humidity": 100.0,
+      "pH": 6.0,
+      "Rainfall": 150.0
+    },
+    "prediction": "4714.07"
+>>>>>>> fb4313d6a9f6d0054236c408dad268247f94d31d
   }
 ]

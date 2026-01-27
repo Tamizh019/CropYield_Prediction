@@ -10,12 +10,43 @@ from google.genai import types
 from dotenv import load_dotenv
 from functools import wraps
 
+# AgriVision v3.0 - New Module Imports
+try:
+    from disease_detection import get_plant_doctor
+    DISEASE_MODULE_AVAILABLE = True
+except ImportError:
+    DISEASE_MODULE_AVAILABLE = False
+    print("⚠️ Disease detection module not available")
+
+try:
+    from price_forecast import get_price_forecaster
+    PRICE_MODULE_AVAILABLE = True
+except ImportError:
+    PRICE_MODULE_AVAILABLE = False
+    print("⚠️ Price forecast module not available")
+
+try:
+    from weather_service import get_weather_service
+    WEATHER_MODULE_AVAILABLE = True
+except ImportError:
+    WEATHER_MODULE_AVAILABLE = False
+    print("⚠️ Weather service module not available")
+
+try:
+    from fertilizer_optimizer import calculate_fertilizer, get_supported_crops as get_fertilizer_crops
+    FERTILIZER_MODULE_AVAILABLE = True
+except ImportError:
+    FERTILIZER_MODULE_AVAILABLE = False
+    print("⚠️ Fertilizer optimizer module not available")
+
 # Load Environment Variables
 load_dotenv()
 
 # Configure Gemini AI with Pro settings
 gen_ai_key = os.getenv("GOOGLE_API_KEY")
 client = None
+GEMINI_MODEL = "gemini-1.5-flash"
+
 if gen_ai_key:
     client = genai.Client(api_key=gen_ai_key)
     print("✅ Gemini AI Client Configured")
@@ -114,33 +145,41 @@ Humidity: {data['Humidity']}%
 Rainfall: {data['Rainfall']}mm
 Soil pH: {data['pH']}
 
-Provide a structured analysis:
+IMPORTANT FORMATTING RULES:
+- Output ONLY raw HTML. Do NOT wrap in markdown code blocks like ```html.
+- Do NOT include any text before or after the HTML.
+- Start directly with <div> and end with </div>.
 
-1. YIELD ASSESSMENT
-[Evaluate if this yield is good/average/poor for these conditions. Compare with typical yields.]
+Use this exact structure:
 
-2. OPTIMIZATION STRATEGIES
-• [First specific, actionable recommendation]
-• [Second specific, actionable recommendation]
+<div class="ai-insight-card">
+    <div class="insight-section">
+        <h4>📊 Yield Assessment</h4>
+        <p>[Is this yield good/average/poor? Compare with typical yields.]</p>
+    </div>
 
-3. RISK FACTORS
-[Identify the main risk (weather/pH/climate) and explain its impact]
+    <div class="insight-section">
+        <h4>🚀 Optimization Strategies</h4>
+        <ul>
+            <li>[First actionable recommendation]</li>
+            <li>[Second actionable recommendation]</li>
+        </ul>
+    </div>
 
-4. SEASONAL ADVICE
-[Brief tip on best practices for current conditions]
+    <div class="insight-section">
+        <h4>⚠️ Risk Factors</h4>
+        <p>[Main risk and its impact]</p>
+    </div>
 
-Keep each section concise and farmer-friendly."""
+    <div class="insight-section">
+        <h4>🌤️ Seasonal Advice</h4>
+        <p class="highlight-text">[Best practice tip]</p>
+    </div>
+</div>
+
+Keep it concise and farmer-friendly."""
         
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-exp',
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.3,
-                max_output_tokens=2000,
-                top_p=0.9,
-                top_k=40
-            )
-        )
+        response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
         return response.text
     
     except Exception as e:
@@ -165,32 +204,44 @@ Average Yield: {stats['avg_yield']} tonnes/hectare
 Top Performing State: {stats['top_state']}
 Best Yielding Crop: {stats['top_crop']}
 
-Provide expert insights:
+IMPORTANT FORMATTING RULES:
+- Output ONLY raw HTML. Do NOT wrap in markdown code blocks like ```html.
+- Do NOT include any text before or after the HTML.
+- Start directly with <div> and end with </div>.
 
-1. OVERALL ASSESSMENT
-[Brief evaluation of the dataset's agricultural potential]
+Use this exact structure:
 
-2. REGIONAL ANALYSIS
-[Key insights about {stats['top_state']}'s performance]
+<div class="ai-analysis-container">
+    <div class="analysis-card overall">
+        <h4>🌍 Overall Assessment</h4>
+        <p>[2-3 sentences about agricultural potential and data quality]</p>
+    </div>
 
-3. CROP RECOMMENDATIONS
-[Strategic advice based on {stats['top_crop']}'s dominance]
+    <div class="analysis-grid">
+        <div class="analysis-card regional">
+            <h4>🗺️ Regional Analysis</h4>
+            <p><strong>{stats['top_state']}</strong> [Why this region performs well]</p>
+        </div>
 
-4. ACTIONABLE INSIGHTS
-[2-3 specific recommendations for farmers or policymakers]
+        <div class="analysis-card crop">
+            <h4>🌾 Crop Strategy</h4>
+            <p><strong>{stats['top_crop']}</strong> [Market and cultivation advice]</p>
+        </div>
+    </div>
+
+    <div class="analysis-card actions">
+        <h4>💡 Actionable Insights</h4>
+        <ul>
+            <li>[Specific recommendation 1]</li>
+            <li>[Specific recommendation 2]</li>
+            <li>[Specific recommendation 3]</li>
+        </ul>
+    </div>
+</div>
 
 Keep insights data-driven and practical."""
         
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-exp',
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.3,
-                max_output_tokens=2000,
-                top_p=0.9,
-                top_k=40
-            )
-        )
+        response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
         return response.text
     
     except Exception as e:
@@ -219,30 +270,36 @@ Humidity: {input_data['Humidity']}%
 pH: {input_data['pH']}
 Rainfall: {input_data['Rainfall']}mm
 
-Provide a structured, friendly, and professional analysis. Use emojis to make it engaging.
+IMPORTANT FORMATTING RULES:
+- Output ONLY raw HTML. Do NOT wrap in markdown code blocks like ```html.
+- Do NOT include any text before or after the HTML.
+- Start directly with <div> and end with </div>.
 
-1. 🌟 WHY THIS CROP?
-[Explain simply why {recommended_crop} matches the soil/conditions. Keep it under 2 sentences.]
+Use this exact structure:
 
-2. 🚜 CULTIVATION TIPS
-• [Tip 1]
-• [Tip 2]
+<div class="crop-insight-card">
+    <div class="insight-header">
+        <h4>🌟 Why {recommended_crop}?</h4>
+        <p>[Why it matches your soil/conditions - 1-2 sentences]</p>
+    </div>
 
-3. 💰 PROFITABILITY
-[Brief mention of market potential or yield expectation]
+    <div class="insight-body">
+        <h5>🚜 Cultivation Tips</h5>
+        <ul>
+            <li>[Tip 1]</li>
+            <li>[Tip 2]</li>
+        </ul>
+    </div>
 
-Tone: Helpful expert. Keep it concise (max 100 words)."""
+    <div class="insight-footer">
+        <span class="profit-badge">💰 Profitability</span>
+        <span class="insight-text">[Brief market potential note]</span>
+    </div>
+</div>
+
+Tone: Helpful expert. Keep it concise."""
         
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-exp',
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.3,
-                max_output_tokens=2000,
-                top_p=0.9,
-                top_k=40
-            )
-        )
+        response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
         return response.text
     
     except Exception as e:
@@ -324,11 +381,50 @@ def get_model_info():
     """
     Get information about loaded models
     """
+    # Check Price Model Status
+    price_status = "Inactive"
+    price_type = "N/A"
+    if PRICE_MODULE_AVAILABLE:
+        try:
+            forecaster = get_price_forecaster()
+            if forecaster.model:
+                price_status = "Active"
+                price_type = "LSTM Neural Net"
+            else:
+                price_status = "Simulation"
+                price_type = "Statistical Mock"
+        except:
+            pass
+
+    # Check Weather Status
+    weather_status = "Inactive"
+    weather_type = "N/A"
+    if WEATHER_MODULE_AVAILABLE:
+        try:
+            service = get_weather_service()
+            if service.api_key:
+                weather_status = "Active"
+                weather_type = "Live API"
+            else:
+                weather_status = "Simulation"
+                weather_type = "Historical Data"
+        except:
+            pass
+
     info = {
         'yield_model': yield_model is not None,
         'recommend_model': recommend_model is not None,
         'ai_model': client is not None,
-        'prediction_count': len(prediction_history)
+        'prediction_count': len(prediction_history),
+        'price_model': {
+            'status': price_status, 
+            'type': price_type
+        },
+        'weather_service': {
+            'status': weather_status, 
+            'type': weather_type
+        },
+        'disease_model': DISEASE_MODULE_AVAILABLE
     }
     return info
 
@@ -694,6 +790,171 @@ def download_dataset(filename):
         return send_from_directory('Datasets', filename, as_attachment=True)
     except FileNotFoundError:
         return "File not found", 404
+
+
+# ========================================
+# AGRIVISION v3.0 - NEW FEATURE ROUTES
+# ========================================
+
+@app.route('/plant_doctor', methods=['GET', 'POST'])
+def plant_doctor():
+    """AI Plant Doctor - Disease Detection"""
+    result = None
+    error = None
+    
+    if request.method == 'POST':
+        if not DISEASE_MODULE_AVAILABLE:
+            error = "Disease detection module not available"
+            return render_template('plant_doctor.html', error=error)
+        
+        if 'image' not in request.files:
+            error = "No image uploaded"
+            return render_template('plant_doctor.html', error=error)
+        
+        file = request.files['image']
+        if file.filename == '':
+            error = "No image selected"
+            return render_template('plant_doctor.html', error=error)
+        
+        try:
+            doctor = get_plant_doctor()
+            result = doctor.predict(file.read())
+            
+            # Generate AI treatment advice if available
+            if client and result.get('success'):
+                disease = result['prediction']['disease_name']
+                crop = result['prediction']['crop']
+                prompt = f"Give 2-3 concise treatment tips for {disease} in {crop}."
+                try:
+                    ai_response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
+                    result['ai_advice'] = ai_response.text
+                except:
+                    pass
+                    
+        except Exception as e:
+            error = f"Analysis failed: {str(e)}"
+    
+    return render_template('plant_doctor.html', result=result, error=error)
+
+
+@app.route('/market_prices', methods=['GET', 'POST'])
+def market_prices():
+    """Market Price Forecasting"""
+    forecast = None
+    overview = None
+    error = None
+    selected_crop = request.form.get('crop', 'Rice')
+    
+    if not PRICE_MODULE_AVAILABLE:
+        error = "Price forecast module not available"
+        return render_template('market_prices.html', error=error)
+    
+    try:
+        forecaster = get_price_forecaster()
+        
+        if request.method == 'POST':
+            forecast = forecaster.forecast(selected_crop)
+        
+        overview = forecaster.get_market_overview()
+        supported_crops = forecaster.get_supported_crops()
+        
+    except Exception as e:
+        error = f"Forecast error: {str(e)}"
+    
+    return render_template('market_prices.html', 
+                         forecast=forecast, 
+                         overview=overview,
+                         crops=supported_crops if 'supported_crops' in dir() else [],
+                         selected_crop=selected_crop,
+                         error=error)
+
+
+@app.route('/weather', methods=['GET', 'POST'])
+def weather():
+    """Weather Intelligence Dashboard"""
+    weather_data = None
+    forecast = None
+    error = None
+    city = request.form.get('city', 'Delhi')
+    
+    if not WEATHER_MODULE_AVAILABLE:
+        error = "Weather service not available"
+        return render_template('weather.html', error=error)
+    
+    try:
+        service = get_weather_service()
+        weather_data = service.get_current_weather(city)
+        forecast = service.get_forecast(city, days=5)
+    except Exception as e:
+        error = f"Weather error: {str(e)}"
+    
+    return render_template('weather.html', 
+                         weather=weather_data, 
+                         forecast=forecast,
+                         city=city,
+                         error=error)
+
+
+@app.route('/fertilizer', methods=['GET', 'POST'])
+def fertilizer():
+    """Smart Fertilizer Calculator"""
+    result = None
+    error = None
+    
+    if not FERTILIZER_MODULE_AVAILABLE:
+        error = "Fertilizer module not available"
+        return render_template('fertilizer.html', error=error)
+    
+    if request.method == 'POST':
+        try:
+            crop = request.form.get('crop')
+            soil_n = float(request.form.get('soil_n', 0))
+            soil_p = float(request.form.get('soil_p', 0))
+            soil_k = float(request.form.get('soil_k', 0))
+            area = float(request.form.get('area', 1))
+            
+            result = calculate_fertilizer(crop, soil_n, soil_p, soil_k, area)
+        except Exception as e:
+            error = f"Calculation error: {str(e)}"
+    
+    crops = get_fertilizer_crops() if FERTILIZER_MODULE_AVAILABLE else []
+    return render_template('fertilizer.html', result=result, crops=crops, error=error)
+
+
+@app.route('/api/disease_detect', methods=['POST'])
+def api_disease_detect():
+    """API endpoint for disease detection"""
+    if not DISEASE_MODULE_AVAILABLE:
+        return jsonify({"error": "Module not available"}), 503
+    
+    if 'image' not in request.files:
+        return jsonify({"error": "No image provided"}), 400
+    
+    doctor = get_plant_doctor()
+    result = doctor.predict(request.files['image'].read())
+    return jsonify(result)
+
+
+@app.route('/api/price_forecast/<crop>')
+def api_price_forecast(crop):
+    """API endpoint for price forecast"""
+    if not PRICE_MODULE_AVAILABLE:
+        return jsonify({"error": "Module not available"}), 503
+    
+    forecaster = get_price_forecaster()
+    result = forecaster.forecast(crop)
+    return jsonify(result)
+
+
+@app.route('/api/weather/<city>')
+def api_weather(city):
+    """API endpoint for weather"""
+    if not WEATHER_MODULE_AVAILABLE:
+        return jsonify({"error": "Module not available"}), 503
+    
+    service = get_weather_service()
+    result = service.get_current_weather(city)
+    return jsonify(result)
 
 
 # ========================================

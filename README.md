@@ -1,5 +1,5 @@
 # Crop Yield Prediction System 🌾
-Hey Guys! This is our machine learning project (Example) that helps farmers decide what to grow and how much they can expect to harvest.
+Hey Guys! This is our machine learning project that helps farmers decide what to grow and how much they can expect to harvest.
 
 ## Work in Progress 🚧
 We are still working on this project! We will add more features soon.
@@ -25,28 +25,108 @@ Before running, you **must** setup the AI:
    GOOGLE_API_KEY=your_actual_api_key_here
    ```
 
-### Running the App
-It's super easy. We made a script for it.
-1. Just double-click the file named **`run.bat`**.
-2. It will install everything and start the website for you.
-3. Open `http://127.0.0.1:5000` in your browser.
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-### OR (Manual Way)
-If you want to run manually, open CMD in this folder and run:
-1. `pip install -r requirements.txt`
-2. `python train_models.py`
-3. `python app.py`
+### 3. Train Models (First Time)
+```bash
+python train_models.py          # ML models (Yield, Recommendation)
+```
 
-## Technologies Used
-- **Python & Flask:** For the backend server.
-- **Google Gemini AI:** For smart agronomy insights.
-- **Machine Learning:** XGBoost & Ensemble Classifiers (High Accuracy).
-- **Glassmorphism UI:** Modern and beautiful design.
+### 3.1 Setup Plant Disease Dataset (Deep Learning)
+Required for `train_disease_model.py`.
+1. Download **PlantVillage** dataset from Kaggle:
+   - **Full Dataset (Recommended):** [PlantVillage Dataset (2.18 GB)](https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset) - Better accuracy.
+   - **Lightweight (Fast):** [PlantDisease (342 MB)](https://www.kaggle.com/datasets/emmarex/plantdisease) - Quicker training.
+2. Extract it into `Datasets/PlantVillage`.
+3. Run the organization script:
+```bash
+python organize_dataset.py      # Fixes folder structure & class names
+python train_disease_model.py   # Trains the CNN model
+```
 
-## Note 📢
-Guys , If you can't train the model for any reason, you can download the trained models from my drive:
-👉 [Download Models Here](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5?usp=sharing)
+### 3.2 Train Market Price Model (Optional)
+Enable the real LSTM forecasting model:
+```bash
+python train_price_model.py
+```
 
-I already trained it for you! Just put the files in the `models/` folder.
+### 4. Run the App
+```bash
+python app.py
+```
+Open `http://127.0.0.1:5000`
 
-Enjoy! 🚀
+---
+
+## 🧠 Technology Stack
+
+### Machine Learning
+- **XGBoost & Random Forest** - Yield prediction & crop recommendation
+- **MobileNetV2 CNN** - Plant disease detection (Transfer Learning)
+- **LSTM RNN** - Time-series price forecasting
+
+### Backend
+- **Flask** - Web framework
+- **TensorFlow/Keras** - Deep Learning
+- **Gemini 2.0 Flash** - AI insights generation
+
+### Frontend
+- **Glassmorphism UI** - Modern design
+- **Chart.js** - Data visualization
+- **Responsive** - Mobile-friendly
+
+---
+
+## 📁 Project Structure
+
+```
+CropYield_Prediction/
+├── app.py                      # Main Flask application
+├── train_models.py             # ML model training
+├── train_disease_model.py      # CNN training script
+├── organize_dataset.py         # Dataset helper script
+├── disease_detection.py        # Plant Doctor module
+├── price_forecast.py           # LSTM price prediction
+├── weather_service.py          # Weather API integration
+├── fertilizer_optimizer.py     # NPK calculator
+├── models/                     # Trained models (.pkl, .h5)
+├── templates/                  # HTML templates
+│   ├── index.html
+│   ├── plant_doctor.html
+│   ├── market_prices.html
+│   ├── weather.html
+│   └── fertilizer.html
+├── Datasets/                   # Training data
+└── static/                     # CSS, JS, images
+```
+
+---
+
+## 👥 Team
+
+- Arunmozhi Adithya
+- Jenivaa
+- Tamizharasan
+- Pradeepraja
+- Dilshan
+
+---
+
+## 📝 Notes
+
+> [!TIP]
+> **Don't want to train?** If your PC is low-spec or you want to skip training, use our pre-trained models:
+> 
+> 📥 **[Download Pre-Trained Models (Google Drive)](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5)**
+> 
+> Extract files into the `models/` folder and you're ready to go!
+
+- Disease detection works in "mock mode" without trained CNN
+- Price forecasting uses simulation when LSTM model is not trained
+
+---
+
+**Built with ❤️**

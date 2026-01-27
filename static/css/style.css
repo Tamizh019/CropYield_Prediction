@@ -10,16 +10,16 @@
     --warning-color: #f39c12;
     --danger-color: #e74c3c;
     --purple-color: #9b59b6;
-    
+
     --dark-bg: #0f0f0f;
     --sidebar-bg: #1a1a1a;
     --card-bg: rgba(255, 255, 255, 0.03);
     --light-text: #ffffff;
     --muted-text: rgba(255, 255, 255, 0.6);
-    
+
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
-    
+
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -233,7 +233,8 @@ body {
     color: rgba(255, 255, 255, 0.9);
 }
 
-input, select {
+input,
+select {
     width: 100%;
     padding: 12px 16px;
     background: rgba(0, 0, 0, 0.3);
@@ -245,7 +246,8 @@ input, select {
     transition: var(--transition);
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     outline: none;
     border-color: var(--primary-color);
     background: rgba(0, 0, 0, 0.4);
@@ -381,6 +383,7 @@ input::placeholder {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -403,8 +406,15 @@ input::placeholder {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
 }
 
 .ai-header h3 {
@@ -597,10 +607,21 @@ input[type="file"] {
     font-size: 20px;
 }
 
-.stat-primary .stat-value { color: var(--primary-color); }
-.stat-success .stat-value { color: var(--primary-color); }
-.stat-warning .stat-value { color: var(--warning-color); }
-.stat-info .stat-value { color: var(--info-color); }
+.stat-primary .stat-value {
+    color: var(--primary-color);
+}
+
+.stat-success .stat-value {
+    color: var(--primary-color);
+}
+
+.stat-warning .stat-value {
+    color: var(--warning-color);
+}
+
+.stat-info .stat-value {
+    color: var(--info-color);
+}
 
 /* ========================================
    CHARTS
@@ -704,23 +725,23 @@ input[type="file"] {
         width: 220px;
         padding: 16px;
     }
-    
+
     .main-content {
         padding: 20px;
     }
-    
+
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .stats-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
     }
-    
+
     .analytics-header {
         flex-direction: column;
         gap: 16px;
@@ -1115,10 +1136,13 @@ input[type="file"] {
 }
 
 @keyframes pulse-dot {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
         box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
     }
+
     50% {
         opacity: 0.8;
         box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
@@ -1157,18 +1181,203 @@ input[type="file"] {
     .dashboard-hero {
         padding: 32px 24px;
     }
-    
+
     .hero-title {
         font-size: 32px;
     }
-    
+
     .features-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .dashboard-footer {
         flex-direction: column;
         gap: 16px;
         text-align: center;
     }
+}
+
+/* ========================================
+   AI FORMATTED CONTENT STYLING
+   ======================================== */
+
+/* General AI Card Container (replaces pre tag style) */
+.ai-formatted {
+    font-family: 'Inter', sans-serif;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    white-space: normal !important;
+    /* Allow wrapping */
+    color: var(--light-text);
+}
+
+/* Base Card Style */
+.ai-insight-card,
+.ai-analysis-container,
+.crop-insight-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Insight Sections */
+.insight-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.insight-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.insight-section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.insight-section ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.insight-section ul li::before {
+    content: "•";
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Bulk Analysis Specifics */
+.ai-analysis-container {
+    gap: 24px;
+}
+
+.analysis-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analysis-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.analysis-card p {
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    margin: 0;
+}
+
+.analysis-card strong {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.analysis-card h4 {
+    margin-top: 0;
+    color: #60a5fa;
+    /* Light Blue */
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.analysis-card.regional {
+    border-top: 3px solid #f1c40f;
+    /* Yellow */
+}
+
+.analysis-card.crop {
+    border-top: 3px solid #2ecc71;
+    /* Green */
+}
+
+.analysis-card.actions ul li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Highlighting */
+.highlight-text {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+/* Crop Recommendation Card */
+.crop-insight-card .insight-header {
+    background: linear-gradient(to right, rgba(46, 204, 113, 0.1), transparent);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.crop-insight-card .insight-header h4 {
+    color: var(--primary-color);
+    margin: 0 0 8px 0;
+    font-size: 18px;
+}
+
+.insight-body h5 {
+    font-size: 15px;
+    color: var(--muted-text);
+    margin: 16px 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.insight-footer {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profit-badge {
+    background: rgba(241, 196, 15, 0.2);
+    color: var(--accent-color);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.insight-text {
+    font-size: 14px;
+    color: var(--light-text);
 }

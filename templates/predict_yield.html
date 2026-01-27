@@ -45,7 +45,7 @@
                     <form action="/predict_yield" method="POST">
                         <div class="form-section">
                             <div class="section-label">📍 Location Details</div>
-                            
+
                             <div class="form-group">
                                 <label>State</label>
                                 <select name="State_Name" required>
@@ -71,7 +71,7 @@
 
                         <div class="form-section">
                             <div class="section-label">🌾 Crop Information</div>
-                            
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Crop Type</label>
@@ -86,7 +86,7 @@
 
                         <div class="form-section">
                             <div class="section-label">🌡️ Environmental Conditions</div>
-                            
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Temperature (°C)</label>
@@ -132,16 +132,16 @@
                     <div class="ai-insights-container">
                         <div class="ai-header">
                             <svg class="ai-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                             </svg>
                             <h3>🤖 AI Agronomist Insights</h3>
                         </div>
-                        
+
                         <div class="ai-content">
-                            <pre class="ai-formatted">{{ ai_insight }}</pre>
+                            <div class="ai-formatted">{{ ai_insight | safe }}</div>
                         </div>
-                        
+
                         <div class="ai-footer">
                             <small>Powered by Gemini 2.0 Flash • Pro Analysis</small>
                         </div>
@@ -158,7 +158,8 @@
                     </div>
 
                     <div class="bulk-description">
-                        <p>Upload CSV files with multiple crop records for comprehensive analysis and AI-powered insights.</p>
+                        <p>Upload CSV files with multiple crop records for comprehensive analysis and AI-powered
+                            insights.</p>
                     </div>
 
                     <div class="upload-zone">

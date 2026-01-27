@@ -26,6 +26,19 @@
                 <a href="/recommend_crop" class="nav-item">
                     <span class="nav-icon">🧪</span> Crop Recommend
                 </a>
+                <div class="nav-divider">v3.0 Features</div>
+                <a href="/plant_doctor" class="nav-item nav-new">
+                    <span class="nav-icon">🩺</span> Plant Doctor
+                </a>
+                <a href="/market_prices" class="nav-item nav-new">
+                    <span class="nav-icon">💰</span> Market Prices
+                </a>
+                <a href="/weather" class="nav-item nav-new">
+                    <span class="nav-icon">🌦️</span> Weather
+                </a>
+                <a href="/fertilizer" class="nav-item nav-new">
+                    <span class="nav-icon">🧪</span> Fertilizer Calc
+                </a>
             </div>
 
             <!-- System Status in Sidebar -->
@@ -107,6 +120,7 @@
             </div>
 
             <div class="status-grid">
+                <!-- Yield Model -->
                 <div class="status-card">
                     <div class="status-card-header">
                         <div class="status-icon status-icon-success">
@@ -124,29 +138,46 @@
                         <span class="status-inactive">Inactive</span>
                         {% endif %}
                     </div>
-                    <div class="status-detail">XGBoost Ensemble • v2.0</div>
+                    <div class="status-detail">XGBoost Ensemble</div>
                 </div>
 
+                <!-- Price Model -->
                 <div class="status-card">
                     <div class="status-card-header">
-                        <div class="status-icon status-icon-success">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                            </svg>
+                        <div class="status-icon status-icon-warning">
+                            <span style="font-size: 20px;">💰</span>
                         </div>
-                        <div class="status-label">Recommendation Model</div>
+                        <div class="status-label">Price Forecast</div>
                     </div>
                     <div class="status-value">
-                        {% if model_info and model_info.recommend_model %}
+                        {% if model_info and model_info.price_model.status == 'Active' %}
                         <span class="status-active">Active</span>
                         {% else %}
-                        <span class="status-inactive">Inactive</span>
+                        <span class="status-warning">Simulation</span>
                         {% endif %}
                     </div>
-                    <div class="status-detail">Random Forest • v2.0</div>
+                    <div class="status-detail">{{ model_info.price_model.type }}</div>
                 </div>
 
+                <!-- Weather Service -->
+                <div class="status-card">
+                    <div class="status-card-header">
+                        <div class="status-icon status-icon-info">
+                            <span style="font-size: 20px;">🌦️</span>
+                        </div>
+                        <div class="status-label">Weather Service</div>
+                    </div>
+                    <div class="status-value">
+                        {% if model_info and model_info.weather_service.status == 'Active' %}
+                        <span class="status-active">Online</span>
+                        {% else %}
+                        <span class="status-inactive">Mock Data</span>
+                        {% endif %}
+                    </div>
+                    <div class="status-detail">{{ model_info.weather_service.type }}</div>
+                </div>
+
+                <!-- AI Engine -->
                 <div class="status-card">
                     <div class="status-card-header">
                         <div class="status-icon status-icon-info">
@@ -167,20 +198,22 @@
                     <div class="status-detail">Gemini 2.0 Flash</div>
                 </div>
 
+                <!-- Disease Protection -->
                 <div class="status-card">
                     <div class="status-card-header">
                         <div class="status-icon status-icon-primary">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 3h18v18H3z" stroke="currentColor" stroke-width="2" />
-                                <path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="2" />
-                            </svg>
+                            <span style="font-size: 20px;">🩺</span>
                         </div>
-                        <div class="status-label">Predictions Today</div>
+                        <div class="status-label">Plant Doctor</div>
                     </div>
                     <div class="status-value">
-                        <span class="status-count">{{ model_info.prediction_count if model_info else 0 }}</span>
+                        {% if model_info and model_info.disease_model %}
+                        <span class="status-active">Ready</span>
+                        {% else %}
+                        <span class="status-inactive">Unload</span>
+                        {% endif %}
                     </div>
-                    <div class="status-detail">Total processed</div>
+                    <div class="status-detail">TensorFlow CNN</div>
                 </div>
             </div>
 
