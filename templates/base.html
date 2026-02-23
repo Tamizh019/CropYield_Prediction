@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgriVision - YieldMax{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">🌾</span>
+                <span class="brand-text">AgriVision</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-item {{ 'active' if request.path == '/' else '' }}">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a href="/predict_yield"
+                    class="nav-item {{ 'active' if request.path.startswith('/predict_yield') else '' }}">
+                    <span class="nav-icon">🌾</span> YieldMax Predictor
+                </a>
+                <a href="/smart_crop_wizard"
+                    class="nav-item {{ 'active' if '/smart_crop_wizard' in request.path or '/recommend_crop' in request.path else '' }}">
+                    <span class="nav-icon">🌱</span> Smart Advisor
+                </a>
+
+            </div>
+
+            <!-- System Status in Sidebar -->
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>System Online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Common Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

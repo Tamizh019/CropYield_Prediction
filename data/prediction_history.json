@@ -1,16 +1,28 @@
 [
   {
-    "timestamp": "2026-01-09T00:56:33.434330",
-    "type": "crop",
+    "timestamp": "2026-02-24T00:15:48.899243",
+    "type": "crop_wizard",
     "input": {
-      "N": 54.0,
-      "P": 54.0,
-      "K": 54.0,
-      "Temperature": 34.0,
-      "Humidity": 24.0,
-      "pH": 5.0,
-      "Rainfall": 134.0
+      "state": "Rajasthan",
+      "district": "Jhunjhunu",
+      "season": "rabi",
+      "soil_type": "clay",
+      "previous_crop": "vegetables",
+      "water_source": "irrigated"
     },
-    "prediction": "Chickpea"
+    "prediction": "Mango"
+  },
+  {
+    "timestamp": "2026-02-24T00:20:01.003402",
+    "type": "crop_wizard",
+    "input": {
+      "state": "Bihar",
+      "district": "Patna",
+      "season": "kharif",
+      "soil_type": "alluvial",
+      "previous_crop": "maize",
+      "water_source": "both"
+    },
+    "prediction": "Coconut"
   }
 ]

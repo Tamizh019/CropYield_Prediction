@@ -1,0 +1,720 @@
+{
+    "states": {
+        "Andhra Pradesh": {
+            "climate": {
+                "temp": 28.5,
+                "humidity": 72,
+                "rainfall": 940
+            },
+            "districts": [
+                "Anantapur",
+                "Chittoor",
+                "East Godavari",
+                "Guntur",
+                "Krishna",
+                "Kurnool",
+                "Nellore",
+                "Prakasam",
+                "Srikakulam",
+                "Visakhapatnam",
+                "Vizianagaram",
+                "West Godavari",
+                "YSR Kadapa"
+            ]
+        },
+        "Assam": {
+            "climate": {
+                "temp": 24.5,
+                "humidity": 82,
+                "rainfall": 2850
+            },
+            "districts": [
+                "Baksa",
+                "Barpeta",
+                "Cachar",
+                "Dibrugarh",
+                "Goalpara",
+                "Jorhat",
+                "Kamrup",
+                "Nagaon",
+                "Sivasagar",
+                "Sonitpur",
+                "Tinsukia"
+            ]
+        },
+        "Bihar": {
+            "climate": {
+                "temp": 26.5,
+                "humidity": 68,
+                "rainfall": 1200
+            },
+            "districts": [
+                "Araria",
+                "Aurangabad",
+                "Begusarai",
+                "Bhagalpur",
+                "Buxar",
+                "Darbhanga",
+                "Gaya",
+                "Muzaffarpur",
+                "Nalanda",
+                "Patna",
+                "Purnia",
+                "Samastipur",
+                "Saran",
+                "Vaishali"
+            ]
+        },
+        "Chhattisgarh": {
+            "climate": {
+                "temp": 27.0,
+                "humidity": 65,
+                "rainfall": 1400
+            },
+            "districts": [
+                "Bastar",
+                "Bilaspur",
+                "Durg",
+                "Janjgir-Champa",
+                "Korba",
+                "Mahasamund",
+                "Raigarh",
+                "Raipur",
+                "Rajnandgaon"
+            ]
+        },
+        "Gujarat": {
+            "climate": {
+                "temp": 27.5,
+                "humidity": 55,
+                "rainfall": 800
+            },
+            "districts": [
+                "Ahmedabad",
+                "Amreli",
+                "Anand",
+                "Banaskantha",
+                "Bharuch",
+                "Bhavnagar",
+                "Junagadh",
+                "Kheda",
+                "Kutch",
+                "Mehsana",
+                "Rajkot",
+                "Surat",
+                "Vadodara"
+            ]
+        },
+        "Haryana": {
+            "climate": {
+                "temp": 25.0,
+                "humidity": 50,
+                "rainfall": 550
+            },
+            "districts": [
+                "Ambala",
+                "Bhiwani",
+                "Faridabad",
+                "Gurugram",
+                "Hisar",
+                "Jhajjar",
+                "Karnal",
+                "Kurukshetra",
+                "Panipat",
+                "Rohtak",
+                "Sirsa",
+                "Sonipat",
+                "Yamunanagar"
+            ]
+        },
+        "Himachal Pradesh": {
+            "climate": {
+                "temp": 18.0,
+                "humidity": 60,
+                "rainfall": 1500
+            },
+            "districts": [
+                "Bilaspur",
+                "Chamba",
+                "Hamirpur",
+                "Kangra",
+                "Kullu",
+                "Mandi",
+                "Shimla",
+                "Solan",
+                "Una"
+            ]
+        },
+        "Jharkhand": {
+            "climate": {
+                "temp": 25.5,
+                "humidity": 65,
+                "rainfall": 1400
+            },
+            "districts": [
+                "Bokaro",
+                "Dhanbad",
+                "Dumka",
+                "East Singhbhum",
+                "Giridih",
+                "Hazaribagh",
+                "Ranchi",
+                "West Singhbhum"
+            ]
+        },
+        "Karnataka": {
+            "climate": {
+                "temp": 26.5,
+                "humidity": 68,
+                "rainfall": 1200
+            },
+            "districts": [
+                "Bagalkot",
+                "Ballari",
+                "Belagavi",
+                "Bengaluru Rural",
+                "Bengaluru Urban",
+                "Bidar",
+                "Chamarajanagar",
+                "Chikkamagaluru",
+                "Chitradurga",
+                "Dakshina Kannada",
+                "Davangere",
+                "Dharwad",
+                "Gadag",
+                "Hassan",
+                "Haveri",
+                "Kalaburagi",
+                "Kodagu",
+                "Kolar",
+                "Koppal",
+                "Mandya",
+                "Mysuru",
+                "Raichur",
+                "Ramanagara",
+                "Shivamogga",
+                "Tumakuru",
+                "Udupi",
+                "Uttara Kannada",
+                "Vijayapura",
+                "Yadgir"
+            ]
+        },
+        "Kerala": {
+            "climate": {
+                "temp": 27.0,
+                "humidity": 80,
+                "rainfall": 3000
+            },
+            "districts": [
+                "Alappuzha",
+                "Ernakulam",
+                "Idukki",
+                "Kannur",
+                "Kasaragod",
+                "Kollam",
+                "Kottayam",
+                "Kozhikode",
+                "Malappuram",
+                "Palakkad",
+                "Pathanamthitta",
+                "Thiruvananthapuram",
+                "Thrissur",
+                "Wayanad"
+            ]
+        },
+        "Madhya Pradesh": {
+            "climate": {
+                "temp": 26.0,
+                "humidity": 55,
+                "rainfall": 1150
+            },
+            "districts": [
+                "Bhopal",
+                "Chhindwara",
+                "Dewas",
+                "Dhar",
+                "Gwalior",
+                "Hoshangabad",
+                "Indore",
+                "Jabalpur",
+                "Khargone",
+                "Ratlam",
+                "Rewa",
+                "Sagar",
+                "Satna",
+                "Sehore",
+                "Shajapur",
+                "Ujjain",
+                "Vidisha"
+            ]
+        },
+        "Maharashtra": {
+            "climate": {
+                "temp": 27.0,
+                "humidity": 62,
+                "rainfall": 1100
+            },
+            "districts": [
+                "Ahmednagar",
+                "Akola",
+                "Amravati",
+                "Aurangabad",
+                "Beed",
+                "Bhandara",
+                "Buldhana",
+                "Chandrapur",
+                "Dhule",
+                "Jalgaon",
+                "Jalna",
+                "Kolhapur",
+                "Latur",
+                "Mumbai",
+                "Nagpur",
+                "Nanded",
+                "Nashik",
+                "Osmanabad",
+                "Parbhani",
+                "Pune",
+                "Sangli",
+                "Satara",
+                "Solapur",
+                "Thane",
+                "Wardha",
+                "Yavatmal"
+            ]
+        },
+        "Odisha": {
+            "climate": {
+                "temp": 27.5,
+                "humidity": 75,
+                "rainfall": 1500
+            },
+            "districts": [
+                "Angul",
+                "Balasore",
+                "Bargarh",
+                "Bhadrak",
+                "Bolangir",
+                "Cuttack",
+                "Dhenkanal",
+                "Ganjam",
+                "Jagatsinghpur",
+                "Jajpur",
+                "Kalahandi",
+                "Kendrapara",
+                "Keonjhar",
+                "Khordha",
+                "Mayurbhanj",
+                "Nayagarh",
+                "Puri",
+                "Rayagada",
+                "Sambalpur",
+                "Sundargarh"
+            ]
+        },
+        "Punjab": {
+            "climate": {
+                "temp": 24.0,
+                "humidity": 55,
+                "rainfall": 650
+            },
+            "districts": [
+                "Amritsar",
+                "Barnala",
+                "Bathinda",
+                "Faridkot",
+                "Fatehgarh Sahib",
+                "Fazilka",
+                "Ferozepur",
+                "Gurdaspur",
+                "Hoshiarpur",
+                "Jalandhar",
+                "Kapurthala",
+                "Ludhiana",
+                "Mansa",
+                "Moga",
+                "Muktsar",
+                "Pathankot",
+                "Patiala",
+                "Rupnagar",
+                "Sangrur",
+                "SAS Nagar",
+                "Tarn Taran"
+            ]
+        },
+        "Rajasthan": {
+            "climate": {
+                "temp": 26.5,
+                "humidity": 40,
+                "rainfall": 550
+            },
+            "districts": [
+                "Ajmer",
+                "Alwar",
+                "Banswara",
+                "Barmer",
+                "Bharatpur",
+                "Bhilwara",
+                "Bikaner",
+                "Bundi",
+                "Chittorgarh",
+                "Churu",
+                "Jaipur",
+                "Jaisalmer",
+                "Jhunjhunu",
+                "Jodhpur",
+                "Kota",
+                "Nagaur",
+                "Pali",
+                "Sikar",
+                "Sirohi",
+                "Tonk",
+                "Udaipur"
+            ]
+        },
+        "Tamil Nadu": {
+            "climate": {
+                "temp": 28.5,
+                "humidity": 70,
+                "rainfall": 950
+            },
+            "districts": [
+                "Ariyalur",
+                "Chengalpattu",
+                "Chennai",
+                "Coimbatore",
+                "Cuddalore",
+                "Dharmapuri",
+                "Dindigul",
+                "Erode",
+                "Kallakurichi",
+                "Kanchipuram",
+                "Kanyakumari",
+                "Karur",
+                "Krishnagiri",
+                "Madurai",
+                "Mayiladuthurai",
+                "Nagapattinam",
+                "Namakkal",
+                "Nilgiris",
+                "Perambalur",
+                "Pudukkottai",
+                "Ramanathapuram",
+                "Ranipet",
+                "Salem",
+                "Sivaganga",
+                "Tenkasi",
+                "Thanjavur",
+                "Theni",
+                "Thoothukudi",
+                "Tiruchirappalli",
+                "Tirunelveli",
+                "Tirupathur",
+                "Tiruppur",
+                "Tiruvallur",
+                "Tiruvannamalai",
+                "Tiruvarur",
+                "Vellore",
+                "Viluppuram",
+                "Virudhunagar"
+            ]
+        },
+        "Telangana": {
+            "climate": {
+                "temp": 28.0,
+                "humidity": 60,
+                "rainfall": 900
+            },
+            "districts": [
+                "Adilabad",
+                "Hyderabad",
+                "Jagtial",
+                "Karimnagar",
+                "Khammam",
+                "Mahabubnagar",
+                "Medak",
+                "Nalgonda",
+                "Nizamabad",
+                "Rangareddy",
+                "Sangareddy",
+                "Warangal"
+            ]
+        },
+        "Uttar Pradesh": {
+            "climate": {
+                "temp": 25.5,
+                "humidity": 58,
+                "rainfall": 1000
+            },
+            "districts": [
+                "Agra",
+                "Aligarh",
+                "Allahabad",
+                "Azamgarh",
+                "Bahraich",
+                "Bareilly",
+                "Bijnor",
+                "Bulandshahr",
+                "Deoria",
+                "Etawah",
+                "Faizabad",
+                "Ghaziabad",
+                "Gorakhpur",
+                "Jaunpur",
+                "Kanpur",
+                "Lucknow",
+                "Mathura",
+                "Meerut",
+                "Mirzapur",
+                "Moradabad",
+                "Muzaffarnagar",
+                "Rae Bareli",
+                "Saharanpur",
+                "Shahjahanpur",
+                "Sitapur",
+                "Sultanpur",
+                "Unnao",
+                "Varanasi"
+            ]
+        },
+        "Uttarakhand": {
+            "climate": {
+                "temp": 20.0,
+                "humidity": 65,
+                "rainfall": 1550
+            },
+            "districts": [
+                "Almora",
+                "Chamoli",
+                "Dehradun",
+                "Haridwar",
+                "Nainital",
+                "Pauri Garhwal",
+                "Pithoragarh",
+                "Rudraprayag",
+                "Tehri Garhwal",
+                "Udham Singh Nagar",
+                "Uttarkashi"
+            ]
+        },
+        "West Bengal": {
+            "climate": {
+                "temp": 26.5,
+                "humidity": 78,
+                "rainfall": 1750
+            },
+            "districts": [
+                "Bankura",
+                "Bardhaman",
+                "Birbhum",
+                "Cooch Behar",
+                "Darjeeling",
+                "Hooghly",
+                "Howrah",
+                "Jalpaiguri",
+                "Kolkata",
+                "Malda",
+                "Medinipur East",
+                "Medinipur West",
+                "Murshidabad",
+                "Nadia",
+                "North 24 Parganas",
+                "Purulia",
+                "South 24 Parganas"
+            ]
+        }
+    },
+    "soil_npk_profiles": {
+        "sandy": {
+            "N": 40,
+            "P": 20,
+            "K": 30,
+            "description": "Light, drains quickly, low nutrients",
+            "ph_range": [
+                5.5,
+                7.0
+            ]
+        },
+        "loamy": {
+            "N": 80,
+            "P": 45,
+            "K": 50,
+            "description": "Ideal soil - good drainage & nutrients",
+            "ph_range": [
+                6.0,
+                7.5
+            ]
+        },
+        "clay": {
+            "N": 60,
+            "P": 35,
+            "K": 55,
+            "description": "Heavy, retains water, rich in nutrients",
+            "ph_range": [
+                6.0,
+                8.0
+            ]
+        },
+        "black": {
+            "N": 50,
+            "P": 30,
+            "K": 60,
+            "description": "Cotton soil - high potassium, retains moisture",
+            "ph_range": [
+                6.5,
+                8.5
+            ]
+        },
+        "red": {
+            "N": 45,
+            "P": 25,
+            "K": 35,
+            "description": "Iron-rich, slightly acidic, well-drained",
+            "ph_range": [
+                5.0,
+                6.5
+            ]
+        },
+        "alluvial": {
+            "N": 70,
+            "P": 40,
+            "K": 45,
+            "description": "River deposits - fertile, good for most crops",
+            "ph_range": [
+                6.0,
+                7.5
+            ]
+        }
+    },
+    "season_adjustments": {
+        "kharif": {
+            "temp_modifier": 2,
+            "humidity_modifier": 15,
+            "rainfall_modifier": 1.5,
+            "description": "Monsoon season (June-October)",
+            "best_for": [
+                "Rice",
+                "Cotton",
+                "Maize",
+                "Sugarcane",
+                "Groundnut",
+                "Soybean"
+            ]
+        },
+        "rabi": {
+            "temp_modifier": -4,
+            "humidity_modifier": -10,
+            "rainfall_modifier": 0.3,
+            "description": "Winter season (November-April)",
+            "best_for": [
+                "Wheat",
+                "Mustard",
+                "Chickpea",
+                "Lentil",
+                "Barley",
+                "Peas"
+            ]
+        },
+        "zaid": {
+            "temp_modifier": 5,
+            "humidity_modifier": -5,
+            "rainfall_modifier": 0.2,
+            "description": "Summer season (March-June)",
+            "best_for": [
+                "Watermelon",
+                "Muskmelon",
+                "Cucumber",
+                "Vegetables"
+            ]
+        }
+    },
+    "previous_crop_npk_effect": {
+        "rice": {
+            "N": -20,
+            "P": -5,
+            "K": -10,
+            "description": "Heavy nitrogen feeder"
+        },
+        "wheat": {
+            "N": -15,
+            "P": -8,
+            "K": -5,
+            "description": "Moderate nutrient consumer"
+        },
+        "cotton": {
+            "N": -25,
+            "P": -10,
+            "K": -15,
+            "description": "Heavy feeder, depletes soil"
+        },
+        "sugarcane": {
+            "N": -30,
+            "P": -12,
+            "K": -20,
+            "description": "Very heavy feeder"
+        },
+        "maize": {
+            "N": -20,
+            "P": -8,
+            "K": -12,
+            "description": "Heavy nitrogen consumer"
+        },
+        "legumes": {
+            "N": 15,
+            "P": -3,
+            "K": -5,
+            "description": "Fixes nitrogen, good rotation crop"
+        },
+        "vegetables": {
+            "N": -10,
+            "P": -5,
+            "K": -8,
+            "description": "Moderate nutrient use"
+        },
+        "fallow": {
+            "N": 5,
+            "P": 2,
+            "K": 3,
+            "description": "Land rested, nutrients recovered"
+        },
+        "none": {
+            "N": 0,
+            "P": 0,
+            "K": 0,
+            "description": "First cultivation"
+        }
+    },
+    "water_availability_effect": {
+        "rainfed": {
+            "humidity_modifier": 5,
+            "rainfall_modifier": 1.0,
+            "description": "Dependent on monsoon",
+            "suitable_crops": [
+                "Millets",
+                "Pulses",
+                "Groundnut",
+                "Cotton"
+            ]
+        },
+        "irrigated": {
+            "humidity_modifier": 10,
+            "rainfall_modifier": 1.3,
+            "description": "Assured water supply",
+            "suitable_crops": [
+                "Rice",
+                "Wheat",
+                "Sugarcane",
+                "Vegetables"
+            ]
+        },
+        "both": {
+            "humidity_modifier": 8,
+            "rainfall_modifier": 1.2,
+            "description": "Mixed water sources",
+            "suitable_crops": [
+                "All crops"
+            ]
+        }
+    }
+}
