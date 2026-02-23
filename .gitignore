@@ -49,8 +49,9 @@ ENV/
 .settings/
 
 # ================================
-# Model Files (Large - Generated)
+# Model Files
 # ================================
+# Ignoring large deep learning files, keeping our specific .pkl files
 models/*.pkl
 models/*.h5
 models/*.keras
@@ -64,6 +65,9 @@ models/*.onnx
 Datasets/PlantVillage/
 Datasets/*.zip
 Datasets/*.tar.gz
+Datasets/*.csv
+# Un-ignore the one CSV needed for the app
+!Datasets/Crop_recommendation.csv
 
 # ================================
 # Logs & Temporary Files

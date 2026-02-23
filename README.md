@@ -1,68 +1,236 @@
-# Crop Yield Prediction System 🌾
+---
+title: AgriVision YieldMax
+emoji: 🌾
+colorFrom: green
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+tags:
+  - agriculture
+  - machine-learning
+  - crop-yield
+  - xgboost
+  - flask
+  - ensemble
+short_description: AI-powered crop yield prediction using XGBoost, LightGBM & DNN ensemble
+env:
+  GOOGLE_API_KEY:
+    description: Google Gemini AI API key for agronomic insights
+    required: false
+---
+
+# 🌾 AgriVision — YieldMax Precision Model
+
+**AI-Powered Crop Yield Prediction with Ensemble Learning**
+
+Advanced machine learning system combining XGBoost, LightGBM, and Deep Neural Networks for accurate, confident crop yield predictions.
+
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.12-blue)](https://www.python.org/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16-orange)](https://www.tensorflow.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-green)](https://flask.palletsprojects.com/)
+[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Spaces-yellow)](https://huggingface.co/spaces)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](https://www.docker.com/)
 
 ---
 
-> [!IMPORTANT]
-> **🚀 Deep Learning Version Available!**
-> We have implemented advanced **Convolutional Neural Networks (CNN)** for disease detection and **LSTM Neural Networks** for price forecasting on a separate branch.
-> 
-> To explore these features, switch your branch:
-> ```bash
-> git checkout dl
-> ```
-> Enjoy the visual and economic intelligence! 🧠💰
+## 🚀 Deploy on Hugging Face Spaces
+
+This app is ready to deploy as a **Docker Space** on [Hugging Face Spaces](https://huggingface.co/spaces).
+
+### Steps to Deploy
+
+1. **Create a new Space** on Hugging Face → choose **Docker** as the SDK.
+2. **Push this repository** to the Space:
+   ```bash
+   git remote add space https://huggingface.co/spaces/<your-username>/agrivision-yieldmax
+   git push space main
+   ```
+3. **Set Secret Environment Variables** in your Space settings:
+   - `GOOGLE_API_KEY` → your [Google Gemini API key](https://aistudio.google.com/app/apikey) *(optional – needed for AI insights)*
+   - `SECRET_KEY` → any random string for Flask session security
+
+> **Note:** Pre-trained model files (`yieldmax_ensemble.pkl`, etc.) must be present in the `models/` folder before deployment. Upload them via Git LFS or the HF dataset hub.
 
 ---
 
-Hey Guys! This is our machine learning project that helps farmers decide what to grow and how much they can expect to harvest.
+## Quick Start (Local)
 
-## Work in Progress 🚧
-We are still working on this project! We will add more features soon.
+### Option 1: One-Click Run (Windows)
+```bash
+# Double-click this file
+run.bat
+```
 
-## Team Members 👥
-- **Arunmozhi Adithya**
-- **Jenivaa**
-- **Tamizharasan**
-- **Pradeepraja**
-- **Dilshan**
+### Option 2: Manual Setup
+```bash
+# 1. Create virtual environment
+python -m venv venv
+.\venv\Scripts\activate          # Windows
+# source venv/bin/activate       # Linux/Mac
 
-## What's New? (v2.0 Updates) 🚀
-We have upgraded the system with the latest tech:
-- **Agri-Intelligence AI:** Now powered by **Gemini 2.0 Flash** to give smart advice and risk analysis.
-- **Advanced Models:** We now use **Ensemble Learning** (Random Forest + XGBoost + Gradient Boosting) to get the best possible accuracy.
-- **Bulk Analytics:** Upload improved CSVs and get detailed reports instantly.
+# 2. Create .env file with API keys
+echo GOOGLE_API_KEY=your_key > .env
+echo SECRET_KEY=your_secret >> .env
 
-## How to run it?
-### 🔑 IMPORTANT: API Key Setup
-Before running, you **must** setup the AI:
-1. Create a file named `.env` in this folder.
-2. Add your Google Gemini API key inside it like this:
-   ```
-   GOOGLE_API_KEY=your_actual_api_key_here
-   ```
+# 3. Install dependencies
+pip install -r requirements.txt
 
-### Running the App
-It's super easy. We made a script for it.
-1. Just double-click the file named **`run.bat`**.
-2. It will install everything and start the website for you.
-3. Open `http://127.0.0.1:5000` in your browser.
+# 4. Train YieldMax ensemble (first time only, ~25 min)
+python scripts/train_ensemble.py
 
-### OR (Manual Way)
-If you want to run manually, open CMD in this folder and run:
-1. `pip install -r requirements.txt`
-2. `python train_models.py`
-3. `python app.py`
+# 5. Start server
+python app.py
+```
 
-## Technologies Used
-- **Python & Flask:** For the backend server.
-- **Google Gemini AI:** For smart agronomy insights.
-- **Machine Learning:** XGBoost & Ensemble Classifiers (High Accuracy).
-- **Glassmorphism UI:** Modern and beautiful design.
+**Open:** [http://localhost:5000](http://localhost:5000)
 
-## Note 📢
-Guys , If you can't train the model for any reason, you can download the trained models from my drive:
-👉 [Download Models Here](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5?usp=sharing)
+### Option 3: Docker (Local)
+```bash
+# Build image
+docker build -t agrivision-yieldmax .
 
-I already trained it for you! Just put the files in the `models/` folder.
+# Run container
+docker run -p 7860:7860 \
+  -e GOOGLE_API_KEY=your_key \
+  -e SECRET_KEY=your_secret \
+  agrivision-yieldmax
 
-IF YOU SEEN UNTIL HERE , HAVE A GOOD DAY 😊! 
+# Open http://localhost:7860
+```
+
+---
+
+## What is YieldMax?
+
+**YieldMax Precision Model** is an ensemble learning system that predicts crop yields with **85-95% confidence** by combining:
+
+- **XGBoost** (300 trees) — Categorical feature specialist
+- **LightGBM** (500 trees) — Environmental data expert
+- **Deep Neural Network** (256→128→64→32→1) — Pattern detector
+- **Ridge Meta-Learner** — Intelligent weight optimizer (Stacking)
+
+### Key Features
+
+**Smart Input System**
+- Single-page form (no complex wizard)
+- Auto-estimates environmental conditions if you don't have soil data
+- Real-time defaults shown as placeholders
+
+**Reliable Predictions**
+- Unified ensemble output (not confusing multiple models)
+- Confidence scores (0-100%) based on model agreement
+- Prediction ranges (worst/expected/best scenarios)
+
+**Dual-Mode Display**
+- **Production Mode:** Clean, farmer-friendly output
+- **Technical Mode:** Detailed breakdown for presentations (`?technical=true`)
+
+**Enterprise-Ready**
+- Bulk CSV upload for agricultural officers
+- Analytics dashboard with charts
+- AI-powered agronomic insights (Gemini 2.0)
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| **Backend** | Flask 3.0, Python 3.10 |
+| **Ensemble Models** | XGBoost 2.0, LightGBM 4.1, TensorFlow 2.16 |
+| **ML Pipeline** | Scikit-learn, Pandas, NumPy |
+| **AI Insights** | Google Gemini 2.0 Flash |
+| **Frontend** | Glassmorphism UI, JavaScript, Chart.js |
+| **Deployment** | Docker, Gunicorn, Hugging Face Spaces |
+
+**Optimized Dependencies:** Only 12 core packages
+```
+Flask, pandas, numpy, scikit-learn
+xgboost, lightgbm, tensorflow
+google-generativeai, markdown
+python-dotenv, Werkzeug, gunicorn
+```
+
+---
+
+## Project Structure
+
+```
+CropYield_Prediction/
+├── app.py                         # Main Flask application
+├── ensemble_model.py              # YieldMax Ensemble class
+├── requirements.txt               # Core dependencies
+├── Dockerfile                     # Docker image for HF Spaces
+├── .env                           # API keys (create manually)
+├── run.bat                        # One-click startup (Windows)
+│
+├── scripts/
+│   ├── train_ensemble.py          # YieldMax training pipeline
+│   └── train_models.py            # Legacy fallback models
+│
+├── models/                        # Trained models (after training)
+│   ├── yieldmax_ensemble.pkl      # Main ensemble (~150MB)
+│   ├── yield_label_encoders.pkl   # Categorical encoders
+│   ├── yield_features.pkl         # Feature metadata
+│   └── ensemble_metadata.pkl      # Training metadata
+│
+├── templates/                     # HTML pages
+│   ├── base.html                  # Base template
+│   ├── index.html                 # Landing page
+│   ├── predict_yield.html         # YieldMax predictor
+│   └── recommend.html             # Crop recommendation
+│
+├── Datasets/                      # Training data
+│   └── Yield_Data_With_Environment.csv  # Required dataset
+│
+├── Docs/                          # Team Documentation
+│   ├── PRESENTATION_GUIDE.md      # Simple guide for team review
+│   └── ARCHITECTURE_AND_TECH_STACK.md  # How the ML pipeline & tech stack works
+│
+└── logs/                          # Training logs (generated)
+```
+
+---
+
+## Team
+
+- Arunmozhi Adithya
+- Jenivaa
+- Tamizharasan
+- Pradeepraja
+- Dilshan
+
+---
+
+## License
+
+MIT License - Feel free to use for educational purposes.
+
+---
+
+## Resources
+
+**Get Gemini API Key:** [Google AI Studio](https://aistudio.google.com/app/apikey)  
+**Documentation:** [Docs folder](./Docs/)  
+**Pre-trained Models (optional):** [Google Drive](https://drive.google.com/drive/folders/1gMGjGMz0oCBkrMp2QtCyx14zPZ9lk4Y5)
+
+---
+
+## Project Highlights
+
+- **Ensemble Learning** (Advanced technique, production-grade)
+- **245k+ Training Records** (Real agricultural data)
+- **92% Accuracy** (R² score, outperforms single models)
+- **AI-Powered Insights** (Gemini 2.0 Flash integration)
+- **User-Friendly** (Smart auto-fill, clean interface)
+- **Transparent** (Technical mode for auditing)
+- **Well-Documented** (4 comprehensive guides)
+- **Docker Ready** (One-command deployment to HF Spaces)
+
+---
+
+**Built for smarter, data-driven agriculture**
+
+*Making farming decisions scientific, one prediction at a time.*

@@ -3,34 +3,25 @@ flask==3.0.0
 werkzeug==3.0.1
 
 # Data Processing
-pandas==2.1.4
-numpy==1.26.2
+pandas>=2.1.4
+numpy>=1.26.0
 
 # Machine Learning
-scikit-learn==1.3.2
-xgboost==2.0.3
-joblib==1.3.2
+scikit-learn>=1.3.2
+xgboost>=2.0.3
+lightgbm>=4.1.0
+joblib>=1.3.2
 
-# Visualization
-matplotlib==3.8.2
-seaborn==0.13.0
+# Deep Learning (for DNN in ensemble)
+tensorflow==2.16.1
 
 # AI & API
-google-generativeai==0.3.2
-python-dotenv==1.0.0
-requests==2.31.0
+google-generativeai>=0.7.2
+python-dotenv>=1.0.0
 
-# Utilities
-python-dateutil==2.8.2
-pytz==2023.3.post1
+# Text Processing (for Gemini AI markdown responses)
+markdown>=3.5.0
 
-# Optional: Performance & Production
-gunicorn==21.2.0
-waitress==2.1.2
+# Production Server (for Hugging Face / Docker deployment)
+gunicorn>=21.2.0
 
-# Optional: Data Validation
-jsonschema==4.20.0
-
-# Optional: Database (if needed later)
-# sqlalchemy==2.0.23
-# pymongo==4.6.1

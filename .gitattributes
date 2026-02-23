@@ -1,0 +1,9 @@
+# Ensure text files are handled correctly
+*.py text
+*.html text
+*.css text
+*.md text
+*.json text
+.env* filter=text
+.gitignore text
+.gitattributes text
