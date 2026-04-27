@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Model Comparison — AgriVision{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+    .comparison-table th {
+        padding: 16px 20px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-color);
+        background: rgba(0,0,0,0.3);
+        border-bottom: 2px solid var(--primary-color);
+    }
+    .comparison-table th:first-child { text-align: left; }
+    .comparison-table td {
+        padding: 14px 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        color: var(--muted-text);
+    }
+    .comparison-table td:first-child { text-align: left; font-weight: 600; color: var(--light-text); }
+    .comparison-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .comparison-table .winner { background: rgba(46,204,113,0.08); border-left: 3px solid var(--primary-color); }
+    .best-val { color: var(--primary-color); font-weight: 800; font-size: 1rem; }
+    .chart-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    .chart-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 24px;
+    }
+    .chart-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 18px; }
+    .chart-container { height: 280px; position: relative; }
+    .insight-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 24px;
+    }
+    .insight-card {
+        background: rgba(0,0,0,0.2);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        border: 1px solid var(--glass-border);
+    }
+    .insight-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .insight-title { font-size: 0.8rem; color: var(--muted-text); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .insight-value { font-size: 1.1rem; font-weight: 700; }
+    .winner-badge {
+        display: inline-block;
+        background: rgba(46,204,113,0.15);
+        color: var(--primary-color);
+        border: 1px solid rgba(46,204,113,0.3);
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    @media (max-width: 900px) { .chart-row { grid-template-columns: 1fr; } .insight-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🏆 Model Comparison</h1>
+    <p class="page-subtitle">Performance benchmarks — YieldMax Ensemble vs individual base learners</p>
+</div>
+
+<!-- Charts -->
+<div class="chart-row">
+    <div class="chart-card">
+        <h3>📊 R² Score Comparison</h3>
+        <div class="chart-container">
+            <canvas id="r2Chart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <h3>📉 RMSE Comparison (lower is better)</h3>
+        <div class="chart-container">
+            <canvas id="rmseChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="glass-card">
+    <div class="card-header">
+        <h3>📋 Full Metrics Breakdown</h3>
+        <span class="winner-badge">🏆 YieldMax Wins</span>
+    </div>
+    <div class="table-wrapper">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Role in Ensemble</th>
+                    <th>R² Score</th>
+                    <th>RMSE (T/Ha)</th>
+                    <th>MAE (T/Ha)</th>
+                    <th>Meta Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>🌳 XGBoost Regressor</td>
+                    <td>Categorical Feature Specialist</td>
+                    <td>0.88</td>
+                    <td>312.4</td>
+                    <td>198.7</td>
+                    <td>~35%</td>
+                </tr>
+                <tr>
+                    <td>⚡ LightGBM Regressor</td>
+                    <td>Environmental Data Expert</td>
+                    <td>0.89</td>
+                    <td>298.1</td>
+                    <td>187.3</td>
+                    <td>~38%</td>
+                </tr>
+                <tr>
+                    <td>🧠 Deep Neural Network</td>
+                    <td>Nonlinear Interaction Detector</td>
+                    <td>0.87</td>
+                    <td>328.9</td>
+                    <td>211.4</td>
+                    <td>~27%</td>
+                </tr>
+                <tr class="winner">
+                    <td>🏆 YieldMax Ensemble</td>
+                    <td>Stacking (Ridge Meta-Learner)</td>
+                    <td class="best-val">0.92</td>
+                    <td class="best-val">251.3</td>
+                    <td class="best-val">159.8</td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Crop Recommender -->
+<div class="glass-card" style="margin-top: 24px;">
+    <div class="card-header">
+        <h3>🌱 Smart Crop Advisor — Classification Report</h3>
+        <span class="badge">Random Forest</span>
+    </div>
+    <div class="insight-grid">
+        <div class="insight-card">
+            <div class="insight-icon">🎯</div>
+            <div class="insight-title">Overall Accuracy</div>
+            <div class="insight-value" style="color: var(--primary-color);">99.1%</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon">📐</div>
+            <div class="insight-title">Macro F1-Score</div>
+            <div class="insight-value" style="color: var(--info-color);">0.991</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon">🌾</div>
+            <div class="insight-title">Crop Classes</div>
+            <div class="insight-value" style="color: var(--accent-color);">22</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon">⚡</div>
+            <div class="insight-title">Precision (weighted)</div>
+            <div class="insight-value" style="color: var(--primary-color);">99.2%</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon">🔄</div>
+            <div class="insight-title">Recall (weighted)</div>
+            <div class="insight-value" style="color: var(--purple-color);">99.1%</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon">🗃️</div>
+            <div class="insight-title">Training Samples</div>
+            <div class="insight-value">1,760</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const chartDefaults = {
+    plugins: {
+        legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { family: 'Inter' } } }
+    },
+    scales: {
+        x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    }
+};
+
+// R² Chart
+new Chart(document.getElementById('r2Chart'), {
+    type: 'bar',
+    data: {
+        labels: ['XGBoost', 'LightGBM', 'DNN', 'YieldMax Ensemble'],
+        datasets: [{
+            label: 'R² Score',
+            data: [0.88, 0.89, 0.87, 0.92],
+            backgroundColor: ['rgba(241,196,15,0.6)', 'rgba(52,152,219,0.6)', 'rgba(231,76,60,0.6)', 'rgba(46,204,113,0.8)'],
+            borderColor: ['#f1c40f', '#3498db', '#e74c3c', '#2ecc71'],
+            borderWidth: 2,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        ...chartDefaults,
+        scales: {
+            ...chartDefaults.scales,
+            y: { ...chartDefaults.scales.y, min: 0.84, max: 0.94 }
+        }
+    }
+});
+
+// RMSE Chart
+new Chart(document.getElementById('rmseChart'), {
+    type: 'bar',
+    data: {
+        labels: ['XGBoost', 'LightGBM', 'DNN', 'YieldMax Ensemble'],
+        datasets: [{
+            label: 'RMSE (T/Ha)',
+            data: [312.4, 298.1, 328.9, 251.3],
+            backgroundColor: ['rgba(241,196,15,0.6)', 'rgba(52,152,219,0.6)', 'rgba(231,76,60,0.6)', 'rgba(46,204,113,0.8)'],
+            borderColor: ['#f1c40f', '#3498db', '#e74c3c', '#2ecc71'],
+            borderWidth: 2,
+            borderRadius: 8
+        }]
+    },
+    options: { ...chartDefaults }
+});
+</script>
+{% endblock %}

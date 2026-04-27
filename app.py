@@ -11,25 +11,23 @@ import os
 import json
 import markdown
 from datetime import datetime
-import google.generativeai as genai
+from google import genai
+from google.genai import types as genai_types
 from dotenv import load_dotenv
 
 # Load Environment Variables
 load_dotenv()
 gen_ai_key = os.getenv("GOOGLE_API_KEY")
+
+# Active model — use the latest stable model available
+GEMINI_MODEL = 'gemini-2.5-pro'
+
 if gen_ai_key:
-    genai.configure(api_key=gen_ai_key)
-    gemini_model = genai.GenerativeModel(
-        'gemini-3.1-pro-preview',       
-        generation_config={
-            "temperature": 0.3,
-            "max_output_tokens": 4000,
-            "top_p": 0.9,
-            "top_k": 40,
-        }
-    )
-    print(f"✅ Gemini AI Model Configured: gemini-3.1-pro-preview | Key ends: ...{gen_ai_key[-6:]}")
+    gemini_client = genai.Client(api_key=gen_ai_key)
+    gemini_model = True  # flag: AI is available
+    print(f"✅ Gemini AI Configured: {GEMINI_MODEL} | Key ends: ...{gen_ai_key[-6:]}")
 else:
+    gemini_client = None
     gemini_model = None
     print("⚠️ WARNING: GOOGLE_API_KEY not found in .env — AI features disabled")
 
@@ -387,7 +385,16 @@ Output ONLY raw HTML with ACTIONABLE farming advice:
 
 Be specific to their location and conditions. Keep it practical and actionable."""
 
-        response = gemini_model.generate_content(prompt)
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=4000,
+                top_p=0.9,
+                top_k=40,
+            )
+        )
         result = response.text.strip()
         if result.startswith('```'):
             result = result.split('\n', 1)[1] if '\n' in result else result[3:]
@@ -409,8 +416,8 @@ def get_ai_insight(data, predicted_yield, confidence=None, prediction_range=None
     print(f"\n{'='*50}")
     print(f"🤖 AI INSIGHT REQUEST: {data.get('Crop')} | {data.get('State_Name')}")
     
-    if not gemini_model:
-        print("❌ SKIP: gemini_model is None — GOOGLE_API_KEY missing")
+    if not gemini_client:
+        print("❌ SKIP: gemini_client is None — GOOGLE_API_KEY missing")
         print('='*50)
         return None
     
@@ -454,20 +461,18 @@ ONLY output the HTML block. Do not truncate the HTML output. Ensure all HTML tag
 
 
 
-        print(f"📡 Calling Gemini API... (prompt length: {len(prompt)} chars)")
+        print(f"📡 Calling Gemini API... (model: {GEMINI_MODEL}, prompt: {len(prompt)} chars)")
         
-        response = gemini_model.generate_content(prompt)
-        
-        print(f"📬 Response received. Type: {type(response)}")
-        
-        # Check for blocked response
-        if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
-            print(f"⚠️ Prompt feedback: {response.prompt_feedback}")
-        
-        if not response.parts:
-            print("❌ FAIL: response.parts is empty (response blocked or empty)")
-            print('='*50)
-            return None
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=4000,
+                top_p=0.9,
+                top_k=40,
+            )
+        )
         
         result = response.text.strip()
         print(f"✅ Got text response: {len(result)} chars")
@@ -499,53 +504,95 @@ def get_bulk_ai_summary(stats):
         return None
     
     try:
-        prompt = f"""You are an expert agricultural advisor. Based on this ML analysis, provide ACTIONABLE RECOMMENDATIONS.
+        prompt = f"""You are a senior agricultural intelligence analyst. Based on the ML crop yield data below, generate a precise FIELD INTELLIGENCE REPORT in the exact HTML format shown. Every number and word you write must be derived from the actual data.
 
-📊 DATASET ANALYSIS:
-- Total Records: {stats['total_rows']}
-- Total Predicted Yield: {stats['total_yield']} T/Ha (sum)
-- Average Yield: {stats['avg_yield']} T/Ha
-- Maximum Yield: {stats.get('max_yield', 'N/A')} T/Ha
-- Minimum Yield: {stats.get('min_yield', 'N/A')} T/Ha
-- Top Performing State: {stats['top_state']}
-- Best Crop: {stats['top_crop']}
-- High Yield Records (>3 T/Ha): {stats.get('high_yield_count', 0)}
-- Low Yield Records (<1 T/Ha): {stats.get('low_yield_count', 0)}
+DATA:
+- Records: {stats['total_rows']} | Avg Yield: {stats['avg_yield']} T/Ha | Max: {stats.get('max_yield','N/A')} T/Ha | Min: {stats.get('min_yield','N/A')} T/Ha
+- Top State: {stats['top_state']} | Best Crop: {stats['top_crop']}
+- High Yield (>3 T/Ha): {stats.get('high_yield_count',0)} records | Low Yield (<1 T/Ha): {stats.get('low_yield_count',0)} records | Medium: {stats.get('medium_yield_count',0)} records
+- Total Predicted Yield: {stats['total_yield']} T
 
-Output ONLY raw HTML. Focus on ACTIONABLE SUGGESTIONS:
+OUTPUT ONLY this exact HTML — no markdown, no code fences, no explanation:
 
-<div class="ai-suggestions-container">
-    <div class="suggestion-card priority-high">
-        <h4>🎯 Priority Actions</h4>
-        <ul>
-            <li><strong>Action:</strong> [Specific action]</li>
-        </ul>
-    </div>
-    <div class="suggestion-card improvement">
-        <h4>📈 Yield Improvement Strategies</h4>
-        <ul>
-            <li>[Strategy]</li>
-        </ul>
-    </div>
-    <div class="suggestion-card risk">
-        <h4>⚠️ Risk Mitigation</h4>
-        <ul>
-            <li>[Risk and mitigation]</li>
-        </ul>
-    </div>
+<div class="ai-scorecard-grid">
+
+  <div class="ai-score-tile [GRADE_CLASS]">
+    <div class="score-icon">[GRADE_EMOJI]</div>
+    <div class="score-grade">[LETTER_GRADE]</div>
+    <div class="score-label">Farm Health Grade</div>
+    <div class="score-sub">[1 phrase: what the grade reflects, e.g. "Critically low avg yield across all regions"]</div>
+  </div>
+
+  <div class="ai-score-tile gap-tile">
+    <div class="score-icon">📉</div>
+    <div class="score-grade">[YIELD_GAP, e.g. −2.1 T/Ha]</div>
+    <div class="score-label">Yield Gap vs Best Practice</div>
+    <div class="score-sub">[e.g. "Below {stats['top_state']}'s top performers — soil &amp; input issues"]</div>
+  </div>
+
+  <div class="ai-score-tile [urgency-high OR urgency-med OR urgency-low]">
+    <div class="score-icon">[URGENCY_EMOJI]</div>
+    <div class="score-grade">[HIGH or MED or LOW]</div>
+    <div class="score-label">Intervention Urgency</div>
+    <div class="score-sub">[e.g. "63% of plots yielding below survival threshold"]</div>
+  </div>
+
+  <div class="ai-score-tile uplift-tile">
+    <div class="score-icon">📈</div>
+    <div class="score-grade">[e.g. +22%]</div>
+    <div class="score-label">Potential Yield Uplift</div>
+    <div class="score-sub">[e.g. "Achievable in 1 season with soil correction + variety switch"]</div>
+  </div>
+
 </div>
 
-Rules:
-- NO description of the data
-- Focus on WHAT TO DO
-- Be specific with crop names and regions"""
+<div class="ai-signals">
+
+  <div class="ai-signal critical">
+    <span class="signal-badge badge-critical">🔴 Critical</span>
+    <div class="signal-content">
+      <h3>[Bold 8-word headline about the single most critical problem — use real numbers from the data]</h3>
+      <p>[Exactly 2 sentences: what is happening and what specific action must be taken immediately — name states/crops.]</p>
+    </div>
+  </div>
+
+  <div class="ai-signal watch">
+    <span class="signal-badge badge-watch">🟡 Watch</span>
+    <div class="signal-content">
+      <h3>[Bold 8-word headline about an emerging trend or risk to monitor]</h3>
+      <p>[Exactly 2 sentences: what to watch and why it matters — specific to this dataset's crop or region mix.]</p>
+    </div>
+  </div>
+
+  <div class="ai-signal opportunity">
+    <span class="signal-badge badge-opportunity">🟢 Opportunity</span>
+    <div class="signal-content">
+      <h3>[Bold 8-word headline about the highest-ROI quick win available]</h3>
+      <p>[Exactly 2 sentences: what to do and what specific yield improvement to expect — reference {stats['top_state']} or {stats['top_crop']} if relevant.]</p>
+    </div>
+  </div>
+
+</div>
+
+GRADE CLASSES: grade-a (A), grade-b (B), grade-c (C), grade-d (D), grade-f (F)
+GRADE LOGIC: A=avg>4, B=avg 3-4, C=avg 2-3, D=avg 1-2, F=avg<1 T/Ha
+STRICT RULES:
+- Replace ALL [bracketed text] with real specific content from the data above
+- Signal card h3 headlines: maximum 10 words, bold and specific — no vague statements
+- Signal card p: exactly 2 sentences, no more
+- Preserve ALL class names exactly as shown — they control the visual design"""
+
         
-        response = gemini_model.generate_content(prompt)
-        
-        # Guard against blocked/empty responses
-        if not response or not response.parts:
-            print("⚠️ Gemini returned an empty/blocked response for bulk AI summary")
-            return None
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=4000,
+                top_p=0.9,
+                top_k=40,
+            )
+        )
         
         result = response.text.strip()
         if result.startswith('```'):
@@ -566,8 +613,8 @@ def get_crop_recommendation_insight(recommended_crop, input_data):
     print(f"\n{'='*50}")
     print(f"🤖 AI RECOMMENDATION REQUEST: {recommended_crop}")
     
-    if not gemini_model:
-        print("❌ SKIP: gemini_model is None — GOOGLE_API_KEY missing")
+    if not gemini_client:
+        print("❌ SKIP: gemini_client is None — GOOGLE_API_KEY missing")
         print('='*50)
         return None
     
@@ -608,13 +655,17 @@ Use this EXACT HTML structure with inline styles for beautiful rendering:
 
 ONLY output the HTML block. Do not truncate the HTML output. Ensure all HTML tags are properly closed."""
         
-        print(f"📡 Calling Gemini API... (prompt length: {len(prompt)} chars)")
-        response = gemini_model.generate_content(prompt)
-        
-        if not response or not response.parts:
-            print("❌ FAIL: response.parts is empty (response blocked or empty)")
-            print('='*50)
-            return None
+        print(f"📡 Calling Gemini API... (model: {GEMINI_MODEL}, prompt: {len(prompt)} chars)")
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=4000,
+                top_p=0.9,
+                top_k=40,
+            )
+        )
         
         result = response.text.strip()
         print(f"✅ Got text response: {len(result)} chars")
@@ -1369,9 +1420,10 @@ if __name__ == '__main__':
     os.makedirs('static', exist_ok=True)
     os.makedirs('data', exist_ok=True)
     os.makedirs('models', exist_ok=True)
-    
-    load_models()
-    
+
+    # Models are already loaded at module import time (load_models() above).
+    # Do NOT call load_models() again here — it would reload ~500 MB into RAM twice.
+
     print("\n" + "="*55)
     print("🌾 AgriVision - YieldMax Precision Model")
     print("   Advanced Multi-Algorithm Intelligence")

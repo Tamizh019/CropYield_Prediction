@@ -29,6 +29,22 @@
                     class="nav-item {{ 'active' if '/smart_crop_wizard' in request.path or '/recommend_crop' in request.path else '' }}">
                     <span class="nav-icon">🌱</span> Smart Advisor
                 </a>
+                <a href="/model_dashboard"
+                    class="nav-item {{ 'active' if request.path == '/model_dashboard' else '' }}">
+                    <span class="nav-icon">📊</span> Model Status
+                </a>
+                <a href="/model_comparison"
+                    class="nav-item {{ 'active' if request.path == '/model_comparison' else '' }}">
+                    <span class="nav-icon">🏆</span> Benchmarks
+                </a>
+                <a href="/sample_data"
+                    class="nav-item {{ 'active' if request.path == '/sample_data' else '' }}">
+                    <span class="nav-icon">🗃️</span> Sample Data
+                </a>
+                <a href="/documentation"
+                    class="nav-item {{ 'active' if request.path == '/documentation' else '' }}">
+                    <span class="nav-icon">📖</span> Docs
+                </a>
 
             </div>
 

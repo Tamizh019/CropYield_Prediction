@@ -11,7 +11,7 @@ def prepare_dataset():
     print("=" * 60)
     
     # Load dataset
-    input_path = 'Datasets/Crop_yield_india.csv'
+    input_path = 'Datasets/crop_yield.csv'
     output_path = 'Datasets/Yield_Data_Ready.csv'
     
     try:

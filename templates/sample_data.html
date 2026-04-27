@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Sample Data — AgriVision{% endblock %}
+
+{% block head %}
+<style>
+    .sample-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+    .sample-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        transition: var(--transition);
+    }
+    .sample-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+    .sample-icon { font-size: 2rem; }
+    .sample-card h3 { font-size: 1rem; font-weight: 700; margin: 0; }
+    .sample-card p { font-size: 0.85rem; color: var(--muted-text); margin: 0; line-height: 1.55; }
+    .sample-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+    .meta-tag {
+        background: rgba(0,0,0,0.3);
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        color: var(--muted-text);
+        font-weight: 600;
+    }
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: rgba(155,89,182,0.15);
+        color: var(--purple-color);
+        border: 1.5px solid var(--purple-color);
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: var(--transition);
+        width: fit-content;
+    }
+    .download-btn:hover { background: rgba(155,89,182,0.3); transform: translateY(-1px); }
+
+    .preview-section { margin-top: 32px; }
+    .preview-section h2 { font-size: 1.1rem; margin-bottom: 16px; }
+    .csv-preview {
+        background: rgba(0,0,0,0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.78rem;
+        line-height: 1.7;
+        color: #a3e635;
+    }
+    .csv-preview .csv-header { color: var(--accent-color); font-weight: 700; }
+
+    .format-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+    .format-table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-color);
+        background: rgba(0,0,0,0.3);
+        border-bottom: 1px solid var(--primary-color);
+    }
+    .format-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        color: var(--muted-text);
+    }
+    .format-table td:first-child { font-weight: 600; color: var(--light-text); font-family: monospace; }
+    .required-badge { background: rgba(231,76,60,0.15); color: var(--danger-color); padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+    .optional-badge { background: rgba(52,152,219,0.15); color: var(--info-color); padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+    .info-box { background: rgba(46,204,113,0.08); border-left: 4px solid var(--primary-color); border-radius: 8px; padding: 14px 18px; font-size: 0.875rem; color: rgba(255,255,255,0.8); margin: 16px 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🗃️ Sample Data</h1>
+    <p class="page-subtitle">Download sample datasets and CSV templates to get started quickly</p>
+</div>
+
+<!-- Dataset Cards -->
+<div class="sample-grid">
+
+    <!-- Bulk Prediction Template -->
+    <div class="sample-card" style="border-color: rgba(46,204,113,0.3);">
+        <div class="sample-icon">📊</div>
+        <h3>Bulk Prediction Template</h3>
+        <p>Sample CSV for bulk yield prediction upload. Includes 10 example rows with all required fields.</p>
+        <div class="sample-meta">
+            <span class="meta-tag">📄 CSV</span>
+            <span class="meta-tag">10 rows</span>
+            <span class="meta-tag">YieldMax</span>
+        </div>
+        <a href="/download_dataset/datafile%20(3).csv" class="download-btn">⬇️ Download Template</a>
+    </div>
+
+    <!-- Crop Recommendation Dataset -->
+    <div class="sample-card" style="border-color: rgba(52,152,219,0.3);">
+        <div class="sample-icon">🌱</div>
+        <h3>Crop Recommendation Dataset</h3>
+        <p>Full soil and climate dataset used to train the Smart Crop Advisor (2,200 samples, 22 crop classes).</p>
+        <div class="sample-meta">
+            <span class="meta-tag">📄 CSV</span>
+            <span class="meta-tag">2,200 rows</span>
+            <span class="meta-tag">22 Crops</span>
+        </div>
+        <a href="/download_dataset/Crop_recommendation.csv" class="download-btn">⬇️ Download Dataset</a>
+    </div>
+
+    <!-- Mini Sample -->
+    <div class="sample-card" style="border-color: rgba(241,196,15,0.3);">
+        <div class="sample-icon">🧪</div>
+        <h3>Quick Test Sample (Small)</h3>
+        <p>3-row minimal sample to quickly test the bulk upload feature without using a large file.</p>
+        <div class="sample-meta">
+            <span class="meta-tag">📄 CSV</span>
+            <span class="meta-tag">3 rows</span>
+            <span class="meta-tag">Quick Test</span>
+        </div>
+        <a href="/download_dataset/datafile.csv" class="download-btn">⬇️ Download</a>
+    </div>
+
+</div>
+
+<!-- CSV Column Format -->
+<div class="glass-card preview-section">
+    <div class="card-header">
+        <h3>📋 Bulk Upload CSV Format</h3>
+        <span class="badge">Reference</span>
+    </div>
+    <div class="info-box">
+        💡 Environmental columns are optional — if missing, realistic defaults are applied automatically (Temperature=25°C, Humidity=65%, pH=6.5, Rainfall=1000mm).
+    </div>
+    <table class="format-table">
+        <thead>
+            <tr>
+                <th>Column Name</th>
+                <th>Also Accepted As</th>
+                <th>Type</th>
+                <th>Example</th>
+                <th>Required?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>State_Name</td><td>State Name</td><td>Text</td><td>Tamil Nadu</td><td><span class="required-badge">Required</span></td></tr>
+            <tr><td>District_Name</td><td>Dist Name</td><td>Text</td><td>Chennai</td><td><span class="required-badge">Required</span></td></tr>
+            <tr><td>Crop_Year</td><td>Year</td><td>Integer</td><td>2023</td><td><span class="required-badge">Required</span></td></tr>
+            <tr><td>Crop</td><td>—</td><td>Text</td><td>Rice</td><td><span class="required-badge">Required</span></td></tr>
+            <tr><td>Area</td><td>Area_ha</td><td>Float (ha)</td><td>1500.0</td><td><span class="required-badge">Required</span></td></tr>
+            <tr><td>Temperature</td><td>Temperature_C</td><td>Float (°C)</td><td>28.5</td><td><span class="optional-badge">Optional</span></td></tr>
+            <tr><td>Humidity</td><td>Humidity_%</td><td>Float (%)</td><td>72.0</td><td><span class="optional-badge">Optional</span></td></tr>
+            <tr><td>pH</td><td>—</td><td>Float (0–14)</td><td>6.8</td><td><span class="optional-badge">Optional</span></td></tr>
+            <tr><td>Rainfall</td><td>Rainfall_mm</td><td>Float (mm)</td><td>1200.0</td><td><span class="optional-badge">Optional</span></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- CSV Preview -->
+<div class="glass-card" style="margin-top: 24px;">
+    <div class="card-header">
+        <h3>👁️ Sample CSV Preview</h3>
+        <span class="badge badge-purple">Example</span>
+    </div>
+    <div class="csv-preview">
+<span class="csv-header">State_Name,District_Name,Crop_Year,Crop,Area,Temperature,Humidity,pH,Rainfall</span>
+Tamil Nadu,Chennai,2023,Rice,1500.0,29.2,78.0,6.5,1250.0
+Karnataka,Bangalore Rural,2023,Wheat,800.0,22.5,65.0,7.1,900.0
+Maharashtra,Pune,2023,Sugarcane,2200.0,27.8,60.0,6.8,750.0
+Andhra Pradesh,Guntur,2023,Cotton,950.0,31.0,55.0,7.4,620.0
+Punjab,Amritsar,2023,Wheat,3100.0,20.1,58.0,7.8,520.0
+    </div>
+</div>
+
+{% endblock %}

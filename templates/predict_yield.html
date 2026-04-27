@@ -1,9 +1,176 @@
 {% extends "base.html" %}
-
 {% block title %}YieldMax Predictor - AgriVision{% endblock %}
-
 {% block head %}
 <style>
+
+    /* ===== LOADING MODAL ===== */
+    #agriLoader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(5, 12, 24, 0.72);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: center;
+    }
+
+    #agriLoader.active { display: flex; }
+    .loader-modal {
+        background: rgba(11, 20, 36, 0.96);
+        border-radius: 24px;
+        padding: 32px 36px 28px;
+        width: 460px;
+        max-width: 92vw;
+        position: relative;
+        overflow: hidden;
+        animation: modalScaleIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow:
+            0 0 0 1px rgba(59,130,246,0.25),
+            0 32px 80px rgba(0,0,0,0.6),
+            0 0 60px rgba(59,130,246,0.1);
+    }
+
+    .loader-modal::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%; transform: translateX(-50%);
+        width: 200px; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(96,165,250,0.8), transparent);
+    }
+
+    .loader-modal::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%; transform: translateX(-50%);
+        width: 120px; height: 40px;
+        background: radial-gradient(ellipse at top, rgba(59,130,246,0.12), transparent);
+        pointer-events: none;
+    }
+
+    @keyframes modalScaleIn {
+        from { opacity: 0; transform: scale(0.88) translateY(12px); }
+        to   { opacity: 1; transform: scale(1)   translateY(0); }
+    }
+
+    .loader-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .loader-ring-wrap {
+        position: relative;
+        width: 46px; height: 46px;
+        flex-shrink: 0;
+    }
+
+    .loader-ring {
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        border: 2.5px solid rgba(255,255,255,0.05);
+        border-top-color: #3b82f6;
+        border-right-color: #8b5cf6;
+        animation: ldrSpin 1s linear infinite;
+        position: absolute; top:0; left:0;
+    }
+
+    .loader-ring-inner {
+        position: absolute;
+        inset: 9px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.04);
+        border-bottom-color: rgba(34,197,94,0.5);
+        animation: ldrSpinR 1.5s linear infinite;
+    }
+
+    @keyframes ldrSpin  { to { transform: rotate(360deg);  } }
+    @keyframes ldrSpinR { to { transform: rotate(-360deg); } }
+    .loader-ring-emoji {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+    }
+
+    .loader-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.01em;
+        margin-bottom: 2px;
+    }
+
+    .loader-subtitle {
+        font-size: 0.74rem;
+        color: #60a5fa;
+        font-weight: 500;
+    }
+
+    .pipeline {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 22px;
+    }
+
+    .pipe-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.05);
+        background: rgba(255,255,255,0.02);
+        opacity: 0.3;
+        transition: all 0.3s ease;
+    }
+
+    .pipe-step.active {
+        opacity: 1;
+        background: rgba(59,130,246,0.1);
+        border-color: rgba(59,130,246,0.3);
+        animation: pipeGlow 1.2s ease-in-out infinite alternate;
+    }
+
+    .pipe-step.done {
+        opacity: 0.8;
+        background: rgba(34,197,94,0.06);
+        border-color: rgba(34,197,94,0.2);
+    }
+
+    @keyframes pipeGlow {
+        from { box-shadow: 0 0 6px rgba(59,130,246,0.08); }
+        to   { box-shadow: 0 0 16px rgba(59,130,246,0.2); }
+    }
+
+    .pipe-icon { font-size: 0.9rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .pipe-label { flex: 1; font-size: 0.79rem; font-weight: 600; color: rgba(255,255,255,0.8); }
+    .pipe-step.done .pipe-label { color: rgba(255,255,255,0.4); }
+    .pipe-status { font-size: 0.68rem; font-weight: 700; white-space: nowrap; }
+    .pipe-step.active .pipe-status { color: #60a5fa; }
+    .pipe-step.done   .pipe-status { color: #4ade80; }
+    .pipe-step:not(.active):not(.done) .pipe-status { color: rgba(255,255,255,0.15); }
+    .loader-progress-track {
+        height: 4px;
+        background: rgba(255,255,255,0.07);
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .loader-progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #22c55e);
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 8px rgba(59,130,246,0.5);
+    }
+
+    .loader-note { font-size: 0.7rem; color: rgba(255,255,255,0.2); text-align: center; }
+
     /* Tab System */
     .tab-container {
         display: flex;
@@ -233,12 +400,10 @@
     }
 
     @keyframes pulse-glow {
-
         0%,
         100% {
             opacity: 0.3;
         }
-
         50% {
             opacity: 0.8;
         }
@@ -507,7 +672,6 @@
         font-size: 3rem;
         margin-bottom: 15px;
     }
-
     input[type="file"] {
         display: none;
     }
@@ -553,11 +717,37 @@
         }
     }
 </style>
-{% endblock %}
 
+{% endblock %}
 {% block content %}
+<!-- ===== ORCHESTRATION LOADING MODAL ===== -->
+<div id="agriLoader">
+  <div class="loader-modal">
+    <div class="loader-header">
+      <div class="loader-ring-wrap">
+        <div class="loader-ring"></div>
+        <div class="loader-ring-inner"></div>
+        <div class="loader-ring-emoji">&#x1F33E;</div>
+      </div>
+      <div>
+        <div class="loader-title">YieldMax Computing&#x2026;</div>
+        <div class="loader-subtitle" id="loaderSubtitle">Initialising pipeline</div>
+      </div>
+    </div>
+    <div class="pipeline">
+      <div class="pipe-step" id="step-0"><span class="pipe-icon">&#x1F4DD;</span><span class="pipe-label">Input Validation</span><span class="pipe-status" id="st-0">···</span></div>
+      <div class="pipe-step" id="step-1"><span class="pipe-icon">&#x26A1;</span><span class="pipe-label">XGBoost Regressor</span><span class="pipe-status" id="st-1">···</span></div>
+      <div class="pipe-step" id="step-2"><span class="pipe-icon">&#x1F4A1;</span><span class="pipe-label">LightGBM Regressor</span><span class="pipe-status" id="st-2">···</span></div>
+      <div class="pipe-step" id="step-3"><span class="pipe-icon">&#x1F9E0;</span><span class="pipe-label">Neural Network (DNN)</span><span class="pipe-status" id="st-3">···</span></div>
+      <div class="pipe-step" id="step-4"><span class="pipe-icon">&#x1F3AF;</span><span class="pipe-label">Ensemble Stacking</span><span class="pipe-status" id="st-4">···</span></div>
+      <div class="pipe-step" id="step-5"><span class="pipe-icon">&#x1F916;</span><span class="pipe-label">Gemini AI Agronomist</span><span class="pipe-status" id="st-5">···</span></div>
+    </div>
+    <div class="loader-progress-track"><div class="loader-progress-fill" id="loaderBar"></div></div>
+    <div class="loader-note" id="loaderNote">Usually takes 5&#x2013;15 seconds</div>
+  </div>
+</div>
 <div class="page-header">
-    <h1 class="page-title">🌾 YieldMax Predictor</h1>
+    <h1 class="page-title">&#x1F33E; YieldMax Predictor</h1>
     <p class="page-subtitle">Get accurate yield predictions with AI-powered environmental estimation</p>
 </div>
 
@@ -565,56 +755,57 @@
 <!-- RESULT VIEW -->
 <div class="glass-card">
     <div class="card-header">
-        <h3>🎉 Prediction Complete</h3>
+        <h3>&#x1F389; Prediction Complete</h3>
         <a href="/predict_yield" class="btn btn-secondary" style="padding: 8px 16px;">New Prediction</a>
     </div>
-
     <!-- Main Result -->
     <div class="yieldmax-result">
-        <div class="yieldmax-badge">⚡ YieldMax Precision Model</div>
+        <div class="yieldmax-badge">&#x26A1; YieldMax Precision Model</div>
         <div class="yield-value">{{ prediction }}</div>
         <div class="yield-unit">Tonnes / Hectare</div>
 
         {% if confidence %}
         <div
             class="confidence-badge {% if confidence >= 80 %}confidence-high{% elif confidence >= 60 %}confidence-medium{% else %}confidence-low{% endif %}">
-            <span>🎯</span>
+            <span>YZ</span>
             <span>{{ confidence }}% Confidence
+
                 {% if confidence >= 80 %}(High){% elif confidence >= 60 %}(Medium){% else %}(Low){% endif %}
             </span>
         </div>
-        {% endif %}
 
+        {% endif %}
         {% if prediction_range %}
         <div class="prediction-range">
             <div class="range-item">
-                <div class="range-label">⬇️ Worst Case</div>
+                <div class="range-label">&#x2B07;&#xFE0F; Worst Case</div>
                 <div class="range-value worst">{{ prediction_range.lower }} T/Ha</div>
             </div>
             <div class="range-item">
-                <div class="range-label">⚡ Expected</div>
+                <div class="range-label">&#x26A1; Expected</div>
                 <div class="range-value expected">{{ prediction }} T/Ha</div>
             </div>
             <div class="range-item">
-                <div class="range-label">⬆️ Best Case</div>
+                <div class="range-label">&#x2B06;&#xFE0F; Best Case</div>
                 <div class="range-value best">{{ prediction_range.upper }} T/Ha</div>
             </div>
         </div>
-        {% endif %}
 
+        {% endif %}
         {% if input_data and input_data.Area %}
         <div class="total-harvest">
-            <div class="harvest-label">📦 Total Expected Harvest ({{ input_data.Area }} ha)</div>
+            <div class="harvest-label">&#x1F4E6; Total Expected Harvest ({{ input_data.Area }} ha)</div>
             <div class="harvest-value">{{ "%.1f"|format(prediction|float * input_data.Area) }} Tonnes</div>
         </div>
+
         {% endif %}
     </div>
-
     <!-- Estimated Conditions -->
+
     {% if input_data and input_data.is_estimated %}
     <div class="estimated-conditions">
         <h4 style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <span>🤖 AI Estimated Conditions</span>
+            <span>&#x1F916; AI Estimated Conditions</span>
             <span class="badge badge-purple" style="font-size: 0.7rem;">Auto-Calculated</span>
         </h4>
         <div class="condition-grid">
@@ -639,43 +830,49 @@
             *Based on {{ input_data.District_Name }} climate data for {{ input_data.Season }}.
         </p>
     </div>
-    {% endif %}
 
+    {% endif %}
     <!-- Technical Mode -->
+
     {% if show_technical and individual_predictions %}
     <div class="technical-section">
         <div class="technical-header">
-            <span style="font-size: 1.5rem;">🔬</span>
-            <h3>Technical Analysis — Ensemble Breakdown</h3>
+            <span style="font-size: 1.5rem;">&#x1F4CA;</span>
+            <h3>&#x1F52C; Technical Analysis &#x2014; Ensemble Breakdown</h3>
         </div>
-
         <div class="model-breakdown">
             <div class="model-card">
                 <div class="model-card-name">XGBoost Regressor</div>
                 <div class="model-card-pred">{{ individual_predictions.xgboost }} T/Ha</div>
+
                 {% if model_weights %}
                 <div class="model-card-weight">Weight: {{ "%.1f"|format(model_weights.xgboost) }}%</div>
+
                 {% endif %}
             </div>
             <div class="model-card">
                 <div class="model-card-name">LightGBM Regressor</div>
                 <div class="model-card-pred">{{ individual_predictions.lightgbm }} T/Ha</div>
+
                 {% if model_weights %}
                 <div class="model-card-weight">Weight: {{ "%.1f"|format(model_weights.lightgbm) }}%</div>
+
                 {% endif %}
             </div>
             <div class="model-card">
                 <div class="model-card-name">Neural Network (DNN)</div>
                 <div class="model-card-pred">{{ individual_predictions.neural_network }} T/Ha</div>
+
                 {% if model_weights %}
                 <div class="model-card-weight">Weight: {{ "%.1f"|format(model_weights.neural_network) }}%</div>
+
                 {% endif %}
             </div>
         </div>
 
         {% if model_weights %}
         <div class="meta-learner-info">
-            <h4 style="margin-bottom: 12px;">📊 Meta-Learner Weights (Stacking)</h4>
+            <h4 style="margin-bottom: 12px;">&#x2696;&#xFE0F; Meta-Learner Weights (Stacking)</h4>
             <div class="weight-bar">
                 <span class="weight-bar-label">XGBoost</span>
                 <div class="weight-bar-track">
@@ -699,6 +896,7 @@
                 </div>
                 <span class="weight-bar-value">{{ "%.1f"|format(model_weights.neural_network) }}%</span>
             </div>
+
             {% if model_agreement %}
             <div
                 style="text-align: center; margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
@@ -708,25 +906,29 @@
                     {{ model_agreement }}%
                 </span>
             </div>
+
             {% endif %}
         </div>
+
         {% endif %}
     </div>
-    {% endif %}
 
+    {% endif %}
     <!-- AI Insight -->
+
     {% if ai_insight %}
     <div class="ai-insights-container" style="margin-top: 30px;">
         <div class="ai-header">
-            <h3>📈 AI Agronomist Analysis</h3>
+            <h3 class="ai-insight-title">&#x1F4CB; AI Agronomist Analysis</h3>
         </div>
         <div class="ai-content">
             <div class="ai-formatted">{{ ai_insight | safe }}</div>
         </div>
         <div class="ai-footer">
-            <small>Powered by Gemini 3.1 Pro </small>
+            <small>&#x1F916; Powered by Gemini 2.5 Pro</small>
         </div>
     </div>
+
     {% endif %}
 </div>
 
@@ -735,21 +937,18 @@
 <div class="glass-card">
     <!-- Tabs: Single vs Bulk -->
     <div class="tab-container">
-        <div class="main-tab active" onclick="switchTab('single')">📝 Single Prediction</div>
-        <div class="main-tab" onclick="switchTab('bulk')">📂 Bulk Analysis</div>
+        <div class="main-tab active" onclick="switchTab('single')">&#x1F4DD; Single Prediction</div>
+        <div class="main-tab" onclick="switchTab('bulk')">&#x1F4C2; Bulk Analysis</div>
     </div>
-
     <!-- SINGLE PREDICTION -->
     <div id="singlePredictionTab" class="simple-form-container">
         <form action="/predict_yield" method="POST" id="yieldForm">
-
             <!-- Basic Info Section -->
             <div class="form-section">
                 <div class="section-title">
-                    <span>📍</span>
+                    <span>&#x1F4CD;</span>
                     <span>Farm Location & Crop Details</span>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label for="state">State<span style="color: #e74c3c;">*</span></label>
@@ -784,7 +983,6 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label for="crop">Crop Type<span style="color: #e74c3c;">*</span></label>
@@ -809,48 +1007,42 @@
                         <input type="number" step="0.01" name="Area" id="area" placeholder="e.g., 2.5" required>
                     </div>
                 </div>
-
                 <input type="hidden" name="Crop_Year" value="2025">
-
                 <!-- Season Selection -->
                 <div class="form-group" style="margin-top: 10px;">
                     <label>Season<span style="color: #e74c3c;">*</span></label>
                     <div class="season-cards">
                         <div class="season-card selected" data-value="Kharif" onclick="selectSeason(this)">
-                            <div class="season-icon">☔</div>
+                            <div class="season-icon">&#x1F33E;</div>
                             <div class="season-name">Kharif</div>
                         </div>
                         <div class="season-card" data-value="Rabi" onclick="selectSeason(this)">
-                            <div class="season-icon">❄️</div>
+                            <div class="season-icon">&#x2744;&#xFE0F;</div>
                             <div class="season-name">Rabi</div>
                         </div>
                         <div class="season-card" data-value="Zaid" onclick="selectSeason(this)">
-                            <div class="season-icon">☀️</div>
+                            <div class="season-icon">&#x2600;&#xFE0F;</div>
                             <div class="season-name">Zaid</div>
                         </div>
                         <div class="season-card" data-value="Whole Year" onclick="selectSeason(this)">
-                            <div class="season-icon">🗓️</div>
+                            <div class="season-icon">&#x1F4C5;</div>
                             <div class="season-name">Annual</div>
                         </div>
                     </div>
                     <input type="hidden" name="Season" id="seasonValue" value="Kharif">
                 </div>
             </div>
-
             <!-- Environmental Data Section (with smart defaults) -->
             <div class="form-section">
                 <div class="section-title">
-                    <span>🌡️</span>
-                    <span>Environmental Conditions</span>
+                    <span>&#x1F321;&#xFE0F; Environmental Conditions</span>
                 </div>
-
                 <div class="env-conditions">
                     <div class="env-info">
-                        <strong>💡 Smart Auto-Fill:</strong> Leave these fields blank and we'll estimate optimal
+                        <strong>&#x1F916; Smart Auto-Fill:</strong> Leave these fields blank and we'll estimate optimal
                         conditions
                         based on your location and season. Or click "Enter Custom Values" if you have soil test data.
                     </div>
-
                     <div class="env-row">
                         <div class="env-item">
                             <label>Temperature (°C)</label>
@@ -872,35 +1064,31 @@
                             <input type="number" step="0.1" name="pH" id="phInput" placeholder="Auto: --" disabled>
                         </div>
                     </div>
-
                     <div style="text-align: center;">
                         <span class="toggle-custom" onclick="toggleCustomInputs()" id="toggleBtn">
-                            📝 Click to Enter Custom Values
+                            &#x1F4DD; Click to Enter Custom Values
                         </span>
                     </div>
                 </div>
             </div>
-
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
-                🚀 Get YieldMax Prediction
+            <button type="submit" id="yieldSubmitBtn" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                &#x1F680; Get YieldMax Prediction
             </button>
         </form>
     </div>
-
     <!-- BULK PREDICTION TAB -->
     <div id="bulkPredictionTab" style="display: none;">
         <div style="max-width: 650px; margin: 0 auto;">
             <div style="text-align: center; margin-bottom: 25px;">
-                <h3 style="margin-bottom: 10px;">📊 Bulk Dataset Analysis</h3>
+                <h3 style="margin-bottom: 10px;">&#x1F4CA; Bulk Dataset Analysis</h3>
                 <p style="color: var(--muted-text); font-size: 0.95rem;">
                     Upload a CSV file with multiple farm records for comprehensive analytics and insights.
                 </p>
             </div>
-
             <form action="/predict_yield_bulk" method="POST" enctype="multipart/form-data">
                 <div class="bulk-upload-zone" onclick="document.getElementById('csvFile').click()">
-                    <div class="upload-icon">📄</div>
+                    <div class="upload-icon">&#x1F4C4;</div>
                     <h4 style="margin-bottom: 10px;">Drag & Drop or Click to Upload CSV</h4>
                     <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 20px;">
                         Get predictions, analytics, and AI insights for your entire dataset
@@ -909,15 +1097,13 @@
                     <span class="file-btn">Choose File</span>
                     <div id="fileName" style="margin-top: 15px; color: var(--primary-color);"></div>
                 </div>
-
-                <button type="submit" class="btn btn-primary"
+                <button type="submit" id="bulkSubmitBtn" class="btn btn-primary"
                     style="width: 100%; margin-top: 25px; padding: 15px; font-size: 1.05rem;">
-                    📊 Upload & Analyze Dataset
+                    &#x1F4CA; Upload & Analyze Dataset
                 </button>
             </form>
-
             <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 10px;">
-                <h4 style="margin-bottom: 12px; font-size: 0.95rem;">📋 Required CSV Columns:</h4>
+                <h4 style="margin-bottom: 12px; font-size: 0.95rem;">&#x1F4CB; Required CSV Columns:</h4>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
                     <span
                         style="background: rgba(255,255,255,0.1); padding: 6px; border-radius: 5px; font-size: 0.8rem; text-align: center;">State
@@ -944,21 +1130,20 @@
         </div>
     </div>
 </div>
-{% endif %}
 
+{% endif %}
 {% if error %}
 <div class="glass-card" style="border-color: #ff6b6b; margin-top: 20px;">
     <div style="color: #ff6b6b; text-align: center; padding: 15px;">{{ error }}</div>
 </div>
-{% endif %}
 
+{% endif %}
 <script>
     // Tab Switching
     function switchTab(tab) {
         const singleTab = document.getElementById('singlePredictionTab');
         const bulkTab = document.getElementById('bulkPredictionTab');
         const tabs = document.querySelectorAll('.main-tab');
-
         if (tab === 'single') {
             singleTab.style.display = 'block';
             bulkTab.style.display = 'none';
@@ -971,7 +1156,6 @@
             tabs[1].classList.add('active');
         }
     }
-
     // Season Selection
     function selectSeason(card) {
         document.querySelectorAll('.season-card').forEach(c => c.classList.remove('selected'));
@@ -979,17 +1163,14 @@
         document.getElementById('seasonValue').value = card.dataset.value;
         handleLocationChange(); // Recalculate when season changes
     }
-
     // Load Districts
     async function loadDistricts(state) {
         const districtSelect = document.getElementById('district');
         districtSelect.innerHTML = '<option value="">Loading...</option>';
-
         if (state) {
             try {
                 const response = await fetch(`/api/districts/${state}`);
                 const data = await response.json();
-
                 districtSelect.innerHTML = '<option value="">Select District</option>';
                 data.districts.forEach(dist => {
                     districtSelect.innerHTML += `<option value="${dist}">${dist}</option>`;
@@ -1002,7 +1183,6 @@
             districtSelect.innerHTML = '<option value="">Select District</option>';
         }
     }
-
     // When state changes
     const stateEl = document.getElementById('state');
     if (stateEl) {
@@ -1010,18 +1190,15 @@
             loadDistricts(this.value);
         });
     }
-
     // Update estimated values when location/season changes
     async function handleLocationChange() {
         const state = document.getElementById('state').value;
         const district = document.getElementById('district').value;
         const season = document.getElementById('seasonValue').value;
-
         if (state && district && season) {
             try {
                 const response = await fetch(`/api/estimate_conditions?state=${state}&district=${district}&season=${season}`);
                 const data = await response.json();
-
                 // Update placeholders with estimated values
                 document.getElementById('tempInput').placeholder = `Auto: ${data.Temperature}°C`;
                 document.getElementById('humidityInput').placeholder = `Auto: ${data.Humidity}%`;
@@ -1032,35 +1209,95 @@
             }
         }
     }
-
     // Toggle Custom Inputs
     let customInputsEnabled = false;
     function toggleCustomInputs() {
         customInputsEnabled = !customInputsEnabled;
         const inputs = ['tempInput', 'humidityInput', 'rainfallInput', 'phInput'];
         const btn = document.getElementById('toggleBtn');
-
         inputs.forEach(id => {
             document.getElementById(id).disabled = !customInputsEnabled;
         });
-
         if (customInputsEnabled) {
-            btn.textContent = '🤖 Use Auto-Estimated Values';
+            btn.textContent = '\u2728 Use Auto-Estimated Values';
             btn.style.background = 'rgba(76, 175, 80, 0.2)';
         } else {
-            btn.textContent = '📝 Click to Enter Custom Values';
+            btn.textContent = '\uD83D\uDCDD Click to Enter Custom Values';
             btn.style.background = 'rgba(255, 255, 255, 0.05)';
         }
     }
-
     // File upload name display
     function updateFileName(input) {
         const display = document.getElementById('fileName');
         if (input.files && input.files.length > 0) {
-            display.textContent = "✅ Selected: " + input.files[0].name;
+            display.textContent = "&#x2705; Selected: " + input.files[0].name;
         } else {
             display.textContent = "";
         }
     }
+    // ============================================================
+    //  ORCHESTRATION LOADER
+    // ============================================================
+    const STEPS = [
+        { label: 'Validating inputs...',     status: 'Running&#x2026;',   done: 'Done &#x2714;',  delay: 400  },
+        { label: 'Running XGBoost...',       status: 'Running&#x2026;',   done: 'Done &#x2714;',  delay: 900  },
+        { label: 'Running LightGBM...',      status: 'Running&#x2026;',   done: 'Done &#x2714;',  delay: 800  },
+        { label: 'Running Neural Net...',    status: 'Running&#x2026;',   done: 'Done &#x2714;',  delay: 1000 },
+        { label: 'Stacking ensemble...',     status: 'Merging&#x2026;',   done: 'Done &#x2714;',  delay: 700  },
+        { label: 'Gemini generating...',     status: 'Writing&#x2026;',   done: 'Done &#x2714;',  delay: 3500 },
+    ];
+    function showLoader(isBulk) {
+        document.getElementById('agriLoader').classList.add('active');
+        document.getElementById('loaderSubtitle').textContent =
+            isBulk ? 'Running bulk dataset through ensemble pipeline' : 'Running farm data through ensemble pipeline';
+        runPipeline();
+    }
+    function runPipeline() {
+        let current = 0;
+        const totalSteps = STEPS.length;
+        const barEl    = document.getElementById('loaderBar');
+        const noteEl   = document.getElementById('loaderNote');
+        function advance(i) {
+            if (i >= totalSteps) {
+                barEl.style.width = '100%';
+                noteEl.textContent = 'Results ready... loading...';
+                return;
+            }
+            // Mark previous done
+            if (i > 0) {
+                const prev = document.getElementById('step-' + (i - 1));
+                prev.classList.remove('active');
+                prev.classList.add('done');
+                document.getElementById('st-' + (i - 1)).textContent = STEPS[i - 1].done;
+            }
+            // Activate current
+            const el = document.getElementById('step-' + i);
+            el.classList.add('active');
+            document.getElementById('st-' + i).textContent = STEPS[i].status;
+            document.getElementById('loaderSubtitle').textContent = STEPS[i].label;
+            // Update progress bar
+            barEl.style.width = Math.round(((i + 0.5) / totalSteps) * 95) + '%';
+            setTimeout(() => advance(i + 1), STEPS[i].delay);
+        }
+        advance(0);
+    }
+    // Intercept single prediction form
+    const yieldForm = document.getElementById('yieldForm');
+    if (yieldForm) {
+        yieldForm.addEventListener('submit', function(e) {
+            // Basic validation - only show loader if form is valid
+            if (!this.checkValidity()) return; // let browser handle HTML5 validation
+            showLoader(false);
+        });
+    }
+    // Intercept bulk form (find by action)
+    const bulkForm = document.querySelector('form[action="/predict_yield_bulk"]');
+    if (bulkForm) {
+        bulkForm.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) return;
+            showLoader(true);
+        });
+    }
 </script>
+
 {% endblock %}

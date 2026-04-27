@@ -1,28 +1,19 @@
 [
   {
-    "timestamp": "2026-02-24T00:15:48.899243",
-    "type": "crop_wizard",
+    "timestamp": "2026-04-28T00:49:56.476010",
+    "type": "yield",
     "input": {
-      "state": "Rajasthan",
-      "district": "Jhunjhunu",
-      "season": "rabi",
-      "soil_type": "clay",
-      "previous_crop": "vegetables",
-      "water_source": "irrigated"
+      "State_Name": "Chhattisgarh",
+      "District_Name": "Bilaspur",
+      "Crop_Year": 2025.0,
+      "Crop": "Wheat",
+      "Area": 12.0,
+      "Temperature": 23.0,
+      "Humidity": 55.0,
+      "pH": 6.5,
+      "Rainfall": 420.0,
+      "is_estimated": true
     },
-    "prediction": "Mango"
-  },
-  {
-    "timestamp": "2026-02-24T00:20:01.003402",
-    "type": "crop_wizard",
-    "input": {
-      "state": "Bihar",
-      "district": "Patna",
-      "season": "kharif",
-      "soil_type": "alluvial",
-      "previous_crop": "maize",
-      "water_source": "both"
-    },
-    "prediction": "Coconut"
+    "prediction": "0.55"
   }
 ]

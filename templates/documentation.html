@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation — AgriVision{% endblock %}
+
+{% block head %}
+<style>
+    .doc-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 32px;
+        align-items: start;
+    }
+    .doc-nav {
+        position: sticky;
+        top: 0;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 20px;
+    }
+    .doc-nav h4 {
+        font-size: 0.75rem;
+        color: var(--muted-text);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+    .doc-nav a {
+        display: block;
+        padding: 9px 12px;
+        color: var(--muted-text);
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: var(--transition);
+        margin-bottom: 4px;
+    }
+    .doc-nav a:hover { background: var(--glass-bg); color: var(--primary-color); }
+    .doc-section { margin-bottom: 40px; }
+    .doc-section h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border); }
+    .doc-section h3 { font-size: 1.05rem; font-weight: 700; margin: 20px 0 10px; color: var(--primary-color); }
+    .doc-section p { color: var(--muted-text); line-height: 1.75; font-size: 0.9rem; margin-bottom: 12px; }
+    .doc-section ul, .doc-section ol { color: var(--muted-text); font-size: 0.9rem; line-height: 1.75; padding-left: 22px; margin-bottom: 12px; }
+    .doc-section li { margin-bottom: 6px; }
+    code {
+        background: rgba(0,0,0,0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 0.82rem;
+        font-family: 'Courier New', monospace;
+        color: var(--accent-color);
+    }
+    pre {
+        background: rgba(0,0,0,0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 18px 20px;
+        font-size: 0.82rem;
+        font-family: 'Courier New', monospace;
+        color: #a3e635;
+        overflow-x: auto;
+        margin: 12px 0;
+        line-height: 1.6;
+    }
+    .api-endpoint {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 14px;
+    }
+    .api-method {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-right: 8px;
+        font-family: monospace;
+    }
+    .method-get { background: rgba(46,204,113,0.2); color: var(--primary-color); }
+    .method-post { background: rgba(52,152,219,0.2); color: var(--info-color); }
+    .api-path { font-family: monospace; font-size: 0.9rem; font-weight: 600; }
+    .api-desc { font-size: 0.85rem; color: var(--muted-text); margin-top: 6px; }
+    .info-box {
+        background: rgba(52,152,219,0.1);
+        border-left: 4px solid var(--info-color);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin: 16px 0;
+        font-size: 0.875rem;
+        color: #93c5fd;
+    }
+    @media (max-width: 900px) { .doc-layout { grid-template-columns: 1fr; } .doc-nav { display: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">📖 Documentation</h1>
+    <p class="page-subtitle">Technical reference for AgriVision YieldMax — setup, API, and usage guide</p>
+</div>
+
+<div class="doc-layout">
+    <!-- Side Nav -->
+    <div class="doc-nav">
+        <h4>Contents</h4>
+        <a href="#quickstart">⚡ Quick Start</a>
+        <a href="#architecture">🏗️ Architecture</a>
+        <a href="#models">🧠 ML Models</a>
+        <a href="#api">🔌 API Reference</a>
+        <a href="#datasets">🗃️ Datasets</a>
+        <a href="#training">🔧 Training</a>
+        <a href="#deployment">🚀 Deployment</a>
+        <a href="#team">👥 Team</a>
+    </div>
+
+    <!-- Content -->
+    <div>
+
+        <!-- Quick Start -->
+        <div class="doc-section glass-card" id="quickstart">
+            <h2>⚡ Quick Start</h2>
+            <p>Get AgriVision running locally in 4 steps:</p>
+            <pre># 1. Create & activate virtual environment
+python -m venv venv
+venv\Scripts\activate       # Windows
+source venv/bin/activate    # Linux/Mac
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Create .env with your Google API key
+GOOGLE_API_KEY=your_gemini_api_key_here
+
+# 4. Run the app
+python app.py
+# → Open http://localhost:5000</pre>
+            <div class="info-box">
+                💡 Models are pre-trained. If <code>models/</code> is empty, run <code>python scripts/train_ensemble.py</code> first (takes ~25 minutes).
+            </div>
+        </div>
+
+        <!-- Architecture -->
+        <div class="doc-section glass-card" id="architecture">
+            <h2>🏗️ System Architecture</h2>
+            <p>AgriVision is a three-layer full-stack precision agriculture platform:</p>
+            <h3>Frontend Layer</h3>
+            <p>Glassmorphism-styled HTML5/CSS3/JavaScript single-page interface with Chart.js visualisations, dynamic form auto-fill, and real-time result rendering.</p>
+            <h3>Backend Layer</h3>
+            <p>Python 3.10 Flask server handling HTTP routing, form validation, data preprocessing, model inference, and Google Gemini API integration.</p>
+            <h3>ML & AI Layer</h3>
+            <ul>
+                <li><strong>YieldMax Stacking Ensemble</strong> — XGBoost + LightGBM + DNN + Ridge meta-learner for yield prediction</li>
+                <li><strong>Random Forest Classifier</strong> — soil-based Smart Crop Advisor (22 crop classes)</li>
+                <li><strong>Google Gemini 2.0 Flash</strong> — real-time agronomic insights via structured prompts</li>
+            </ul>
+        </div>
+
+        <!-- ML Models -->
+        <div class="doc-section glass-card" id="models">
+            <h2>🧠 ML Models</h2>
+            <h3>YieldMax Ensemble</h3>
+            <p>A stacking ensemble combining three heterogeneous base learners trained on the Indian agricultural yield dataset:</p>
+            <ul>
+                <li><strong>XGBoost</strong> (300 trees, depth=8, lr=0.05) — categorical feature specialist</li>
+                <li><strong>LightGBM</strong> (500 trees, lr=0.03, num_leaves=31) — environmental data expert</li>
+                <li><strong>DNN</strong> (256→128→64→32→1, BatchNorm, Dropout, Adam) — interaction pattern detector</li>
+                <li><strong>Ridge Meta-Learner</strong> (α=1.0) — trained on 5-fold CV predictions to optimally weight base models</li>
+            </ul>
+            <p>Achieves <strong>R² = 0.92</strong> on test set, outperforming any single model by 3–5%.</p>
+            <h3>Smart Crop Advisor</h3>
+            <p>Random Forest Classifier trained on <code>Crop_recommendation.csv</code> (2,200 samples, 22 crop classes). Features: N, P, K, Temperature, Humidity, pH, Rainfall + 6 engineered interaction features. Achieves <strong>99.1% accuracy</strong>.</p>
+            <h3>Confidence Scoring</h3>
+            <pre>CV = std(xgb_pred, lgbm_pred, dnn_pred) / |mean(predictions)|
+Confidence = clip(100 × (1 − CV), 0, 100)</pre>
+        </div>
+
+        <!-- API -->
+        <div class="doc-section glass-card" id="api">
+            <h2>🔌 API Reference</h2>
+            <div class="api-endpoint">
+                <span class="api-method method-get">GET</span>
+                <span class="api-path">/api/model_status</span>
+                <div class="api-desc">Returns JSON with loaded model flags and prediction count.</div>
+            </div>
+            <div class="api-endpoint">
+                <span class="api-method method-get">GET</span>
+                <span class="api-path">/api/history</span>
+                <div class="api-desc">Returns the last 10 prediction history entries.</div>
+            </div>
+            <div class="api-endpoint">
+                <span class="api-method method-get">GET</span>
+                <span class="api-path">/api/districts/&lt;state&gt;</span>
+                <div class="api-desc">Returns list of districts for a given state name.</div>
+            </div>
+            <div class="api-endpoint">
+                <span class="api-method method-get">GET</span>
+                <span class="api-path">/api/estimate_conditions?state=&amp;district=&amp;season=</span>
+                <div class="api-desc">Returns estimated Temperature, Humidity, Rainfall, pH for the given location and season.</div>
+            </div>
+            <div class="api-endpoint">
+                <span class="api-method method-post">POST</span>
+                <span class="api-path">/predict_yield_bulk</span>
+                <div class="api-desc">Upload a CSV file for bulk yield prediction. Returns analytics dashboard with Chart.js charts and downloadable output CSV.</div>
+            </div>
+        </div>
+
+        <!-- Datasets -->
+        <div class="doc-section glass-card" id="datasets">
+            <h2>🗃️ Datasets</h2>
+            <h3>Yield Dataset (<code>Yield_Data_Ready.csv</code>)</h3>
+            <p>Historical Indian crop yield records. Required columns:</p>
+            <pre>State_Name, District_Name, Crop_Year, Crop,
+Area (ha), Production (tonnes), Temperature (°C),
+Humidity (%), pH, Rainfall (mm)</pre>
+            <h3>Bulk Upload CSV Format</h3>
+            <p>For the bulk predictor, columns can be in either standard or alternate naming:</p>
+            <pre>State_Name (or "State Name"), District_Name (or "Dist Name"),
+Crop_Year (or "Year"), Crop, Area (or "Area_ha"),
+Temperature (or "Temperature_C"), Humidity (or "Humidity_%"),
+pH, Rainfall (or "Rainfall_mm")</pre>
+            <div class="info-box">
+                💡 Environmental columns (Temperature, Humidity, pH, Rainfall) are optional in bulk uploads — defaults are applied if missing.
+            </div>
+        </div>
+
+        <!-- Training -->
+        <div class="doc-section glass-card" id="training">
+            <h2>🔧 Training the Models</h2>
+            <h3>Step 1 — Prepare Dataset</h3>
+            <pre>python scripts/prepare_dataset.py</pre>
+            <p>Converts raw CSV to <code>Datasets/Yield_Data_Ready.csv</code> with standardised column names.</p>
+            <h3>Step 2 — Train YieldMax Ensemble</h3>
+            <pre>python scripts/train_ensemble.py</pre>
+            <p>Trains XGBoost + LightGBM + DNN + Ridge meta-learner. Takes ~25 minutes. Saves to <code>models/</code>.</p>
+            <h3>Step 3 — Train Crop Recommender</h3>
+            <pre>python scripts/train_recommend.py</pre>
+            <p>Trains the Random Forest classifier for crop recommendation.</p>
+        </div>
+
+        <!-- Deployment -->
+        <div class="doc-section glass-card" id="deployment">
+            <h2>🚀 Deployment (Hugging Face Spaces)</h2>
+            <ol>
+                <li>Create a new <strong>Docker</strong> Space on <a href="https://huggingface.co/spaces" style="color: var(--primary-color);">huggingface.co/spaces</a></li>
+                <li>Push this repo: <code>git push space main</code></li>
+                <li>Set secrets: <code>GOOGLE_API_KEY</code> and <code>SECRET_KEY</code> in Space settings</li>
+                <li>Upload <code>models/*.pkl</code> via the HF Files tab (excluded from git due to size)</li>
+            </ol>
+            <p>The <code>Dockerfile</code> uses Gunicorn with 2 workers, 4 threads, and a 120s timeout on port 7860.</p>
+        </div>
+
+        <!-- Team -->
+        <div class="doc-section glass-card" id="team">
+            <h2>👥 Team</h2>
+            <p>AgriVision YieldMax is a P2BL project from <strong>Sathyabama Institute of Science and Technology, Chennai</strong>.</p>
+            <ul>
+                <li>Arunmozhi Adithya</li>
+                <li>Jenivaa</li>
+                <li>Tamizharasan</li>
+                <li>Pradeepraja</li>
+                <li>Dilshan</li>
+            </ul>
+            <p style="margin-top: 12px;">Guide: <strong>Dr. T. Anitha</strong> (Asst. Professor, Dept. of CSE)</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

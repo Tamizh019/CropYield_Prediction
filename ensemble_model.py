@@ -244,17 +244,15 @@ class YieldMaxEnsemble:
         return float(np.mean(agreement))
     
     def save(self, filepath):
-        """Save the entire ensemble model"""
-        # Save DNN in native Keras format (avoids legacy HDF5/mse issues)
-        dnn_path = filepath.replace('.pkl', '_dnn.keras')
-        self.dnn_model.save(dnn_path)
-        
+        """Save the entire ensemble model.
+        DNN is stored as raw weights (numpy arrays) to avoid Keras version issues.
+        """
         model_data = {
             'model_name': self.model_name,
             'version': self.version,
             'xgb_model': self.xgb_model,
             'lgbm_model': self.lgbm_model,
-            'dnn_path': dnn_path,  # Store path, not Keras model
+            'dnn_weights': self.dnn_model.get_weights(),  
             'meta_learner': self.meta_learner,
             'feature_names': self.feature_names,
             'n_features': self.n_features
@@ -263,7 +261,9 @@ class YieldMaxEnsemble:
         print(f"✅ {self.model_name} saved to: {filepath}")
     
     def load(self, filepath):
-        """Load a pre-trained ensemble model"""
+        """Load a pre-trained ensemble model.
+        Rebuilds DNN architecture locally and restores weights — version-independent.
+        """
         model_data = joblib.load(filepath)
         self.model_name = model_data['model_name']
         self.version = model_data['version']
@@ -273,26 +273,24 @@ class YieldMaxEnsemble:
         self.feature_names = model_data['feature_names']
         self.n_features = model_data['n_features']
         
-        # Try .keras format first, fall back to legacy .h5
-        stored_path = model_data.get('dnn_path', '')
-        keras_path = filepath.replace('.pkl', '_dnn.keras')
-        h5_path = filepath.replace('.pkl', '_dnn.h5')
-        
-        dnn_path = None
-        if os.path.exists(stored_path):
-            dnn_path = stored_path
-        elif os.path.exists(keras_path):
-            dnn_path = keras_path
-        elif os.path.exists(h5_path):
-            dnn_path = h5_path
-        
-        if dnn_path:
-            # compile=False skips 'mse' metric deserialization (fixes TF 2.16 bug)
-            self.dnn_model = load_model(dnn_path, compile=False)
-            # Recompile with explicit loss function (works on all Keras versions)
-            self.dnn_model.compile(optimizer='adam', loss='mean_squared_error')
-            print(f"✅ DNN loaded from: {dnn_path}")
+        # Restore DNN from saved weights (no Keras version dependency)
+        dnn_weights = model_data.get('dnn_weights')
+        if dnn_weights is not None:
+            self.dnn_model = self._build_dnn(self.n_features)
+            self.dnn_model.set_weights(dnn_weights)
+            print(f"✅ DNN restored from weights (version-independent)")
         else:
-            print(f"⚠️ DNN model not found (tried .keras and .h5 paths)")
+            # Legacy fallback: try loading from .keras or .h5 file
+            stored_path = model_data.get('dnn_path', '')
+            keras_path = filepath.replace('.pkl', '_dnn.keras')
+            h5_path = filepath.replace('.pkl', '_dnn.h5')
+            dnn_path = next((p for p in [stored_path, keras_path, h5_path] if os.path.exists(p)), None)
+            if dnn_path:
+                self.dnn_model = load_model(dnn_path, compile=False)
+                self.dnn_model.compile(optimizer='adam', loss='mean_squared_error')
+                print(f"✅ DNN loaded from file (legacy): {dnn_path}")
+            else:
+                print(f"⚠️ DNN model not found — predictions will be XGB+LGBM only")
+                self.dnn_model = None
         
         print(f"✅ {self.model_name} v{self.version} loaded successfully")

@@ -20,7 +20,7 @@ os.makedirs('models', exist_ok=True)
 os.makedirs('logs', exist_ok=True)
 
 print("="*60)
-print("🌾 YieldMax Precision Model - Training Pipeline")
+print("YieldMax Precision Model - Training Pipeline")
 print("="*60)
 
 # ========================================
