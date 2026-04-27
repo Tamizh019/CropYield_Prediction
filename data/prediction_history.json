@@ -1,19 +1,19 @@
 [
   {
-    "timestamp": "2026-04-28T00:49:56.476010",
+    "timestamp": "2026-04-28T01:22:09.396879",
     "type": "yield",
     "input": {
-      "State_Name": "Chhattisgarh",
-      "District_Name": "Bilaspur",
+      "State_Name": "Assam",
+      "District_Name": "Cachar",
       "Crop_Year": 2025.0,
       "Crop": "Wheat",
-      "Area": 12.0,
-      "Temperature": 23.0,
-      "Humidity": 55.0,
+      "Area": 5.0,
+      "Temperature": 26.5,
+      "Humidity": 97.0,
       "pH": 6.5,
-      "Rainfall": 420.0,
+      "Rainfall": 4275.0,
       "is_estimated": true
     },
-    "prediction": "0.55"
+    "prediction": "0.67"
   }
 ]
